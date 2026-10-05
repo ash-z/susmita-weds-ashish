@@ -73,6 +73,18 @@ node og.mjs "$PWD/../docs/index.html" /tmp/og.png         # link-preview image; 
   Its RSVPs send `invite: "groom"`; the script writes "Groom side" in the Invite column (Code.gs from 2 Oct; an older
   deployed script writes "Relatives"). The Totals tab's per-link rows count only Relatives and Friends.
 
+## Posters
+Each invitation also has a poster: https://susmitawedsashish.in/poster/, /friends/poster/ and /bhimanpalliwar/poster/
+(added 5 Oct). Each folder holds `poster.svg` (self-contained: art, photo and font subsets embedded), `poster.png`
+(1620px wide, for WhatsApp and printing; phones don't preview SVG) and `index.html` (the poster with Save / Share /
+Open invitation). The poster: toranam with Ganesha, ॥ శ్రీ గణేశాయ నమః ॥, the cover photo in an arch, శుభలేఖ /
+Wedding Invitation, "Together with our families…", the names (groom first on his side's), the friends' 28 Oct block,
+wedding and reception side by side, both sets of parents, and a QR code to that invitation (checked to scan, also at
+a third of the size). Made by `invite-src/poster/poster.py` (not by build.py): run it with a Python that has `segno`
+when any detail changes; its wording and details are a copy of body.html's, so change both. It caches Google
+Fonts subsets in `poster/fonts/` (fetches new ones only when the text changes) and renders the PNGs with
+`poster/render.mjs` (node + Playwright's Chromium).
+
 ## Screens
 Invite (the sea) · Us (photo deck) · Wedding · Reception · RSVP · Blessings — six tabs, each its own full screen. Both tickets carry the same days/hours/mins/secs countdown.
 The friends' version adds a seventh, **Haldi** ("The day before"), between Us and Wedding: one ticket with the day's
