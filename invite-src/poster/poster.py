@@ -21,7 +21,7 @@ BRIDE_PARENTS, GROOM_PARENTS = "Chandrika & Srinivasulu Gorantla", "Satyarani & 
 WEDDING = dict(label="THE WEDDING", day="Thursday, 29 October 2026", time="7:31 PM", note="Sumuhurtam",
                venue="Hotel Ambica Sea Green", hall="‘Marina’ Banquet Hall", addr=["Beach Road,", "Visakhapatnam"])
 RECEPTION = dict(label="THE RECEPTION", day="Sunday, 1 November 2026", time="12:00 PM", note="onwards",
-                 venue="Hotel Tulip Grand", hall="5th floor", addr=["Annojiguda,", "Hyderabad"])
+                 venue="Hotel Tulip Grand", hall="‘Vedha’ · 5th floor", addr=["Annojiguda,", "Hyderabad"])
 DAY_BEFORE = dict(label="THE DAY BEFORE · WEDNESDAY, 28 OCTOBER 2026",
                   rows=[("9:00 AM onwards", "Haldi & Pellikuturu"), ("5:00 PM onwards", "Mehendi")],
                   where=["Home · 9-6-93/3, Sivajipalem,", "Opp. Sivaji Park, Visakhapatnam"])
@@ -184,7 +184,7 @@ def page(v, H):
 </head>
 <body>
 <main>
-  <img src="poster.png" width="{W}" height="{H}" alt="{esc(title)}: wedding invitation poster. Wedding on Thursday 29 October 2026, 7:31 PM, at Hotel Ambica Sea Green, Visakhapatnam; reception on Sunday 1 November 2026, 12 PM onwards, at Hotel Tulip Grand, Hyderabad.">
+  <img src="poster.png" width="{W}" height="{H}" alt="{esc(title)}: wedding invitation poster. Wedding on Thursday 29 October 2026, 7:31 PM, at Hotel Ambica Sea Green, Visakhapatnam; reception on Sunday 1 November 2026, 12 PM onwards, in the Vedha hall of Hotel Tulip Grand, Hyderabad.">
   <div class="row">
     <a class="solid" href="poster.png" download="{title.replace(' ', '-')}-invitation.png">Save poster</a>
     <button id="share" type="button" hidden>Share</button>

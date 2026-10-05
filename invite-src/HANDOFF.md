@@ -35,7 +35,7 @@ node og.mjs "$PWD/../docs/index.html" /tmp/og.png         # link-preview image; 
 ## Locked decisions
 - Names: **Sai Susmita** in formal places (opening screen, hero, families, closing, title, previews); **Susmita** in casual ones (photo deck). The woman is always named first.
 - Two events for everyone: **sumuhurtam** Thu 29 Oct 2026 **7:31 PM**, **Hotel Ambica Sea Green** (ticket heading) with **'Marina' Banquet Hall** as the subheading (`.t-hall`, gold), Beach Road, Visakhapatnam;
-  reception Sun 1 Nov 2026 **12:00 PM onwards** (moved from 11 AM on 29 Sep), Hotel Tulip Grand, **5th floor**, Annojiguda, Hyderabad
+  reception Sun 1 Nov 2026 **12:00 PM onwards** (moved from 11 AM on 29 Sep), Hotel Tulip Grand, **'Vedha'** (the hall, added 5 Oct) **· 5th floor**, Annojiguda, Hyderabad
   (hall name not known yet; add it next to the floor when the couple sends it). Directions: the couple's pin
   https://maps.app.goo.gl/9DuCbhDxaaxrSeXr5. Wedding Directions: the couple's pin for Marina Banquet Hall,
   https://maps.app.goo.gl/AhTU2qBLJbRZLm4s6.
