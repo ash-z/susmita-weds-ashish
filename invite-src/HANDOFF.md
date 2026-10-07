@@ -86,6 +86,11 @@ soften for "reduce motion".
   pages, turning just moves on. groom_first swaps the names on both. Tried just before (same day) and replaced:
   the envelope opening straight onto the home page ("option 3", commit 1ff0302). The old splash CSS (.splash,
   .open-btn, .sp-a) is still in style.html, unused.
+  Shadows (7 Oct, "they are weak"): layered, in `--shade` (warm brown on Ivory, black on Jewel): the envelope's
+  body, a pool on the ground under it that breathes with its float (.env-shadow), the flap's shadow on the pocket
+  (.env-flap-shade: a blurred copy of the triangle, since a drop-shadow on the clipped flap is clipped away), the
+  seal, the rising card, and on the cover the photograph and the names. The envelope keeps the Ivory inks on Jewel
+  (it is ivory paper in both).
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct
