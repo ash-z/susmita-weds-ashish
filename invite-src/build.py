@@ -48,7 +48,7 @@ def groom_first(body):
         assert text.count(old) == count, ("groom variant: expected", count, old)
         return text.replace(old, new)
     body = swap(body, '<span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span>',
-                      '<span class="n">Ashish</span><span class="amp">&amp;</span><span class="n">Sai Susmita</span>', 2)   # cover and envelope
+                      '<span class="n">Ashish</span><span class="amp">&amp;</span><span class="n">Sai Susmita</span>')   # the envelope
     body = re.sub(r'(<span class="nm">)Sai Susmita(</span>\s*<span class="weds">weds</span>\s*<span class="nm">)Ashish(</span>)',
                   r'\1Ashish\2Sai Susmita\3', body)
     # photos: his card before hers

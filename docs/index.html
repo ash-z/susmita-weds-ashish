@@ -115,16 +115,18 @@ button{font:inherit;color:inherit}
   transition:transform .15s ease,box-shadow .2s ease;
 }
 .open-btn:active{transform:scale(.96)}
-/* ============ 3D OPENING — the envelope ============
-   Before the cover: an ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the
-   finger or pointer. One tap pops the seal, swings the flap open towards you and lifts a card out, which grows toward
-   you and dissolves into the invitation's first page (no second "open" step). html.env-on while it is up (the old
-   cover stays hidden; it is only for reduce motion); .env.open runs the opening, .env.zoom the hand-off. */
+/* ============ PAGE ONE — the envelope, in 3D ============
+   An ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the finger or
+   pointer. Leaving the page (a turn, or a tap on the seal) pops the seal, swings the flap open towards you and lifts
+   a card out, which grows toward you and dissolves into the invitation (.env.open runs the opening, .env.zoom the
+   hand-off, while the page fades away over the next one). */
+.js .screen.cover{justify-content:center;padding:0;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
+/* the invitation's first page waits underneath the envelope, drawn, so the sea is ready when the envelope opens */
+.js .screen.cover.is-active ~ .hero{visibility:visible;z-index:0}
+.js .screen.fade-away{visibility:visible;z-index:4;opacity:0;transition:opacity .9s ease .15s}
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
-  padding-top:min(calc(var(--crown) * .22),12vh);perspective:1200px;perspective-origin:50% 40%}
-.env[hidden]{display:none}
-.env-on .sp-inner{opacity:0;transform:translateY(16vh) scale(.84);pointer-events:none}
-.sp-inner{transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.8,.2,1)}
+  padding:min(calc(var(--crown) * .22),12vh) 0 calc(var(--tab-h) + 26px + env(safe-area-inset-bottom,0px));perspective:1200px;perspective-origin:50% 40%}
+.env.still,.env.still *{transition:none!important}
 .env-btn{all:unset;position:relative;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;
   --ew:min(84vw,440px,62vh);width:var(--ew);height:calc(var(--ew) * .66);
   transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ety,0) * 1deg)) rotateY(calc(var(--etx,0) * 1deg));
@@ -172,11 +174,10 @@ button{font:inherit;color:inherit}
 .env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
 .env.open .env-3d{animation:none}
 .env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
-/* then the card grows toward you and dissolves as the envelope fades, and the splash fades into page one */
+/* then the card grows toward you and dissolves as the envelope fades */
 .env.zoom .env-card{transform:translateZ(1px) translateY(-46%) scale(2.8);opacity:0;transition:transform 1s cubic-bezier(.5,0,.25,1),opacity .6s ease .4s}
 .env.zoom .env-back,.env.zoom .env-front,.env.zoom .env-flap{opacity:0;transition:opacity .45s ease}
 .env.zoom{pointer-events:none}
-.splash.fade{opacity:0;transition:opacity .9s ease .15s}
 .env-card-en{margin-top:5%;font-family:"Marcellus",Georgia,serif;font-size:.36em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}
@@ -770,35 +771,7 @@ button{font:inherit;color:inherit}
 
 </head>
 <body>
-<script>(function(){var d=document.documentElement;d.classList.add('js');if(location.hash){d.classList.add('ui','opened')}else{d.classList.add('locked')}})();</script>
-
-<div class="splash" id="splash" role="dialog" aria-label="Wedding invitation">
-  <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
-  <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
-  <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
-  <!-- 3D opening: a sealed envelope over the cover; tapping the seal opens it and the card (the cover) rises out -->
-  <div class="env" id="env" hidden>
-    <button class="env-btn" id="envBtn" type="button" aria-label="Open the invitation">
-      <span class="env-3d" aria-hidden="true">
-        <span class="env-back"></span>
-        <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i><span class="env-card-en">Wedding Invitation</span></span>
-        <span class="env-front"><span class="env-names"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></span><span class="env-date">29 · 10 · 2026</span></span>
-        <span class="env-flap"></span>
-        <span class="env-seal"></span>
-      </span>
-    </button>
-    <p class="env-hint" aria-hidden="true">Tap the seal to open</p>
-  </div>
-  <div class="sp-inner">
-    <p class="invocation telugu sp-a" lang="te">॥ శ్రీ గణేశాయ నమః ॥</p>
-    <button class="seal sp-a" id="seal" tabindex="-1" aria-hidden="true"><span class="cover"><img src="photos/cover.webp" alt="" decoding="async"></span></button>
-    <p class="eyebrow telugu sp-a" lang="te">శుభలేఖ</p>
-    <p class="sp-en sp-a">Wedding Invitation</p>
-    <h2 class="sp-names sp-a"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></h2>
-    <p class="sp-date sp-a">29 · 10 · 2026</p>
-    <button class="open-btn sp-a" id="openBtn">Open invitation<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
-  </div>
-</div>
+<script>(function(){var d=document.documentElement;d.classList.add('js','ui')})();</script>
 
 <div class="pal" id="pal" role="group" aria-label="Colour and music">
   <button id="palIvory" aria-pressed="true">Ivory</button>
@@ -809,6 +782,26 @@ button{font:inherit;color:inherit}
 <audio id="song" loop preload="none"><source src="music/relatives.mp3" type="audio/mpeg"><source src="music/relatives.m4a" type="audio/mp4"><source src="music/relatives.wav" type="audio/wav"></audio>
 
 <main id="app">
+
+  <!-- page one: a sealed envelope (3D). Tapping the seal, or turning the page, opens it: the flap swings open,
+       the card rises and grows into the next page -->
+  <section class="screen cover" id="cover" aria-label="Wedding invitation">
+    <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
+    <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+    <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+    <div class="env" id="env">
+      <button class="env-btn" id="envBtn" type="button" aria-label="Open the invitation">
+        <span class="env-3d" aria-hidden="true">
+          <span class="env-back"></span>
+          <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i><span class="env-card-en">Wedding Invitation</span></span>
+          <span class="env-front"><span class="env-names"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></span><span class="env-date">29 · 10 · 2026</span></span>
+          <span class="env-flap"></span>
+          <span class="env-seal"></span>
+        </span>
+      </button>
+      <p class="env-hint" aria-hidden="true">Tap the seal to open</p>
+    </div>
+  </section>
 
   <section class="screen hero" id="home" aria-label="Invitation">
     <canvas id="bay" aria-hidden="true"></canvas>
@@ -5532,51 +5525,6 @@ function enableTilt(){
 })();
 
 /* ===================================================================
-   OPENING — a kolam seal, then the invitation slides away to the sea.
-   =================================================================== */
-function buildSeal(host){
-  if(!host) return [];
-  var NS = 'http://www.w3.org/2000/svg';
-  var s = document.createElementNS(NS, 'svg');
-  s.setAttribute('viewBox', '0 0 200 200');
-  s.setAttribute('aria-hidden', 'true');
-  host.insertBefore(s, host.firstChild);
-  var cx = 100, cy = 100, drawn = [];
-  function el(tag, a, stroke, w, draw){
-    var n = document.createElementNS(NS, tag);
-    for(var k in a) n.setAttribute(k, a[k]);
-    n.style.fill = 'none'; n.style.stroke = stroke; n.style.strokeWidth = w;
-    n.style.strokeLinecap = 'round'; n.style.strokeLinejoin = 'round';
-    s.appendChild(n);
-    if(draw) drawn.push(n);
-    return n;
-  }
-  function petal(ang, r0, r1, wid, stroke, w){
-    var mr = (r0 + r1)/2;
-    var sx = cx + r0*Math.cos(ang), sy = cy + r0*Math.sin(ang);
-    var tx = cx + r1*Math.cos(ang), ty = cy + r1*Math.sin(ang);
-    var c1x = cx + mr*Math.cos(ang + wid), c1y = cy + mr*Math.sin(ang + wid);
-    var c2x = cx + mr*Math.cos(ang - wid), c2y = cy + mr*Math.sin(ang - wid);
-    el('path', { d:'M'+sx.toFixed(1)+' '+sy.toFixed(1)+' Q'+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+tx.toFixed(1)+' '+ty.toFixed(1)+
-                   ' Q'+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+sx.toFixed(1)+' '+sy.toFixed(1) }, stroke, w, true);
-  }
-  el('circle', { cx:cx, cy:cy, r:58 }, 'var(--gold)', 0.9, true);
-  el('circle', { cx:cx, cy:cy, r:52 }, 'var(--gold)', 0.5, true);
-  for(var i = 0; i < 24; i++) petal(i/24*Math.PI*2, 60, 92, 0.1, 'var(--gold)', 1.1);
-  for(var j = 0; j < 8; j++)  petal((j + 0.5)/8*Math.PI*2, 60, 78, 0.16, '#6A9A6E', 1);
-  for(var k2 = 0; k2 < 36; k2++){
-    var a = k2/36*Math.PI*2;
-    var d = document.createElementNS(NS, 'circle');
-    d.setAttribute('cx', (cx + 97*Math.cos(a)).toFixed(1));
-    d.setAttribute('cy', (cy + 97*Math.sin(a)).toFixed(1));
-    d.setAttribute('r', k2 % 3 === 0 ? 2 : 1.2);
-    d.style.fill = k2 % 3 === 0 ? 'var(--accent)' : 'var(--gold)';
-    s.appendChild(d);
-  }
-  return drawn;
-}
-
-/* ===================================================================
    MUSIC — the couple's song from docs/music (song.mp3, .m4a or .wav).
    Phones only allow sound after a tap, so it starts when the invitation
    is opened. The speaker beside the colour switch pauses and resumes it
@@ -5606,87 +5554,42 @@ var music = (function(){
   return { start:function(){ if(!off) play(); } };
 })();
 
-var cover = (function opening(){
-  var sp = $('#splash'), btn = $('#openBtn'), seal = $('#seal');
-  var app = $('#app'), tabs = $('#tabs'), pal = $('#pal'), rail = $('#rail');
-  var drawn = buildSeal(seal);
-  var done = !root.classList.contains('locked');             // a link to #page skips the cover
-  if(done){ if(sp) sp.hidden = true; }
-  else [app, tabs, pal, rail].forEach(function(e){ if(e) e.inert = true; });
-
-  // 3D opening: the envelope over the cover (not for reduced motion, nor when a link opened a page directly)
-  var env = $('#env'), envBtn = $('#envBtn'), envUp = !done && !reduced && !!env;
-  if(envUp){
-    env.hidden = false; root.classList.add('env-on');
-    sp.addEventListener('pointermove', function(e){                      // the envelope leans toward the finger
-      if(!root.classList.contains('env-on')) return;
-      var r = sp.getBoundingClientRect();
-      envBtn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
-      envBtn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
-    });
-    // one tap: the seal pops and the flap opens, the card rises, then grows toward you and becomes the invitation
-    envBtn.addEventListener('click', function(){
-      if(done || env.classList.contains('open')) return;
-      buzz([10, 40, 14]); music.start();                                   // the tap is the gesture that lets music play
-      env.classList.add('open');
-      setTimeout(function(){ env.classList.add('zoom'); open(true); }, 1900);
-    });
+/* ===================================================================
+   ENVELOPE — page one is a sealed envelope, in 3D, leaning toward the
+   finger or pointer. Leaving it for the next page (a turn, or a tap on
+   the seal) opens it: the seal pops, the flap swings open, the card
+   rises, then grows toward you and dissolves into the invitation. The
+   first page turn is also the tap that lets the music play. Coming back
+   finds it sealed again.
+   =================================================================== */
+var envelope = (function(){
+  var page = $('#cover'), env = $('#env'), btn = $('#envBtn'), tabs = $('#tabs'), first = true;
+  if(!page || !env) return { leave:function(){}, open:function(){ return false; }, reseal:function(){} };
+  if(!reduced) page.addEventListener('pointermove', function(e){
+    var r = page.getBoundingClientRect();
+    btn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
+    btn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
+  });
+  btn.addEventListener('click', function(){ pager.go(1, 'scroll'); });
+  // any way off page one: the music starts and the tab bar shimmers once
+  function leave(){
+    music.start(); enableTilt();
+    if(!first || !tabs) return; first = false;
+    tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer');
   }
-  function reseal(){                                               // back to the cover: the envelope, sealed again
-    if(!env || reduced) return false;
-    env.classList.remove('open', 'zoom'); env.hidden = false; root.classList.add('env-on');
+  // the opening, then hand over to the page underneath (done runs as the card dissolves)
+  function open(done){
+    if(reduced) return false;
+    buzz([10, 40, 14]);
+    env.classList.add('open');
+    setTimeout(function(){ env.classList.add('zoom'); done(); }, 1900);
     return true;
   }
-  function drawSeal(){
-    if(done || reduced) return;
-    drawn.forEach(function(p, i){
-      var len = 0; try{ len = p.getTotalLength(); }catch(e){}
-      if(!len) return;
-      p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
-      p.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.3,.8,.3,1) ' + (0.2 + i*0.035) + 's';
-    });
-    requestAnimationFrame(function(){ requestAnimationFrame(function(){
-      drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
-    }); });
+  function reseal(){                                               // instantly, before the page comes back into view
+    env.classList.add('still'); env.classList.remove('open', 'zoom');
+    void env.offsetWidth; env.classList.remove('still');
   }
-  if(!envUp) drawSeal();                                           // (with the envelope the cover is never shown, so no kolam)
-
-  function shimmer(){ if(!tabs) return; tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer'); }
-  if(done) shimmer();                                            // arrived on a page from a shared link
-  function finish(){
-    root.classList.remove('locked', 'env-on');
-    root.classList.add('opened');
-    sp.hidden = true; sp.classList.remove('fade');
-    if(env) env.hidden = true;
-  }
-  function open(fromEnvelope){
-    if(done) return; done = true;
-    if(fromEnvelope !== true) buzz(12);
-    enableTilt(); music.start(); shimmer();
-    root.classList.add('ui');
-    [app, tabs, pal, rail].forEach(function(e){ if(e) e.inert = false; });
-    if(reduced){ finish(); return; }
-    if(fromEnvelope === true){ sp.classList.add('fade'); setTimeout(finish, 1000); return; }   // the card dissolves into page one
-    sp.classList.add('opening');
-    setTimeout(function(){ sp.classList.add('gone'); }, 360);
-    setTimeout(finish, 1400);
-  }
-  // back to the cover: it slides down over the invitation again
-  function close(){
-    if(!done || !sp) return; done = false;
-    [app, tabs, pal, rail].forEach(function(e){ if(e) e.inert = true; });
-    sp.classList.remove('opening'); sp.classList.add('gone');
-    sp.hidden = false;
-    root.classList.remove('opened', 'ui'); root.classList.add('locked');
-    var sealed = reseal();
-    void sp.offsetWidth;
-    requestAnimationFrame(function(){ sp.classList.remove('gone'); });
-    try{ (sealed ? envBtn : btn).focus({ preventScroll:true }); }catch(e){}
-    buzz(8);
-  }
-  btn.addEventListener('click', open);
-  seal.addEventListener('click', open);
-  return { close:close };
+  return { leave:leave, open:open, reseal:reseal };
 })();
 
 /* ===================================================================
@@ -5714,12 +5617,12 @@ var pager = (function(){
   function idx(id){ for(var i = 0; i < pages.length; i++){ if(pages[i].id === id) return i; } return -1; }
   function atTop(p){ return p.scrollTop <= 1; }
   function atEnd(p){ return p.scrollTop + p.clientHeight >= p.scrollHeight - 2; }
-  function locked(){ return root.classList.contains('locked') || root.classList.contains('sheet-open') || root.classList.contains('typing'); }
+  function locked(){ return root.classList.contains('sheet-open') || root.classList.contains('typing'); }
   function emit(name, detail){ document.dispatchEvent(new CustomEvent(name, { detail:detail })); }
   function mark(i){ links.forEach(function(l){ l.setAttribute('aria-current', String(l.hash === '#' + pages[i].id)); }); cue(i); }
 
-  // the side rail: up and down a page, a dot per page between (the current one gold); up on the first
-  // page and down on the last go to the cover
+  // the side rail: up and down a page, a dot per page between (the current one gold); down on the last
+  // page goes back to the envelope
   var railUp = $('#railUp'), railDown = $('#railDown'), railDots = $('#railDots');
   if(railDots) pages.forEach(function(){ railDots.appendChild(document.createElement('i')); });
   function tabName(i){ var l = links.filter(function(a){ return a.hash === '#' + pages[i].id; })[0]; return l ? l.textContent.trim() : ''; }
@@ -5727,8 +5630,9 @@ var pager = (function(){
     if(!railDots) return;
     var last = i >= pages.length - 1;
     [].forEach.call(railDots.children, function(d, k){ d.classList.toggle('on', k === i); });
-    railUp.setAttribute('aria-label', i === 0 ? 'Back to the cover' : 'Previous: ' + tabName(i - 1));
-    railDown.setAttribute('aria-label', last ? 'Back to the cover' : 'Next: ' + tabName(i + 1));
+    railUp.disabled = i === 0;
+    if(i > 0) railUp.setAttribute('aria-label', 'Previous: ' + (tabName(i - 1) || 'the envelope'));
+    railDown.setAttribute('aria-label', last ? 'Back to the envelope' : 'Next: ' + (tabName(i + 1) || 'the invitation'));
   }
   function setPh(){ root.style.setProperty('--ph', innerHeight + 'px'); }
   addEventListener('resize', setPh); setPh();
@@ -5751,9 +5655,20 @@ var pager = (function(){
     // arriving from below starts at the top; backing up into a long page lands on its end
     inn.scrollTop = (mode === 'scroll' && !down) ? inn.scrollHeight : 0;
     cur = i; mark(i);
+    if(out.id === 'cover') envelope.leave();
+    if(inn.id === 'cover') envelope.reseal();
     emit('pagechange', { id:inn.id, from:out.id });
     buzz(6);
     if(reduced){ settle(i); busy = false; return; }
+
+    // off the envelope onto the invitation: it opens, and its card dissolves into the page underneath
+    if(out.id === 'cover' && inn.id === 'home' && envelope.open(function(){
+      out.classList.add('fade-away'); replay(inn);
+      setTimeout(function(){
+        out.classList.remove('fade-away');
+        settle(i); busy = false; quietUntil = performance.now() + 250;
+      }, 1050);
+    })) return;
 
     var enter, leave;
     if(mode === 'bloom'){
@@ -5780,13 +5695,7 @@ var pager = (function(){
       quietUntil = performance.now() + 250;
     }, DUR);
   }
-  // back to the cover: the invitation returns to its first page underneath, and the cover slides down over it
-  function toCover(){
-    if(busy || locked()) return;
-    if(cur !== 0){ cur = 0; mark(0); settle(0); }
-    cover.close();
-  }
-  function step(d){ if((d < 0 && cur === 0) || (d > 0 && cur === pages.length - 1)) toCover(); else go(cur + d, 'scroll'); }
+  function step(d){ if(d > 0 && cur === pages.length - 1) go(0, 'scroll'); else go(cur + d, 'scroll'); }
   if(railUp) railUp.addEventListener('click', function(){ step(-1); });
   if(railDown) railDown.addEventListener('click', function(){ step(1); });
 
@@ -6473,7 +6382,6 @@ var refit = (function(){
     var wake = function(){ if(!running){ running = true; loop(); } };
     var rest = function(){ running = false; cancelAnimationFrame(raf); };
     document.addEventListener('pagechange', function(e){ if(e.detail.id === 'home' || e.detail.from === 'home') wake(); });
-    // (the sea also wakes when a page settles on it: going back to the cover lands on it without a page turn)
     document.addEventListener('pagesettle', function(e){ if(e.detail.id === 'home') wake(); else rest(); });
     if(pager.current() !== 'home') rest();
   }

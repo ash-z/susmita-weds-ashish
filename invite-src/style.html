@@ -96,16 +96,18 @@ button{font:inherit;color:inherit}
   transition:transform .15s ease,box-shadow .2s ease;
 }
 .open-btn:active{transform:scale(.96)}
-/* ============ 3D OPENING — the envelope ============
-   Before the cover: an ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the
-   finger or pointer. One tap pops the seal, swings the flap open towards you and lifts a card out, which grows toward
-   you and dissolves into the invitation's first page (no second "open" step). html.env-on while it is up (the old
-   cover stays hidden; it is only for reduce motion); .env.open runs the opening, .env.zoom the hand-off. */
+/* ============ PAGE ONE — the envelope, in 3D ============
+   An ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the finger or
+   pointer. Leaving the page (a turn, or a tap on the seal) pops the seal, swings the flap open towards you and lifts
+   a card out, which grows toward you and dissolves into the invitation (.env.open runs the opening, .env.zoom the
+   hand-off, while the page fades away over the next one). */
+.js .screen.cover{justify-content:center;padding:0;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
+/* the invitation's first page waits underneath the envelope, drawn, so the sea is ready when the envelope opens */
+.js .screen.cover.is-active ~ .hero{visibility:visible;z-index:0}
+.js .screen.fade-away{visibility:visible;z-index:4;opacity:0;transition:opacity .9s ease .15s}
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
-  padding-top:min(calc(var(--crown) * .22),12vh);perspective:1200px;perspective-origin:50% 40%}
-.env[hidden]{display:none}
-.env-on .sp-inner{opacity:0;transform:translateY(16vh) scale(.84);pointer-events:none}
-.sp-inner{transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.8,.2,1)}
+  padding:min(calc(var(--crown) * .22),12vh) 0 calc(var(--tab-h) + 26px + env(safe-area-inset-bottom,0px));perspective:1200px;perspective-origin:50% 40%}
+.env.still,.env.still *{transition:none!important}
 .env-btn{all:unset;position:relative;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;
   --ew:min(84vw,440px,62vh);width:var(--ew);height:calc(var(--ew) * .66);
   transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ety,0) * 1deg)) rotateY(calc(var(--etx,0) * 1deg));
@@ -153,11 +155,10 @@ button{font:inherit;color:inherit}
 .env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
 .env.open .env-3d{animation:none}
 .env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
-/* then the card grows toward you and dissolves as the envelope fades, and the splash fades into page one */
+/* then the card grows toward you and dissolves as the envelope fades */
 .env.zoom .env-card{transform:translateZ(1px) translateY(-46%) scale(2.8);opacity:0;transition:transform 1s cubic-bezier(.5,0,.25,1),opacity .6s ease .4s}
 .env.zoom .env-back,.env.zoom .env-front,.env.zoom .env-flap{opacity:0;transition:opacity .45s ease}
 .env.zoom{pointer-events:none}
-.splash.fade{opacity:0;transition:opacity .9s ease .15s}
 .env-card-en{margin-top:5%;font-family:"Marcellus",Georgia,serif;font-size:.36em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}

@@ -1,32 +1,4 @@
-<script>(function(){var d=document.documentElement;d.classList.add('js');if(location.hash){d.classList.add('ui','opened')}else{d.classList.add('locked')}})();</script>
-
-<div class="splash" id="splash" role="dialog" aria-label="Wedding invitation">
-  <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
-  <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
-  <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
-  <!-- 3D opening: a sealed envelope over the cover; tapping the seal opens it and the card (the cover) rises out -->
-  <div class="env" id="env" hidden>
-    <button class="env-btn" id="envBtn" type="button" aria-label="Open the invitation">
-      <span class="env-3d" aria-hidden="true">
-        <span class="env-back"></span>
-        <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i><span class="env-card-en">Wedding Invitation</span></span>
-        <span class="env-front"><span class="env-names"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></span><span class="env-date">29 · 10 · 2026</span></span>
-        <span class="env-flap"></span>
-        <span class="env-seal"></span>
-      </span>
-    </button>
-    <p class="env-hint" aria-hidden="true">Tap the seal to open</p>
-  </div>
-  <div class="sp-inner">
-    <p class="invocation telugu sp-a" lang="te">॥ శ్రీ గణేశాయ నమః ॥</p>
-    <button class="seal sp-a" id="seal" tabindex="-1" aria-hidden="true"><span class="cover"><img data-photo="cover" alt="" decoding="async"></span></button>
-    <p class="eyebrow telugu sp-a" lang="te">శుభలేఖ</p>
-    <p class="sp-en sp-a">Wedding Invitation</p>
-    <h2 class="sp-names sp-a"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></h2>
-    <p class="sp-date sp-a">29 · 10 · 2026</p>
-    <button class="open-btn sp-a" id="openBtn">Open invitation<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
-  </div>
-</div>
+<script>(function(){var d=document.documentElement;d.classList.add('js','ui')})();</script>
 
 <div class="pal" id="pal" role="group" aria-label="Colour and music">
   <button id="palIvory" aria-pressed="true">Ivory</button>
@@ -37,6 +9,26 @@
 <audio id="song" loop preload="none"><source data-music="mp3" type="audio/mpeg"><source data-music="m4a" type="audio/mp4"><source data-music="wav" type="audio/wav"></audio>
 
 <main id="app">
+
+  <!-- page one: a sealed envelope (3D). Tapping the seal, or turning the page, opens it: the flap swings open,
+       the card rises and grows into the next page -->
+  <section class="screen cover" id="cover" aria-label="Wedding invitation">
+    <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
+    <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+    <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+    <div class="env" id="env">
+      <button class="env-btn" id="envBtn" type="button" aria-label="Open the invitation">
+        <span class="env-3d" aria-hidden="true">
+          <span class="env-back"></span>
+          <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i><span class="env-card-en">Wedding Invitation</span></span>
+          <span class="env-front"><span class="env-names"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></span><span class="env-date">29 · 10 · 2026</span></span>
+          <span class="env-flap"></span>
+          <span class="env-seal"></span>
+        </span>
+      </button>
+      <p class="env-hint" aria-hidden="true">Tap the seal to open</p>
+    </div>
+  </section>
 
   <section class="screen hero" id="home" aria-label="Invitation">
     <canvas id="bay" aria-hidden="true"></canvas>
