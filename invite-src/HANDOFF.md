@@ -84,12 +84,6 @@ they suit. All must stay smooth on ordinary phones and skip or soften for "reduc
   - The photo deck has depth: cards further back sit 46px behind each other; a dragged photo turns in 3D and is
     thrown off turning, and comes back the same way.
   - Reduce motion: no parallax, no 3D entrance, no idle sway.
-- **Stage 3, 3D page turns (7 Oct):** "3D PAGE TURNS" in style.html; `go()` in app.js. Scrolling, swiping, the
-  rail and the keys turn pages like a top-bound booklet: going on, the page lifts at its bottom edge and turns up and
-  over the top (`turn-away`) with the next page beneath (`beneath rise`); going back, the previous page turns down
-  onto the current one (`turn-onto`) with its contents already in place (`shown()`, no fade-in) while the old one
-  settles beneath. Perspective 2600px so the turning page doesn't balloon over the screen. A tab tap still blooms its
-  page open from the tab; reduce motion still switches pages instantly.
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct

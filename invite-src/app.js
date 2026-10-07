@@ -369,9 +369,6 @@ var cover = (function opening(){
      pagechange {id, from}  — a transition has started
      pagesettle {id}        — the page is in place
    =================================================================== */
-function shown(screen){                                  // everything in place at once, no fade-in
-  screen.querySelectorAll('.reveal').forEach(function(n){ n.style.removeProperty('--rd'); n.classList.add('in'); });
-}
 function replay(screen){
   var items = [].slice.call(screen.querySelectorAll('.reveal'));
   items.forEach(function(n, i){ n.classList.remove('in'); n.style.setProperty('--rd', (0.28 + i*0.09).toFixed(2) + 's'); });
@@ -438,16 +435,15 @@ var pager = (function(){
       enter = 'bloom'; leave = 'leave-bloom';
       fx.burst(x, y - 10, 14, 'petal');
     } else {
-      // a booklet page turn: on, the old page turns up and away over the new one beneath; back, the new one turns down onto the old
-      enter = down ? 'beneath rise' : 'turn-onto'; leave = down ? 'turn-away' : 'beneath sink';
+      enter = down ? 'wipe-down' : 'wipe-up'; leave = down ? 'leave-down' : 'leave-up';
+      if(edge){ edge.className = 'edge'; void edge.offsetWidth; edge.className = 'edge ' + (down ? 'run-down' : 'run-up'); }
     }
-    var E = enter.split(' '), L = leave.split(' ');
-    inn.classList.add.apply(inn.classList, ['enter'].concat(E));
-    out.classList.add.apply(out.classList, ['leave'].concat(L));
-    if(enter === 'turn-onto') shown(inn); else replay(inn);   // a page turned down onto you arrives with its print already on it
+    inn.classList.add('enter', enter);
+    out.classList.add('leave', leave);
+    replay(inn);
     setTimeout(function(){
-      out.classList.remove.apply(out.classList, ['leave'].concat(L));
-      inn.classList.remove.apply(inn.classList, ['enter'].concat(E));
+      out.classList.remove('leave', leave);
+      inn.classList.remove('enter', enter);
       if(edge) edge.className = 'edge';
       settle(i);
       busy = false;

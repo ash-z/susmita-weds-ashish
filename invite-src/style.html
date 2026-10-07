@@ -597,29 +597,6 @@ button{font:inherit;color:inherit}
 @keyframes edge-down{from{--ey:0px}to{--ey:calc(var(--ph,100vh) + 24px)}}
 @keyframes edge-fade{0%,86%{opacity:1}100%{opacity:0}}
 
-/* ============ 3D PAGE TURNS ============
-   Like a top-bound invitation booklet: going on, the page lifts at its bottom edge and turns up and away over the
-   top, the next page lying beneath it; going back, the previous page turns down from the top onto the current one.
-   (A tab tap still blooms its page open from the tab.) */
-.js .screen.turn-away,.js .screen.turn-onto{visibility:visible;z-index:4;transform-origin:50% 0;backface-visibility:hidden}
-.js .screen.beneath{visibility:visible;z-index:2}
-.screen.turn-away{animation:turn-away .95s cubic-bezier(.5,0,.3,1) both}
-.screen.turn-onto{animation:turn-onto .95s cubic-bezier(.3,.6,.25,1) both}
-.screen.beneath.rise{animation:beneath-rise .95s cubic-bezier(.4,0,.2,1) both}
-.screen.beneath.sink{animation:beneath-sink .95s cubic-bezier(.4,0,.2,1) both}
-@keyframes turn-away{
-  0%{transform:perspective(2600px) rotateX(0);filter:brightness(1)}
-  70%{opacity:1}
-  100%{transform:perspective(2600px) rotateX(92deg);filter:brightness(.72);opacity:0}}
-@keyframes turn-onto{
-  0%{transform:perspective(2600px) rotateX(92deg);filter:brightness(.72);opacity:0}
-  25%{opacity:1}
-  100%{transform:perspective(2600px) rotateX(0);filter:brightness(1)}}
-.screen.turn-onto .reveal{transition:none!important}
-.screen.turn-onto .ticket.reveal.in{animation:none}
-@keyframes beneath-rise{from{transform:scale(.95);filter:brightness(.8)}to{transform:none;filter:none}}
-@keyframes beneath-sink{to{transform:scale(.95);filter:brightness(.8)}}
-
 /* ============ ILLUSTRATIONS (from the couple's Canva) ============ */
 :root{--ganesha-img:url({{art:ganesha}})}
 .ganesha{
