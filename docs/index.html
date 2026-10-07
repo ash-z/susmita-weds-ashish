@@ -5842,24 +5842,40 @@ var refit = (function(){
       fx.burst(r.left + r.width/2, r.top + r.height*0.3, mood === 'her' ? 28 : 16, 'petal');
     }
   }
+  // one move at a time: a swipe during a move would throw the same photo twice
+  var moving = false;
+  function done(){ moving = false; }
   function next(dir){
+    if(moving) return;
     markUsed(); buzz(8);
     var c = cards[order[0]];
     if(reduced){ order.push(order.shift()); layout(false); arrive(); return; }
+    moving = true;
     c.style.transition = 'transform .34s cubic-bezier(.3,.5,.4,1)';
     c.style.transform = 'translate3d(' + (dir*135) + '%,-4%,0) rotate(' + (dir*22) + 'deg)';
-    setTimeout(function(){ order.push(order.shift()); c.style.zIndex = '0'; layout(true); arrive(); }, 320);
+    setTimeout(function(){ order.push(order.shift()); c.style.zIndex = '0'; layout(true); arrive(); setTimeout(done, 200); }, 320);
   }
-  function prev(){                                   // the previous photo slides back in from the left
+  // back: the mirror of next. The photo at the back of the stack slides out to the left from behind it (it used to
+  // jump off-screen in one frame), then comes over the top into place.
+  function prev(){
+    if(moving) return;
     markUsed(); buzz(6);
-    order.unshift(order.pop());
-    var c = cards[order[0]];
-    if(!reduced){ c.style.transition = 'none'; c.style.transform = 'translate3d(-135%,-4%,0) rotate(-22deg)'; void c.offsetWidth; }
-    layout(true); arrive();
+    if(reduced){ order.unshift(order.pop()); layout(false); arrive(); return; }
+    moving = true;
+    var c = cards[order[order.length - 1]];
+    c.style.transition = 'transform .32s cubic-bezier(.4,0,.6,1), opacity .2s ease';
+    c.style.opacity = '1';
+    c.style.transform = 'translate3d(-112%,-3%,0) rotate(-16deg)';
+    setTimeout(function(){
+      order.unshift(order.pop());
+      layout(true);
+      c.style.transition = 'transform .5s cubic-bezier(.22,.8,.3,1), opacity .4s ease';   // no overshoot coming back
+      arrive(); setTimeout(done, 200);
+    }, 320);
   }
   function go(i){
     markUsed();
-    if(order[0] === i) return;
+    if(moving || order[0] === i) return;
     while(order[0] !== i) order.push(order.shift());
     layout(true); arrive(); buzz(6);
   }
@@ -5872,7 +5888,7 @@ var refit = (function(){
   var drag = null;
   deck.addEventListener('pointerdown', function(e){
     var c = cards[order[0]];
-    if(!c.contains(e.target)) return;
+    if(moving || !c.contains(e.target)) return;
     drag = { x:e.clientX, y:e.clientY, t:performance.now(), dx:0, dy:0, id:e.pointerId, c:c };
     c.style.transition = 'none';
   });
