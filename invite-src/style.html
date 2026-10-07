@@ -96,6 +96,64 @@ button{font:inherit;color:inherit}
   transition:transform .15s ease,box-shadow .2s ease;
 }
 .open-btn:active{transform:scale(.96)}
+/* ============ 3D OPENING — the envelope ============
+   Before the cover: an ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the
+   finger or pointer. Tapping it pops the seal, swings the flap open towards you, a card rises out, and the envelope
+   drops away to reveal the cover (the card). html.env-on while it is up; .env.open runs the opening. */
+.env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
+  padding-top:min(calc(var(--crown) * .22),12vh);perspective:1200px;perspective-origin:50% 40%}
+.env[hidden]{display:none}
+.env-on .sp-inner{opacity:0;transform:translateY(16vh) scale(.84);pointer-events:none}
+.sp-inner{transition:opacity .9s ease,transform 1.2s cubic-bezier(.2,.8,.2,1)}
+.env-btn{all:unset;position:relative;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;
+  --ew:min(84vw,440px,62vh);width:var(--ew);height:calc(var(--ew) * .66);
+  transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ety,0) * 1deg)) rotateY(calc(var(--etx,0) * 1deg));
+  transition:transform .35s ease-out}
+.env-btn:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:12px}
+.env-3d{position:absolute;inset:0;transform-style:preserve-3d;animation:env-float 5.5s ease-in-out infinite}
+@keyframes env-float{50%{transform:translateY(-8px) rotateZ(-.6deg)}}
+.env-back{position:absolute;inset:0;border-radius:10px;background:linear-gradient(160deg,#8f3027,#5e1a15);
+  box-shadow:0 34px 60px -26px rgba(70,35,10,.6),0 0 0 1px rgba(90,30,20,.3)}
+/* the card inside: rises out when the flap is open */
+.env-card{position:absolute;left:7%;right:7%;top:7%;height:84%;border-radius:6px;transform:translateZ(1px);
+  background:linear-gradient(#FFFCF6,#F6EEDD);box-shadow:inset 0 0 0 1px rgba(169,124,43,.45),inset 0 0 0 7px #FFFCF6,inset 0 0 0 8px rgba(169,124,43,.35);
+  display:flex;flex-direction:column;align-items:center;padding-top:9%;font-size:calc(var(--ew) * .07);color:var(--gold);
+  transition:transform 1s cubic-bezier(.3,.7,.2,1)}
+.env-card i{display:block;width:30%;height:1px;margin-top:6%;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+/* the pocket: the front of the envelope, its top cut in a V */
+.env-front{position:absolute;inset:0;border-radius:10px;transform:translateZ(2px);
+  background:radial-gradient(130% 120% at 50% 100%,#FFFDF8,#F3EADA 70%,#E9DCC4);
+  clip-path:polygon(0 0,50% 50%,100% 0,100% 100%,0 100%);
+  display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6%;
+  box-shadow:inset 0 0 0 1px rgba(169,124,43,.5)}
+.env-front::before{content:"";position:absolute;inset:6px;border-radius:7px;border:1px solid rgba(169,124,43,.45);pointer-events:none}
+.env-names{font-family:"Alex Brush",cursive;font-size:calc(var(--ew) * .088);line-height:1;color:var(--ink);white-space:nowrap}
+.env-names .amp{font-family:"Marcellus",Georgia,serif;font-size:.45em;color:var(--gold);margin:0 .35em;vertical-align:middle}
+.env-date{margin-top:calc(var(--ew) * .025);font-family:"Marcellus",Georgia,serif;font-size:calc(var(--ew) * .032);letter-spacing:.16em;color:var(--muted)}
+/* the flap: hinged on the top edge; its outside is ivory, its inside the envelope's lining */
+.env-flap{position:absolute;left:0;right:0;top:0;height:52%;transform-origin:50% 0;transform:translateZ(3px);transform-style:preserve-3d;
+  transition:transform .9s cubic-bezier(.45,0,.25,1)}
+.env-flap::before,.env-flap::after{content:"";position:absolute;inset:0;clip-path:polygon(0 0,100% 0,50% 100%);backface-visibility:hidden}
+.env-flap::before{background:linear-gradient(180deg,#F7EFE0,#EADFC9);filter:drop-shadow(0 4px 6px rgba(70,35,10,.25))}
+.env-flap::after{transform:rotateX(180deg);clip-path:polygon(0 100%,100% 100%,50% 0);background:linear-gradient(180deg,#a3473a,#6b1f19)}
+/* the wax seal, with Ganesha pressed into it */
+.env-seal{position:absolute;left:50%;top:52%;width:18%;aspect-ratio:1;transform:translate(-50%,-50%) translateZ(5px);border-radius:50%;
+  background:radial-gradient(circle at 34% 30%,#c4574a,#8f2a22 55%,#5c1712);
+  box-shadow:0 6px 12px -4px rgba(60,15,10,.6),inset 0 -3px 6px rgba(0,0,0,.25),inset 0 2px 3px rgba(255,220,200,.35);
+  transition:transform .4s cubic-bezier(.3,1.6,.5,1),opacity .35s ease;animation:seal-pulse 2.4s ease-in-out infinite}
+.env-seal::after{content:"";position:absolute;inset:18%;background:#F0C987;opacity:.9;
+  -webkit-mask:var(--ganesha-img) center/contain no-repeat;mask:var(--ganesha-img) center/contain no-repeat}
+@keyframes seal-pulse{50%{box-shadow:0 6px 12px -4px rgba(60,15,10,.6),0 0 0 9px rgba(196,87,74,.18),inset 0 -3px 6px rgba(0,0,0,.25)}}
+.env-hint{margin:0;font-family:"Marcellus",Georgia,serif;font-size:13px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);
+  animation:rise .9s cubic-bezier(.2,.7,.3,1) .5s both}
+/* opening */
+.env.open .env-seal{transform:translate(-50%,-50%) translateZ(30px) scale(1.25);opacity:0;animation:none}
+.env.open .env-flap{transform:translateZ(.5px) rotateX(180deg);transition-delay:.25s}
+.env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
+.env.open .env-3d{animation:none}
+.env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
+.env.leave .env-btn{transform:translateY(55vh) rotateX(25deg) scale(.9);opacity:0;transition:transform .9s cubic-bezier(.6,0,.4,1),opacity .5s ease .1s}
+.env.leave{pointer-events:none}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}
 .open-btn svg{width:17px;height:17px;flex:none;animation:cue-nudge 1.4s ease-in-out infinite}
@@ -679,7 +737,7 @@ button{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .js .reveal{opacity:1!important;transform:none!important;transition:none!important}
-  .seal,.seal.sp-a,.sp-a,.card-face,.card-in,.swipe-cue svg,.hint::before,.open-btn svg,.open-btn::after,.rail,.rail svg,.mus .w,.tabs-in,.tabs-in::after{animation:none!important}
+  .env-3d,.env-seal,.env-hint,.seal,.seal.sp-a,.sp-a,.card-face,.card-in,.swipe-cue svg,.hint::before,.open-btn svg,.open-btn::after,.rail,.rail svg,.mus .w,.tabs-in,.tabs-in::after{animation:none!important}
   .splash,.tabs,.ticket,.deck,.seg-pill{transition:none!important}
   .screen,.edge{animation:none!important}
   .coming-list li,.done-flame,.crown .toranam{animation:none!important}

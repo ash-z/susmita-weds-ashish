@@ -63,6 +63,18 @@ node og.mjs "$PWD/../docs/index.html" /tmp/og.png         # link-preview image; 
 - No framed oval portraits side by side — in India that reads as a memorial photo. Photos live in the swipeable deck.
 - No algorithmic line-art or posterised portraits (tried twice, rejected).
 
+## 3D (branch `claude/invite-3d`)
+The plan, in stages, each previewed before the next: (1) the 3D opening; (2) depth on every page (layers that move
+with tilt or swipe, tickets that flip); (3) 3D page turns; (4) a walk-through mandapam; plus 3D touches wherever
+they suit. All must stay smooth on ordinary phones and skip or soften for "reduce motion".
+- **Stage 1, the 3D opening (done 7 Oct):** before the cover, a sealed envelope (`#env` in body.html; "3D OPENING"
+  in style.html; the cover module in app.js). Ivory, gold-edged, the names and date on the pocket, a maroon wax seal
+  with Ganesha on the flap; it leans toward the finger or pointer and floats. Tapping it (or Enter) pops the seal,
+  starts the music, swings the flap open in 3D (pure CSS 3D transforms, no WebGL), a శుభలేఖ card rises out, and the
+  envelope drops away as the cover rises in (the kolam then draws). Skipped for reduce motion and for links that
+  open a page directly; going back to the cover shows the cover, not the envelope. The groom's side envelope names
+  Ashish first (groom_first swaps both the cover's and the envelope's names).
+
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct
   for the groom's family): the relatives' invitation with Ashish named first everywhere: cover and first-page names,

@@ -266,7 +266,27 @@ var cover = (function opening(){
   if(done){ if(sp) sp.hidden = true; }
   else [app, tabs, pal, rail].forEach(function(e){ if(e) e.inert = true; });
 
-  if(!done && !reduced){
+  // 3D opening: the envelope over the cover (not for reduced motion, nor when a link opened a page directly)
+  var env = $('#env'), envBtn = $('#envBtn'), envUp = !done && !reduced && !!env;
+  if(envUp){
+    env.hidden = false; root.classList.add('env-on');
+    sp.addEventListener('pointermove', function(e){                      // the envelope leans toward the finger
+      if(!root.classList.contains('env-on')) return;
+      var r = sp.getBoundingClientRect();
+      envBtn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
+      envBtn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
+    });
+    envBtn.addEventListener('click', function(){
+      if(env.classList.contains('open')) return;
+      buzz([10, 40, 14]); music.start();                                   // the tap is the gesture that lets music play
+      env.classList.add('open');
+      setTimeout(function(){ env.classList.add('leave'); }, 1850);
+      setTimeout(function(){ root.classList.remove('env-on'); drawSeal(); }, 2400);    // the cover rises as the envelope clears
+      setTimeout(function(){ env.hidden = true; try{ btn.focus({ preventScroll:true }); }catch(e){} }, 3000);
+    });
+  }
+  function drawSeal(){
+    if(done || reduced) return;
     drawn.forEach(function(p, i){
       var len = 0; try{ len = p.getTotalLength(); }catch(e){}
       if(!len) return;
@@ -277,6 +297,7 @@ var cover = (function opening(){
       drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
     }); });
   }
+  if(!envUp) drawSeal();                                           // with the envelope, the kolam draws as the card appears
 
   function shimmer(){ if(!tabs) return; tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer'); }
   if(done) shimmer();                                            // arrived on a page from a shared link

@@ -7,6 +7,10 @@
   commit here, and share this branch's own previews (published as separate artifacts, so the dev previews below stay
   as they are). Nothing from here goes to dev or golden until the user asks; then it goes to dev first, and on to
   golden only with the usual promote. Dev fixes can be brought in here by merging dev into this branch.
+  This branch's previews: after build.py run `python3 invite-src/preview3d.py`, then publish `build/artifact-3d.html`
+  (https://claude.ai/artifact/HBpGRcTFeAkkmZYmh2dBUP), `artifact-3d-friends.html` (https://claude.ai/artifact/18qEmAKwfrErWPjDdznR4r)
+  and `artifact-3d-groom.html` (https://claude.ai/artifact/YSM8pCVMZytrdbEsQV66pX). Never publish `artifact-dev*.html` from
+  here: those paths update the dev previews.
 - `golden` is the live site guests see (GitHub Pages, `/docs`). Never commit to it directly.
 - Work on `claude/add-threejs-library-ogt1s7`, and share the dev previews (`invite-src/build/artifact-dev.html`, `artifact-dev-friends.html`, `artifact-dev-groom.html`).
 - Promote dev to golden only when the user asks (steps in HANDOFF.md, "Golden and dev").
