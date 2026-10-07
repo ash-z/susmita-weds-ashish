@@ -1,0 +1,417 @@
+<script>(function(){var d=document.documentElement;d.classList.add('js','ui')})();</script>
+
+<div class="pal" id="pal" role="group" aria-label="Colour and music">
+  <button id="palIvory" aria-pressed="true">Ivory</button>
+  <button id="palJewel" aria-pressed="false">Jewel</button>
+  <button id="musicBtn" class="mus" type="button" hidden aria-pressed="false" aria-label="Play the music"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9.5h3.5L12 5.5v13l-4.5-4H4z" fill="currentColor" fill-opacity=".18"/><path class="w" d="M15.5 9a4 4 0 0 1 0 6M18 6.5a7.5 7.5 0 0 1 0 11"/><path class="x" d="M16 9.5l5 5M21 9.5l-5 5"/></svg></button>
+</div>
+<!-- each invitation's song: build.py points these at docs/music/<relatives|friends>.mp3 (or .m4a / .wav) -->
+<audio id="song" loop preload="none"><source data-music="mp3" type="audio/mpeg"><source data-music="m4a" type="audio/mp4"><source data-music="wav" type="audio/wav"></audio>
+
+<main id="app">
+
+  <!-- page one: a sealed envelope (3D). Tapping the seal, or turning the page, opens it: the flap swings open,
+       the letter rises out (a small copy of page two, made by app.js) and grows into page two, the cover -->
+  <section class="screen cover" id="cover" aria-label="Envelope">
+    <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
+    <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+    <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+    <div class="env" id="env">
+      <button class="env-btn" id="envBtn" type="button" aria-label="Open the invitation">
+        <span class="env-shadow" aria-hidden="true"></span>
+        <span class="env-3d" aria-hidden="true">
+          <span class="env-back"></span>
+          <!-- the flap comes before the card here: the 3D depths order them while the envelope is whole, but while it
+               fades (drawn flat, in this order) the open flap must stay behind the risen card -->
+          <span class="env-flap"></span>
+          <span class="env-card"></span>
+          <span class="env-front"><span class="env-names"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></span><span class="env-date">29 · 10 · 2026</span></span>
+          <span class="env-flap-shade"><i></i></span>
+          <span class="env-seal"></span>
+        </span>
+      </button>
+      <p class="env-hint" aria-hidden="true">Tap the seal to open</p>
+    </div>
+  </section>
+
+  <!-- page two: the cover -->
+  <section class="screen front" id="front" aria-label="Wedding invitation">
+    <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
+    <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+    <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+    <div class="wrap">
+      <div class="sp-inner">
+        <p class="invocation telugu reveal" lang="te">॥ శ్రీ గణేశాయ నమః ॥</p>
+        <div class="reveal"><div class="seal" id="seal" aria-hidden="true"><span class="cover"><img data-photo="cover" alt="" decoding="async"></span></div></div>
+        <p class="eyebrow telugu reveal" lang="te">శుభలేఖ</p>
+        <p class="sp-en reveal">Wedding Invitation</p>
+        <h2 class="sp-names reveal"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></h2>
+        <p class="sp-date reveal">29 · 10 · 2026</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen hero" id="home" aria-label="Invitation">
+    <canvas id="bay" aria-hidden="true"></canvas>
+    <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
+    <div class="plate">
+      <p class="invocation telugu" lang="te">॥ శ్రీ గణేశాయ నమః ॥</p>
+      <div class="hero-eyebrow"><i></i><span class="eyebrow telugu" lang="te">శుభలేఖ</span><i></i></div>
+      <p class="hero-invite">Together with our families, we invite you to celebrate the wedding of</p>
+      <h1 class="names">
+        <span class="nm">Sai Susmita</span>
+        <span class="weds">weds</span>
+        <span class="nm">Ashish</span>
+      </h1>
+      <p class="hero-when">Thursday &middot; 29 October 2026</p>
+      <p class="hero-where">Visakhapatnam &middot; Hyderabad</p>
+    </div>
+    <p class="hint" id="hint">Touch the water to float a lamp</p>
+  </section>
+
+  <section class="screen garland" id="us" aria-labelledby="usH">
+    <div class="crown crown-page" aria-hidden="true"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha"></span></div>
+    <div class="wrap">
+      <div class="head reveal">
+        <h2 id="usH">Moments</h2>
+      </div>
+      <div class="deck-wrap reveal">
+        <div class="deck" id="deck" tabindex="0" role="region" aria-roledescription="photo deck" aria-label="Photographs — swipe, tap, or use the arrow keys">
+          <figure class="card" data-mood="both" aria-label="Susmita and Ashish">
+            <div class="card-in"><div class="card-face">
+              <img data-photo="together-laughing" alt="Susmita and Ashish laughing together, wearing garlands" decoding="async">
+              <figcaption class="cap"><span class="cap-name">Susmita &amp; Ashish</span></figcaption>
+            </div></div>
+          </figure>
+          <figure class="card" data-mood="her" aria-label="Susmita">
+            <div class="card-in"><div class="card-face">
+              <img data-photo="susmita" alt="Susmita in a silk saree" decoding="async">
+              <figcaption class="cap"><span class="cap-name">Susmita</span><span class="cap-tel telugu" lang="te">సుస్మిత</span></figcaption>
+            </div></div>
+          </figure>
+          <figure class="card" data-mood="him" aria-label="Ashish">
+            <div class="card-in"><div class="card-face">
+              <img data-photo="ashish" alt="Ashish" decoding="async">
+              <figcaption class="cap"><span class="cap-name">Ashish</span><span class="cap-tel telugu" lang="te">ఆశిష్</span></figcaption>
+            </div></div>
+          </figure>
+          <figure class="card" data-mood="both" aria-label="Susmita and Ashish">
+            <div class="card-in"><div class="card-face">
+              <img data-photo="together-portrait" alt="Susmita seated and Ashish standing beside her, both wearing garlands" decoding="async">
+            </div></div>
+          </figure>
+          <figure class="card" data-mood="both" aria-label="Susmita and Ashish">
+            <div class="card-in"><div class="card-face">
+              <img data-photo="together-ring" alt="Susmita showing her ring, with Ashish behind her" decoding="async">
+            </div></div>
+          </figure>
+        </div>
+      </div>
+      <div class="deck-ui reveal">
+        <div class="dots" id="dots">
+          <button class="dot" aria-label="Show photo 1 of 5"></button>
+          <button class="dot" aria-label="Show photo 2 of 5"></button>
+          <button class="dot" aria-label="Show photo 3 of 5"></button>
+          <button class="dot" aria-label="Show photo 4 of 5"></button>
+          <button class="dot" aria-label="Show photo 5 of 5"></button>
+        </div>
+        <p class="swipe-cue" id="swipeCue">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          Swipe the cards
+        </p>
+      </div>
+    </div>
+  </section>
+
+<!--friends-->
+  <section class="screen" id="haldi" aria-labelledby="haldiH">
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow">Haldi &middot; Pellikuturu &middot; Mehendi</span>
+        <h2 id="haldiH">The day before</h2>
+      </div>
+      <article class="ticket reveal hung" data-tilt>
+        <img class="t-toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha t-ganesha" role="img" aria-label="Lord Ganesha"></span>
+        <div class="t-top">
+          <div class="t-when">
+            <div class="t-date"><b>28</b><span>Oct<br>2026</span></div>
+            <div class="t-time"><span>Wednesday</span><b>9:00 AM</b><small>onwards</small></div>
+          </div>
+        </div>
+        <div class="t-perf" aria-hidden="true"></div>
+        <div class="t-bot">
+          <p class="t-venue">Home</p>
+          <p class="t-addr">9-6-93/3, Sivajipalem, Opp. Sivaji Park, Visakhapatnam</p>
+          <ol class="t-sched">
+            <li><time datetime="2026-10-28T09:00+05:30">9:00 AM <small>onwards</small></time><span>Haldi &amp; Pellikuturu</span></li>
+            <li><time datetime="2026-10-28T17:00+05:30">5:00 PM <small>onwards</small></time><span>Mehendi</span></li>
+          </ol>
+          <div class="t-count" data-countdown="2026-10-28T09:00:00+05:30" data-today="Happening today" data-until="2026-10-29T00:00:00+05:30" data-past="Celebrated on 28 October 2026" aria-label="Time until the haldi">
+            <div><b data-u="d">—</b><span>Days</span></div>
+            <div><b data-u="h">—</b><span>Hours</span></div>
+            <div><b data-u="m">—</b><span>Mins</span></div>
+            <div><b data-u="s">—</b><span>Secs</span></div>
+          </div>
+          <div class="t-btns">
+            <a class="btn" target="_blank" rel="noopener" href="https://maps.app.goo.gl/4jKmVR2unpEwwRWNA">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              Directions
+            </a>
+            <a class="btn" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Susmita%20%26%20Ashish%20%E2%80%94%20Haldi%2C%20Pellikuturu%20%26%20Mehendi&amp;dates=20261028/20261029&amp;details=9%3A00%20AM%20onwards%20Haldi%20%26%20Pellikuturu%0A5%3A00%20PM%20onwards%20Mehendi&amp;location=9-6-93%2F3%2C%20Sivajipalem%2C%20Opp.%20Sivaji%20Park%2C%20Visakhapatnam">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+              Save date
+            </a>
+          </div>
+        </div>
+        <span class="t-foil" aria-hidden="true"></span>
+      </article>
+    </div>
+  </section>
+<!--/friends-->
+
+  <section class="screen garland alt" id="wedding" aria-labelledby="wedH">
+    <div class="crown crown-page" aria-hidden="true"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha"></span></div>
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow telugu" lang="te">వివాహ ముహూర్తం</span>
+        <h2 id="wedH">The wedding</h2>
+      </div>
+      <article class="ticket reveal crowned" data-tilt>
+        <img class="t-flora t-flora-l t-flora-b" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+        <img class="t-flora t-flora-r t-flora-b" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+        <img class="t-gopuram" data-art="gopuram" alt="" aria-hidden="true" decoding="async">
+        <div class="t-top">
+          <div class="t-row"><span class="t-city">Visakhapatnam</span></div>
+          <div class="t-when">
+            <div class="t-date"><b>29</b><span>Oct<br>2026</span></div>
+            <div class="t-time"><span>Thursday</span><b>7:31 PM</b><small>Sumuhurtam</small></div>
+          </div>
+        </div>
+        <div class="t-perf" aria-hidden="true"></div>
+        <div class="t-bot">
+          <p class="t-venue">Hotel Ambica Sea Green</p>
+          <p class="t-hall">&lsquo;Marina&rsquo; Banquet Hall</p>
+          <p class="t-addr">Beach Road, Visakhapatnam</p>
+          <div class="t-count" data-countdown="2026-10-29T19:31:00+05:30" data-past="Married on 29 October 2026" aria-label="Time until the sumuhurtam">
+            <div><b data-u="d">—</b><span>Days</span></div>
+            <div><b data-u="h">—</b><span>Hours</span></div>
+            <div><b data-u="m">—</b><span>Mins</span></div>
+            <div><b data-u="s">—</b><span>Secs</span></div>
+          </div>
+          <div class="t-btns">
+            <a class="btn" target="_blank" rel="noopener" href="https://maps.app.goo.gl/AhTU2qBLJbRZLm4s6">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              Directions
+            </a>
+            <a class="btn" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Susmita%20weds%20Ashish%20%E2%80%94%20Sumuhurtam&amp;dates=20261029T140100Z/20261029T163000Z&amp;location=Marina%20Banquet%20Hall%2C%20Hotel%20Ambica%20Sea%20Green%2C%20Beach%20Road%2C%20Visakhapatnam">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+              Save date
+            </a>
+          </div>
+        </div>
+        <span class="t-foil" aria-hidden="true"></span>
+      </article>
+    </div>
+  </section>
+
+  <section class="screen garland" id="reception" aria-labelledby="recH">
+    <div class="crown crown-page" aria-hidden="true"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha"></span></div>
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow telugu" lang="te">రిసెప్షన్</span>
+        <h2 id="recH">The reception</h2>
+      </div>
+      <article class="ticket reveal" data-tilt>
+        <img class="t-flora t-flora-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+        <img class="t-flora t-flora-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+        <img class="t-flora t-flora-l t-flora-b" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+        <img class="t-flora t-flora-r t-flora-b" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+        <div class="t-top">
+          <div class="t-row"><span class="t-city">Hyderabad</span></div>
+          <div class="t-when">
+            <div class="t-date"><b>01</b><span>Nov<br>2026</span></div>
+            <div class="t-time"><span>Sunday</span><b>12:00 PM</b><small>onwards</small></div>
+          </div>
+        </div>
+        <div class="t-perf" aria-hidden="true"></div>
+        <div class="t-bot">
+          <p class="t-venue">Hotel Tulip Grand</p>
+          <p class="t-hall">&lsquo;Vedha&rsquo; &middot; 5th floor</p>
+          <p class="t-addr">Annojiguda, Hyderabad</p>
+          <div class="t-count" data-countdown="2026-11-01T12:00:00+05:30" data-today="Happening today" data-until="2026-11-02T00:00:00+05:30" data-past="Thank you for celebrating with us" aria-label="Time until the reception">
+            <div><b data-u="d">—</b><span>Days</span></div>
+            <div><b data-u="h">—</b><span>Hours</span></div>
+            <div><b data-u="m">—</b><span>Mins</span></div>
+            <div><b data-u="s">—</b><span>Secs</span></div>
+          </div>
+          <div class="t-btns">
+            <a class="btn" target="_blank" rel="noopener" href="https://maps.app.goo.gl/9DuCbhDxaaxrSeXr5">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"/><circle cx="12" cy="10" r="3"/></svg>
+              Directions
+            </a>
+            <a class="btn" target="_blank" rel="noopener" href="https://calendar.google.com/calendar/render?action=TEMPLATE&amp;text=Susmita%20%26%20Ashish%20%E2%80%94%20Reception&amp;dates=20261101T063000Z/20261101T093000Z&amp;location=Vedha%2C%20Hotel%20Tulip%20Grand%20(5th%20floor)%2C%20Annojiguda%2C%20Hyderabad">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>
+              Save date
+            </a>
+          </div>
+        </div>
+        <span class="t-foil" aria-hidden="true"></span>
+      </article>
+    </div>
+  </section>
+
+  <section class="screen garland alt" id="rsvp" aria-labelledby="rsvpH">
+    <div class="crown crown-page" aria-hidden="true"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha"></span></div>
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow telugu" lang="te">మీరు వస్తున్నారా?</span>
+        <h2 id="rsvpH">Will you be there?</h2>
+      </div>
+      <div class="rsvp-card reveal" id="rsvpCard">
+        <img class="t-flora t-flora-l t-flora-b" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+        <img class="t-flora t-flora-r t-flora-b" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+        <img class="card-diya" data-art="diya" alt="" aria-hidden="true" decoding="async">
+        <p class="rsvp-soon" id="rsvpSoon" role="status" hidden>RSVPs open very soon &mdash; please check back.</p>
+        <form class="rsvp-form" id="rsvpForm" novalidate>
+          <label class="fld" for="rsvpName">
+            <span class="lbl">Your full name</span>
+            <input id="rsvpName" name="name" type="text" autocomplete="name" autocapitalize="words" maxlength="80" required placeholder="First and last name">
+          </label>
+          <fieldset class="ev-rsvp" id="ev-wedding">
+            <legend class="ev-head"><b>Wedding</b><small>Thu 29 Oct &middot; 7:31 PM &middot; Visakhapatnam</small></legend>
+            <div class="yn">
+              <label class="pill"><input type="radio" name="wedding" value="yes"><span>Attending</span></label>
+              <label class="pill"><input type="radio" name="wedding" value="no"><span>Can&rsquo;t make it</span></label>
+            </div>
+            <div class="ev-party" hidden>
+              <span class="lbl" id="weddingPartyL">How many of you</span>
+              <div class="stepper" role="group" aria-labelledby="weddingPartyL">
+                <button type="button" data-d="-1" aria-label="One fewer for the wedding">&minus;</button>
+                <output aria-live="polite">1</output>
+                <button type="button" data-d="1" aria-label="One more for the wedding">+</button>
+              </div>
+            </div>
+          </fieldset>
+          <fieldset class="ev-rsvp" id="ev-reception">
+            <legend class="ev-head"><b>Reception</b><small>Sun 1 Nov &middot; 12 PM onwards &middot; Hyderabad</small></legend>
+            <div class="yn">
+              <label class="pill"><input type="radio" name="reception" value="yes"><span>Attending</span></label>
+              <label class="pill"><input type="radio" name="reception" value="no"><span>Can&rsquo;t make it</span></label>
+            </div>
+            <div class="ev-party" hidden>
+              <span class="lbl" id="receptionPartyL">How many of you</span>
+              <div class="stepper" role="group" aria-labelledby="receptionPartyL">
+                <button type="button" data-d="-1" aria-label="One fewer for the reception">&minus;</button>
+                <output aria-live="polite">1</output>
+                <button type="button" data-d="1" aria-label="One more for the reception">+</button>
+              </div>
+            </div>
+          </fieldset>
+          <input class="hp" type="text" name="website" id="rsvpHp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <button type="submit" class="btn solid" id="rsvpSend">Send RSVP</button>
+          <p class="rsvp-msg" id="rsvpMsg" role="status" aria-live="polite"></p>
+        </form>
+        <div class="rsvp-done" id="rsvpDone" hidden>
+          <svg class="done-diya" viewBox="0 0 60 56" aria-hidden="true">
+            <path class="done-flame" d="M30 5C36.5 15 38.5 20.5 38.5 25.5a8.5 8.5 0 0 1-17 0C21.5 20.5 23.5 15 30 5Z"/>
+            <path class="done-bowl" d="M6 36c1 11 11 16 24 16s23-5 24-16Z"/>
+            <path class="done-rim" d="M2 36h56"/>
+          </svg>
+          <p class="done-title" id="doneTitle">Thank you</p>
+          <p class="done-sub" id="doneSub" hidden></p>
+          <div class="rsvp-acts">
+            <button type="button" class="btn" id="rsvpEdit">Change my RSVP</button>
+            <button type="button" class="btn ghost" id="rsvpAnother">RSVP for someone else</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="screen garland" id="blessings" aria-labelledby="blsH">
+    <div class="crown crown-page" aria-hidden="true"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha"></span></div>
+    <div class="wrap">
+      <div class="head reveal">
+        <span class="eyebrow telugu" lang="te">ఆశీస్సులతో</span>
+        <h2 id="blsH">With the blessings of</h2>
+      </div>
+      <div class="fams reveal">
+        <div class="fam">
+          <p class="rel">Parents of<br>the bride</p>
+          <p class="par">Chandrika &amp;<br>Srinivasulu Gorantla</p>
+          <p class="child">their daughter <b>Sai Susmita</b></p>
+        </div>
+        <div class="fam">
+          <p class="rel">Parents of<br>the groom</p>
+          <p class="par">Satyarani &amp;<br>Suresh Bhimanpalliwar</p>
+          <p class="child">their son <b>Ashish</b></p>
+        </div>
+      </div>
+      <div class="close reveal">
+        <p class="blessing">We ask for your presence, and for your blessings.</p>
+        <p class="sig-en">Sai Susmita &amp; Ashish</p>
+
+        <div class="acts-row">
+          <img class="pk pk-l" data-art="peacock" alt="" aria-hidden="true" decoding="async">
+          <div class="acts">
+          <button class="btn solid" id="shower">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><path d="M7 4v2M12 3v3M17 4v2M5 10v2M10 9v2M15 9v2M19 10v2M8 15v2M13 14v2M17 15v2"/></svg>
+            Shower akshintalu
+          </button>
+          <button class="btn" id="share">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12v7a1 1 0 0 0 1 1h14a1 1 0 0 0 1-1v-7M16 6l-4-4-4 4M12 2v13"/></svg>
+            Share invitation
+          </button>
+          </div>
+          <img class="pk pk-r" data-art="peacock" alt="" aria-hidden="true" decoding="async">
+        </div>
+        <p class="akshi">Akshintalu are the turmeric rice guests shower on the couple as a blessing.</p>
+        <p class="shower-note" id="showerNote" aria-live="polite"></p>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<nav class="tabs" id="tabs" aria-label="Sections">
+  <div class="tabs-in">
+    <a href="#home" aria-current="true">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="9" r="3"/><path d="M2 16c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 20c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2"/></svg>
+      Invite
+    </a>
+    <a href="#us">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="9" cy="12" r="5.5"/><circle cx="15" cy="12" r="5.5"/></svg>
+      Us
+    </a>
+<!--friends-->
+    <a href="#haldi">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="12" cy="12" r="2.6"/><circle cx="12" cy="5.6" r="3"/><circle cx="17.5" cy="8.8" r="3"/><circle cx="17.5" cy="15.2" r="3"/><circle cx="12" cy="18.4" r="3"/><circle cx="6.5" cy="15.2" r="3"/><circle cx="6.5" cy="8.8" r="3"/></svg>
+      Haldi
+    </a>
+<!--/friends-->
+    <a href="#wedding">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3c2 3 3 4.4 3 6.3a3 3 0 0 1-6 0C9 7.4 10 6 12 3Z"/><path d="M4 14h16c-.6 3.8-3.8 6-8 6s-7.4-2.2-8-6Z"/></svg>
+      Wedding
+    </a>
+    <a href="#reception">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true"><path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/></svg>
+      Reception
+    </a>
+    <a href="#rsvp">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2.5"/><path d="M7.5 12l3 3 6-6"/></svg>
+      RSVP
+    </a>
+    <a href="#blessings">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20c-4.2 0-7.2-2.6-8-6.2 3.1 0 5.6 1.1 8 3.6 2.4-2.5 4.9-3.6 8-3.6-.8 3.6-3.8 6.2-8 6.2Z"/><path d="M12 17.4c-2.1-2.2-2.6-5.4 0-9.4 2.6 4 2.1 7.2 0 9.4Z"/></svg>
+      Blessings
+    </a>
+  </div>
+</nav>
+
+<nav class="rail" id="rail" aria-label="Page up and down">
+  <button id="railUp" type="button" aria-label="Previous page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 15l6-6 6 6"/></svg></button>
+  <span class="rail-dots" id="railDots" aria-hidden="true"></span>
+  <button id="railDown" type="button" aria-label="Next page"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></button>
+</nav>
+<canvas id="fx" aria-hidden="true"></canvas>
+<div class="edge" id="edge" aria-hidden="true"></div>
