@@ -135,10 +135,12 @@ button{font:inherit;color:inherit}
 .js .screen.front{text-align:center;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
 .front .seal{display:block;cursor:default}
 .front .sp-names{text-shadow:0 1px 1px rgba(var(--shade),.12),0 6px 14px rgba(var(--shade),.16)}
-/* the cover page during that: drawn over the envelope, starting shrunk onto the card (set from app.js), then grown */
-.js .screen.morph{visibility:visible;z-index:4;animation:morph-in .25s ease both}
-.js .screen.morph.grow{transition:transform 1.1s cubic-bezier(.65,0,.25,1),clip-path 1.1s cubic-bezier(.65,0,.25,1)}
-@keyframes morph-in{from{opacity:0}}
+/* the cover page during that: drawn over the envelope, starting exactly where the letter is (set from app.js), then
+   grown to the screen, over a sheet of its paper (.morph-paper) that grows from the letter's edges to the screen's */
+.js .screen.morph{visibility:visible;z-index:5;transform-origin:0 0;background:none}
+.morph-paper{position:absolute;inset:0;z-index:4;visibility:hidden;pointer-events:none;
+  background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
+.morph-paper.morph{visibility:visible}
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
   padding:min(calc(var(--crown) * .22),12vh) 0 calc(var(--tab-h) + 26px + env(safe-area-inset-bottom,0px));perspective:1200px;perspective-origin:50% 40%}
 .env.still,.env.still *{transition:none!important}
@@ -147,9 +149,7 @@ button{font:inherit;color:inherit}
   transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ety,0) * 1deg)) rotateY(calc(var(--etx,0) * 1deg));
   transition:transform .35s ease-out}
 .env-btn:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:12px}
-/* the envelope is ivory paper in both palettes, so its inks stay the ivory ones (on Jewel the names were ivory on ivory) */
-.env-3d{position:absolute;inset:0;transform-style:preserve-3d;animation:env-float 5.5s ease-in-out infinite;
-  --ink:#2B2318;--gold:#826019;--muted:#6B5B47}
+.env-3d{position:absolute;inset:0;transform-style:preserve-3d;animation:env-float 5.5s ease-in-out infinite}
 @keyframes env-float{50%{transform:translateY(-8px) rotateZ(-.6deg)}}
 .env-back{position:absolute;inset:0;border-radius:10px;background:linear-gradient(160deg,#8f3027,#5e1a15);
   box-shadow:0 0 0 1px rgba(90,30,20,.3),0 1px 2px rgba(var(--shade),.3),0 6px 12px -2px rgba(var(--shade),.28),
@@ -165,15 +165,17 @@ button{font:inherit;color:inherit}
 .env-flap-shade{position:absolute;left:0;right:0;top:0;height:52%;transform:translateZ(2.5px);filter:blur(5px);pointer-events:none;transition:opacity .4s ease .2s}
 .env-flap-shade i{position:absolute;inset:6px -2px -8px;background:rgba(var(--shade),.32);clip-path:polygon(0 0,100% 0,50% 100%)}
 .env.open .env-flap-shade{opacity:0}
-/* the card inside: rises out when the flap is open */
-.env-card{position:absolute;left:7%;right:7%;top:7%;height:84%;border-radius:6px;transform:translateZ(1px);
-  background:linear-gradient(#FFFCF6,#F6EEDD);box-shadow:inset 0 0 0 1px rgba(169,124,43,.45),inset 0 0 0 7px #FFFCF6,inset 0 0 0 8px rgba(169,124,43,.35),
-    0 -2px 4px rgba(var(--shade),.12),0 -10px 22px -6px rgba(var(--shade),.3);
-  display:flex;flex-direction:column;align-items:center;padding-top:9%;font-size:calc(var(--ew) * .07);color:var(--gold);
+/* the letter inside: the cover in miniature (a copy of page two, .env-mini, made and fitted by app.js), on the
+   cover's own paper, so what rises out is what the screen becomes. It rises almost all the way out. */
+.env-card{position:absolute;left:7%;right:7%;top:7%;height:84%;border-radius:6px;transform:translateZ(1px);overflow:hidden;
+  background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%);
+  box-shadow:inset 0 0 0 1px var(--rule),0 -2px 4px rgba(var(--shade),.12),0 -10px 22px -6px rgba(var(--shade),.3);
   transition:transform 1s cubic-bezier(.3,.7,.2,1)}
-.env-card i{display:block;width:30%;height:1px;margin-top:6%;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.js .env-mini.screen{visibility:visible;inset:auto;left:0;top:0;transform-origin:0 0;background:none;pointer-events:none;z-index:auto}
+.env.handed .env-card{visibility:hidden}
 /* the pocket: the front of the envelope, its top cut in a V */
-.env-front{position:absolute;inset:0;border-radius:10px;transform:translateZ(2px);
+/* (the envelope is ivory paper in both palettes, so the pocket keeps the ivory inks; on Jewel they were ivory on ivory) */
+.env-front{position:absolute;inset:0;border-radius:10px;transform:translateZ(2px);--ink:#2B2318;--gold:#826019;--muted:#6B5B47;
   background:radial-gradient(130% 120% at 50% 100%,#FFFDF8,#F3EADA 70%,#E9DCC4);
   clip-path:polygon(0 0,50% 50%,100% 0,100% 100%,0 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6%;
@@ -201,14 +203,13 @@ button{font:inherit;color:inherit}
 /* opening */
 .env.open .env-seal{transform:translate(-50%,-50%) translateZ(30px) scale(1.25);opacity:0;animation:none}
 .env.open .env-flap{transform:translateZ(.5px) rotateX(180deg);transition-delay:.25s}
-.env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
+.env.open .env-card{transform:translateZ(1px) translateY(-76%);transition-delay:1s}
 .env.open .env-3d{animation:none}
 .env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
 /* then the cover takes the card's place (see .screen.morph) and the envelope fades */
 /* (faded as one piece: faded part by part, the red back showed through the ivory front as pink) */
 .env.zoom .env-3d{opacity:0;transition:opacity .45s ease .15s}
 .env.zoom{pointer-events:none}
-.env-card-en{margin-top:5%;font-family:"Marcellus",Georgia,serif;font-size:.36em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}
 .open-btn svg{width:17px;height:17px;flex:none;animation:cue-nudge 1.4s ease-in-out infinite}
@@ -845,7 +846,7 @@ button{font:inherit;color:inherit}
 <main id="app">
 
   <!-- page one: a sealed envelope (3D). Tapping the seal, or turning the page, opens it: the flap swings open,
-       the card rises and grows into page two, the cover -->
+       the letter rises out (a small copy of page two, made by app.js) and grows into page two, the cover -->
   <section class="screen cover" id="cover" aria-label="Envelope">
     <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
     <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
@@ -858,7 +859,7 @@ button{font:inherit;color:inherit}
           <!-- the flap comes before the card here: the 3D depths order them while the envelope is whole, but while it
                fades (drawn flat, in this order) the open flap must stay behind the risen card -->
           <span class="env-flap"></span>
-          <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i><span class="env-card-en">Wedding Invitation</span></span>
+          <span class="env-card"></span>
           <span class="env-front"><span class="env-names"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></span><span class="env-date">29 · 10 · 2026</span></span>
           <span class="env-flap-shade"><i></i></span>
           <span class="env-seal"></span>
@@ -5712,7 +5713,8 @@ function buildSeal(host){
       drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
     }); });
   }
-  if(!reduced) document.addEventListener('pagechange', function(e){ if(e.detail.id === 'front') draw(); });
+  // (not when it grows out of the envelope's letter, which shows the kolam already drawn)
+  if(!reduced) document.addEventListener('pagechange', function(e){ if(e.detail.id === 'front' && e.detail.from !== 'cover') draw(); });
 })();
 
 /* ===================================================================
@@ -5748,14 +5750,15 @@ var music = (function(){
 /* ===================================================================
    ENVELOPE — page one is a sealed envelope, in 3D, leaning toward the
    finger or pointer. Leaving it for the next page (a turn, or a tap on
-   the seal) opens it: the seal pops, the flap swings open, the card
-   rises, and the card opens out to fill the screen: it becomes the
-   cover, page two, while the envelope fades away. The
+   the seal) opens it: the seal pops, the flap swings open, and the
+   letter rises out: the cover, page two, in miniature. Then it grows
+   to fill the screen and is the cover, while the envelope fades. The
    first page turn is also the tap that lets the music play. Coming back
    finds it sealed again.
    =================================================================== */
 var envelope = (function(){
   var page = $('#cover'), env = $('#env'), btn = $('#envBtn'), tabs = $('#tabs'), first = true;
+  var card = $('.env-card'), front = $('#front'), fit = null, paper = document.createElement('div');
   if(!page || !env) return { leave:function(){}, open:function(){ return false; }, morph:function(p, d){ d(); }, reseal:function(){} };
   if(!reduced) page.addEventListener('pointermove', function(e){
     var r = page.getBoundingClientRect();
@@ -5769,31 +5772,67 @@ var envelope = (function(){
     if(!first || !tabs) return; first = false;
     tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer');
   }
-  // the opening, then hand over to the page underneath (done runs as the card dissolves)
+  paper.className = 'morph-paper'; paper.setAttribute('aria-hidden', 'true');
+  if(front) front.parentNode.insertBefore(paper, front);
+  // the letter: a copy of the cover page, laid out at the screen's size and shrunk so its contents fit the card
+  function letter(){
+    if(!card || !front) return;
+    var old = card.querySelector('.env-mini'); if(old) card.removeChild(old);
+    var mini = front.cloneNode(true);
+    mini.removeAttribute('id'); mini.removeAttribute('aria-label'); mini.classList.add('env-mini'); mini.classList.remove('is-active');
+    [].forEach.call(mini.querySelectorAll('[id]'), function(n){ n.removeAttribute('id'); });
+    [].forEach.call(mini.querySelectorAll('.reveal'), function(n){ n.classList.remove('reveal'); });
+    var C = front.querySelector('.sp-inner').getBoundingClientRect(), cw = card.offsetWidth, ch = card.offsetHeight;
+    var k = Math.min(ch * 0.9 / C.height, cw * 0.9 / C.width);
+    mini.style.width = innerWidth + 'px'; mini.style.height = innerHeight + 'px';
+    mini.style.transform = 'translate(' + (cw / 2 - k * (C.left + C.width / 2)).toFixed(2) + 'px,' + (ch / 2 - k * (C.top + C.height / 2)).toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
+    card.appendChild(mini);
+    fit = { k:k, cx:C.left + C.width / 2, cy:C.top + C.height / 2 };
+  }
+  // the opening, then hand over to the page underneath (done runs once the letter is out)
   function open(done){
     if(reduced) return false;
+    letter();
     buzz([10, 40, 14]);
     env.classList.add('open');
     setTimeout(function(){ env.classList.add('zoom'); done(); }, 1900);
     return true;
   }
-  // the risen card becomes the page: the page starts shrunk onto the card (its width the card's width, cut to the
-  // card's height, around the middle of the page) and grows to the whole screen
+  // the risen letter becomes the page: the page takes the letter's place exactly (same scale and position, cut to the
+  // letter's edges, over a sheet of its paper cut the same), then both grow to the whole screen. One timeline drives
+  // both cuts, so the page's edge and the paper's stay together all the way.
   function morph(page, done){
-    var r = env.querySelector('.env-card').getBoundingClientRect();
-    var W = innerWidth, H = innerHeight, k = r.width / W, cut = Math.max(0, (H - r.height / k) / 2);
-    var dx = r.left + r.width / 2 - W / 2, dy = r.top + r.height / 2 - H / 2;
-    [].forEach.call(page.querySelectorAll('.reveal'), function(n){ n.classList.add('in'); });   // already in place
-    page.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + k.toFixed(4) + ')';
-    page.style.clipPath = 'inset(' + cut.toFixed(1) + 'px 0px round ' + (6 / k).toFixed(1) + 'px)';
-    page.classList.add('morph');
-    void page.offsetWidth;
-    page.classList.add('grow');
-    page.style.transform = ''; page.style.clipPath = 'inset(0px 0px round 0px)';
-    setTimeout(function(){ page.classList.remove('morph', 'grow'); page.style.clipPath = ''; done(); }, 1150);
+    if(!fit) return done();
+    var r = card.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+    var k0 = fit.k * r.width / card.offsetWidth;                       // the letter's scale as drawn (the envelope leans)
+    var tx0 = r.left + r.width / 2 - k0 * fit.cx, ty0 = r.top + r.height / 2 - k0 * fit.cy;
+    var shown = [].slice.call(page.querySelectorAll('.reveal'));          // already in place: no drift-in
+    shown.forEach(function(n){ n.style.transition = 'none'; n.classList.add('in'); });
+    void page.offsetWidth;                                               // (applied now, so the jump isn't animated)
+    function lerp(a, b, e){ return a + (b - a) * e; }
+    function px(v){ return Math.max(0, v).toFixed(1) + 'px'; }
+    function frame(e){
+      var k = lerp(k0, 1, e), tx = lerp(tx0, 0, e), ty = lerp(ty0, 0, e), rad = lerp(6, 0, e);
+      var t = lerp(r.top, 0, e), l = lerp(r.left, 0, e), b = lerp(r.bottom, H, e), rt = lerp(r.right, W, e);
+      page.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
+      page.style.clipPath = 'inset(' + px((t - ty) / k) + ' ' + px(W - (rt - tx) / k) + ' ' + px(H - (b - ty) / k) + ' ' + px((l - tx) / k) + ' round ' + (rad / k).toFixed(2) + 'px)';
+      paper.style.clipPath = 'inset(' + px(t) + ' ' + px(W - rt) + ' ' + px(H - b) + ' ' + px(l) + ' round ' + rad.toFixed(2) + 'px)';
+    }
+    frame(0);
+    page.classList.add('morph'); paper.classList.add('morph'); env.classList.add('handed');
+    shown.forEach(function(n){ n.style.transition = ''; });
+    var t0 = performance.now(), DUR = 1100;
+    (function step(now){
+      var x = Math.min(1, (now - t0) / DUR), e = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;   // ease in-out
+      frame(e);
+      if(x < 1) return requestAnimationFrame(step);
+      page.classList.remove('morph'); paper.classList.remove('morph');
+      page.style.transform = page.style.clipPath = paper.style.clipPath = '';
+      done();
+    })(t0);
   }
   function reseal(){                                               // instantly, before the page comes back into view
-    env.classList.add('still'); env.classList.remove('open', 'zoom');
+    env.classList.add('still'); env.classList.remove('open', 'zoom', 'handed');
     void env.offsetWidth; env.classList.remove('still');
   }
   return { leave:leave, open:open, morph:morph, reseal:reseal };

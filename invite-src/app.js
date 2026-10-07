@@ -242,7 +242,8 @@ function buildSeal(host){
       drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
     }); });
   }
-  if(!reduced) document.addEventListener('pagechange', function(e){ if(e.detail.id === 'front') draw(); });
+  // (not when it grows out of the envelope's letter, which shows the kolam already drawn)
+  if(!reduced) document.addEventListener('pagechange', function(e){ if(e.detail.id === 'front' && e.detail.from !== 'cover') draw(); });
 })();
 
 /* ===================================================================
@@ -278,14 +279,15 @@ var music = (function(){
 /* ===================================================================
    ENVELOPE — page one is a sealed envelope, in 3D, leaning toward the
    finger or pointer. Leaving it for the next page (a turn, or a tap on
-   the seal) opens it: the seal pops, the flap swings open, the card
-   rises, and the card opens out to fill the screen: it becomes the
-   cover, page two, while the envelope fades away. The
+   the seal) opens it: the seal pops, the flap swings open, and the
+   letter rises out: the cover, page two, in miniature. Then it grows
+   to fill the screen and is the cover, while the envelope fades. The
    first page turn is also the tap that lets the music play. Coming back
    finds it sealed again.
    =================================================================== */
 var envelope = (function(){
   var page = $('#cover'), env = $('#env'), btn = $('#envBtn'), tabs = $('#tabs'), first = true;
+  var card = $('.env-card'), front = $('#front'), fit = null, paper = document.createElement('div');
   if(!page || !env) return { leave:function(){}, open:function(){ return false; }, morph:function(p, d){ d(); }, reseal:function(){} };
   if(!reduced) page.addEventListener('pointermove', function(e){
     var r = page.getBoundingClientRect();
@@ -299,31 +301,67 @@ var envelope = (function(){
     if(!first || !tabs) return; first = false;
     tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer');
   }
-  // the opening, then hand over to the page underneath (done runs as the card dissolves)
+  paper.className = 'morph-paper'; paper.setAttribute('aria-hidden', 'true');
+  if(front) front.parentNode.insertBefore(paper, front);
+  // the letter: a copy of the cover page, laid out at the screen's size and shrunk so its contents fit the card
+  function letter(){
+    if(!card || !front) return;
+    var old = card.querySelector('.env-mini'); if(old) card.removeChild(old);
+    var mini = front.cloneNode(true);
+    mini.removeAttribute('id'); mini.removeAttribute('aria-label'); mini.classList.add('env-mini'); mini.classList.remove('is-active');
+    [].forEach.call(mini.querySelectorAll('[id]'), function(n){ n.removeAttribute('id'); });
+    [].forEach.call(mini.querySelectorAll('.reveal'), function(n){ n.classList.remove('reveal'); });
+    var C = front.querySelector('.sp-inner').getBoundingClientRect(), cw = card.offsetWidth, ch = card.offsetHeight;
+    var k = Math.min(ch * 0.9 / C.height, cw * 0.9 / C.width);
+    mini.style.width = innerWidth + 'px'; mini.style.height = innerHeight + 'px';
+    mini.style.transform = 'translate(' + (cw / 2 - k * (C.left + C.width / 2)).toFixed(2) + 'px,' + (ch / 2 - k * (C.top + C.height / 2)).toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
+    card.appendChild(mini);
+    fit = { k:k, cx:C.left + C.width / 2, cy:C.top + C.height / 2 };
+  }
+  // the opening, then hand over to the page underneath (done runs once the letter is out)
   function open(done){
     if(reduced) return false;
+    letter();
     buzz([10, 40, 14]);
     env.classList.add('open');
     setTimeout(function(){ env.classList.add('zoom'); done(); }, 1900);
     return true;
   }
-  // the risen card becomes the page: the page starts shrunk onto the card (its width the card's width, cut to the
-  // card's height, around the middle of the page) and grows to the whole screen
+  // the risen letter becomes the page: the page takes the letter's place exactly (same scale and position, cut to the
+  // letter's edges, over a sheet of its paper cut the same), then both grow to the whole screen. One timeline drives
+  // both cuts, so the page's edge and the paper's stay together all the way.
   function morph(page, done){
-    var r = env.querySelector('.env-card').getBoundingClientRect();
-    var W = innerWidth, H = innerHeight, k = r.width / W, cut = Math.max(0, (H - r.height / k) / 2);
-    var dx = r.left + r.width / 2 - W / 2, dy = r.top + r.height / 2 - H / 2;
-    [].forEach.call(page.querySelectorAll('.reveal'), function(n){ n.classList.add('in'); });   // already in place
-    page.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + k.toFixed(4) + ')';
-    page.style.clipPath = 'inset(' + cut.toFixed(1) + 'px 0px round ' + (6 / k).toFixed(1) + 'px)';
-    page.classList.add('morph');
-    void page.offsetWidth;
-    page.classList.add('grow');
-    page.style.transform = ''; page.style.clipPath = 'inset(0px 0px round 0px)';
-    setTimeout(function(){ page.classList.remove('morph', 'grow'); page.style.clipPath = ''; done(); }, 1150);
+    if(!fit) return done();
+    var r = card.getBoundingClientRect(), W = innerWidth, H = innerHeight;
+    var k0 = fit.k * r.width / card.offsetWidth;                       // the letter's scale as drawn (the envelope leans)
+    var tx0 = r.left + r.width / 2 - k0 * fit.cx, ty0 = r.top + r.height / 2 - k0 * fit.cy;
+    var shown = [].slice.call(page.querySelectorAll('.reveal'));          // already in place: no drift-in
+    shown.forEach(function(n){ n.style.transition = 'none'; n.classList.add('in'); });
+    void page.offsetWidth;                                               // (applied now, so the jump isn't animated)
+    function lerp(a, b, e){ return a + (b - a) * e; }
+    function px(v){ return Math.max(0, v).toFixed(1) + 'px'; }
+    function frame(e){
+      var k = lerp(k0, 1, e), tx = lerp(tx0, 0, e), ty = lerp(ty0, 0, e), rad = lerp(6, 0, e);
+      var t = lerp(r.top, 0, e), l = lerp(r.left, 0, e), b = lerp(r.bottom, H, e), rt = lerp(r.right, W, e);
+      page.style.transform = 'translate(' + tx.toFixed(2) + 'px,' + ty.toFixed(2) + 'px) scale(' + k.toFixed(5) + ')';
+      page.style.clipPath = 'inset(' + px((t - ty) / k) + ' ' + px(W - (rt - tx) / k) + ' ' + px(H - (b - ty) / k) + ' ' + px((l - tx) / k) + ' round ' + (rad / k).toFixed(2) + 'px)';
+      paper.style.clipPath = 'inset(' + px(t) + ' ' + px(W - rt) + ' ' + px(H - b) + ' ' + px(l) + ' round ' + rad.toFixed(2) + 'px)';
+    }
+    frame(0);
+    page.classList.add('morph'); paper.classList.add('morph'); env.classList.add('handed');
+    shown.forEach(function(n){ n.style.transition = ''; });
+    var t0 = performance.now(), DUR = 1100;
+    (function step(now){
+      var x = Math.min(1, (now - t0) / DUR), e = x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;   // ease in-out
+      frame(e);
+      if(x < 1) return requestAnimationFrame(step);
+      page.classList.remove('morph'); paper.classList.remove('morph');
+      page.style.transform = page.style.clipPath = paper.style.clipPath = '';
+      done();
+    })(t0);
   }
   function reseal(){                                               // instantly, before the page comes back into view
-    env.classList.add('still'); env.classList.remove('open', 'zoom');
+    env.classList.add('still'); env.classList.remove('open', 'zoom', 'handed');
     void env.offsetWidth; env.classList.remove('still');
   }
   return { leave:leave, open:open, morph:morph, reseal:reseal };

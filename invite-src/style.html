@@ -116,10 +116,12 @@ button{font:inherit;color:inherit}
 .js .screen.front{text-align:center;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
 .front .seal{display:block;cursor:default}
 .front .sp-names{text-shadow:0 1px 1px rgba(var(--shade),.12),0 6px 14px rgba(var(--shade),.16)}
-/* the cover page during that: drawn over the envelope, starting shrunk onto the card (set from app.js), then grown */
-.js .screen.morph{visibility:visible;z-index:4;animation:morph-in .25s ease both}
-.js .screen.morph.grow{transition:transform 1.1s cubic-bezier(.65,0,.25,1),clip-path 1.1s cubic-bezier(.65,0,.25,1)}
-@keyframes morph-in{from{opacity:0}}
+/* the cover page during that: drawn over the envelope, starting exactly where the letter is (set from app.js), then
+   grown to the screen, over a sheet of its paper (.morph-paper) that grows from the letter's edges to the screen's */
+.js .screen.morph{visibility:visible;z-index:5;transform-origin:0 0;background:none}
+.morph-paper{position:absolute;inset:0;z-index:4;visibility:hidden;pointer-events:none;
+  background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
+.morph-paper.morph{visibility:visible}
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
   padding:min(calc(var(--crown) * .22),12vh) 0 calc(var(--tab-h) + 26px + env(safe-area-inset-bottom,0px));perspective:1200px;perspective-origin:50% 40%}
 .env.still,.env.still *{transition:none!important}
@@ -128,9 +130,7 @@ button{font:inherit;color:inherit}
   transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ety,0) * 1deg)) rotateY(calc(var(--etx,0) * 1deg));
   transition:transform .35s ease-out}
 .env-btn:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:12px}
-/* the envelope is ivory paper in both palettes, so its inks stay the ivory ones (on Jewel the names were ivory on ivory) */
-.env-3d{position:absolute;inset:0;transform-style:preserve-3d;animation:env-float 5.5s ease-in-out infinite;
-  --ink:#2B2318;--gold:#826019;--muted:#6B5B47}
+.env-3d{position:absolute;inset:0;transform-style:preserve-3d;animation:env-float 5.5s ease-in-out infinite}
 @keyframes env-float{50%{transform:translateY(-8px) rotateZ(-.6deg)}}
 .env-back{position:absolute;inset:0;border-radius:10px;background:linear-gradient(160deg,#8f3027,#5e1a15);
   box-shadow:0 0 0 1px rgba(90,30,20,.3),0 1px 2px rgba(var(--shade),.3),0 6px 12px -2px rgba(var(--shade),.28),
@@ -146,15 +146,17 @@ button{font:inherit;color:inherit}
 .env-flap-shade{position:absolute;left:0;right:0;top:0;height:52%;transform:translateZ(2.5px);filter:blur(5px);pointer-events:none;transition:opacity .4s ease .2s}
 .env-flap-shade i{position:absolute;inset:6px -2px -8px;background:rgba(var(--shade),.32);clip-path:polygon(0 0,100% 0,50% 100%)}
 .env.open .env-flap-shade{opacity:0}
-/* the card inside: rises out when the flap is open */
-.env-card{position:absolute;left:7%;right:7%;top:7%;height:84%;border-radius:6px;transform:translateZ(1px);
-  background:linear-gradient(#FFFCF6,#F6EEDD);box-shadow:inset 0 0 0 1px rgba(169,124,43,.45),inset 0 0 0 7px #FFFCF6,inset 0 0 0 8px rgba(169,124,43,.35),
-    0 -2px 4px rgba(var(--shade),.12),0 -10px 22px -6px rgba(var(--shade),.3);
-  display:flex;flex-direction:column;align-items:center;padding-top:9%;font-size:calc(var(--ew) * .07);color:var(--gold);
+/* the letter inside: the cover in miniature (a copy of page two, .env-mini, made and fitted by app.js), on the
+   cover's own paper, so what rises out is what the screen becomes. It rises almost all the way out. */
+.env-card{position:absolute;left:7%;right:7%;top:7%;height:84%;border-radius:6px;transform:translateZ(1px);overflow:hidden;
+  background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%);
+  box-shadow:inset 0 0 0 1px var(--rule),0 -2px 4px rgba(var(--shade),.12),0 -10px 22px -6px rgba(var(--shade),.3);
   transition:transform 1s cubic-bezier(.3,.7,.2,1)}
-.env-card i{display:block;width:30%;height:1px;margin-top:6%;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.js .env-mini.screen{visibility:visible;inset:auto;left:0;top:0;transform-origin:0 0;background:none;pointer-events:none;z-index:auto}
+.env.handed .env-card{visibility:hidden}
 /* the pocket: the front of the envelope, its top cut in a V */
-.env-front{position:absolute;inset:0;border-radius:10px;transform:translateZ(2px);
+/* (the envelope is ivory paper in both palettes, so the pocket keeps the ivory inks; on Jewel they were ivory on ivory) */
+.env-front{position:absolute;inset:0;border-radius:10px;transform:translateZ(2px);--ink:#2B2318;--gold:#826019;--muted:#6B5B47;
   background:radial-gradient(130% 120% at 50% 100%,#FFFDF8,#F3EADA 70%,#E9DCC4);
   clip-path:polygon(0 0,50% 50%,100% 0,100% 100%,0 100%);
   display:flex;flex-direction:column;align-items:center;justify-content:flex-end;padding-bottom:6%;
@@ -182,14 +184,13 @@ button{font:inherit;color:inherit}
 /* opening */
 .env.open .env-seal{transform:translate(-50%,-50%) translateZ(30px) scale(1.25);opacity:0;animation:none}
 .env.open .env-flap{transform:translateZ(.5px) rotateX(180deg);transition-delay:.25s}
-.env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
+.env.open .env-card{transform:translateZ(1px) translateY(-76%);transition-delay:1s}
 .env.open .env-3d{animation:none}
 .env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
 /* then the cover takes the card's place (see .screen.morph) and the envelope fades */
 /* (faded as one piece: faded part by part, the red back showed through the ivory front as pink) */
 .env.zoom .env-3d{opacity:0;transition:opacity .45s ease .15s}
 .env.zoom{pointer-events:none}
-.env-card-en{margin-top:5%;font-family:"Marcellus",Georgia,serif;font-size:.36em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}
 .open-btn svg{width:17px;height:17px;flex:none;animation:cue-nudge 1.4s ease-in-out infinite}

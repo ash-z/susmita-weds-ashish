@@ -74,11 +74,14 @@ soften for "reduce motion".
   envelope (`<section id="cover">` in body.html; "PAGE ONE" in style.html; the envelope module in app.js): ivory,
   gold-edged, the names and date on the pocket, a maroon wax seal with Ganesha on the flap; it leans toward the
   finger or pointer and floats. Turning the page (swipe, wheel, arrow keys, ▼) or tapping the seal opens it: the
-  seal pops, the flap swings open in 3D (pure CSS 3D transforms, no WebGL), a card rises (శుభలేఖ / Wedding
-  Invitation), and the card becomes page two, the cover: envelope.morph sets the cover page shrunk onto the card
-  (scaled to the card's width, clipped to its height around the page's middle) and grows it to the whole screen
-  while the envelope fades as one piece (the flap sits before the card in the markup so that, drawn flat while
-  fading, it stays behind the risen card). The cover (`<section id="front">`; the COVER module in
+  seal pops, the flap swings open in 3D (pure CSS 3D transforms, no WebGL), and the letter rises almost all the way
+  out. The letter is the cover in miniature (the couple asked for the letter to be the opening page): when the
+  envelope opens, envelope.letter() copies page two (#front) into the card (.env-mini), laid out at the screen's
+  size and shrunk to fit; on Jewel it is the dark Jewel cover. Then envelope.morph puts the real cover page exactly
+  over the letter (same scale and position, cut to the letter's edges, over a sheet of its paper, .morph-paper)
+  and grows both to the screen on one timeline, while the envelope fades as one piece (the flap sits before the
+  card in the markup so that, drawn flat while fading, it stays behind the letter). The cover's kolam is already
+  drawn when it comes from the letter (it draws itself in on other arrivals). The cover (`<section id="front">`; the COVER module in
   app.js): the old opening screen as a page, the photograph in its arch with the kolam drawing itself in, శుభలేఖ,
   Wedding Invitation, the names and date, without the button. Then the home page, and the rest as before.
   pager.go hands the envelope-to-cover turn to envelope.open. The tab bar, rail and colour switch show on both
