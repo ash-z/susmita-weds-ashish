@@ -6161,12 +6161,16 @@ var refit = (function(){
   if(!gl) return;
   var VS = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
   // each pixel looks along its line of sight from nearest to farthest and takes the first surface it meets, so
-  // nearer things hide what is behind them (a single shift by depth left ghosts of hair and ears at the edges)
+  // nearer things hide what is behind them (a single shift by depth left ghosts of hair and ears at the edges); then a
+  // few halvings between that step and the one before find the edge exactly (no stair-steps). The photo zooms in a
+  // little as the light moves off centre, so its own borders never come into view (at rest it is exactly the photo).
   var FS = 'precision mediump float;uniform sampler2D img,dep;uniform vec2 L;varying vec2 uv;' +
-    'const float FOCUS=.55;' +
-    'void main(){vec2 s=uv;' +
-    'for(int i=0;i<=14;i++){float h=1.-float(i)/14.;vec2 q=uv+L*(h-FOCUS);' +
-    'if(texture2D(dep,q).r>=h){s=q;break;}}' +
+    'const float F=.55;' +
+    'void main(){vec2 c=(uv-.5)*(1.-1.2*length(L))+.5;vec2 s=c;float hp=1.;' +
+    'for(int i=0;i<=12;i++){float h=1.-float(i)/12.;' +
+    'if(texture2D(dep,c+L*(h-F)).r>=h){float a=h,b=hp;' +
+    'for(int j=0;j<3;j++){float m=(a+b)*.5;if(texture2D(dep,c+L*(m-F)).r>=m)a=m;else b=m;}' +
+    's=c+L*(a-F);break;}hp=h;}' +
     'gl_FragColor=texture2D(img,clamp(s,0.,1.));}';
   function sh(type, src){ var o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; }
   var pr = gl.createProgram();
@@ -6180,7 +6184,7 @@ var refit = (function(){
   var uL = gl.getUniformLocation(pr, 'L');
   gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 
-  var SHIFT = 0.04;                                        // the most a pixel moves, as a share of the photo's width
+  var SHIFT = 0.06;                                        // the most a pixel moves, as a share of the photo's width
   var cache = {}, cur = null, ready = false;
   function tex(source){
     var t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
