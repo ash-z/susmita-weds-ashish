@@ -83,9 +83,12 @@ Plan after researching 3D sites (7 Oct), in order: A light that moves with the p
   github.com/fabio-sim/Depth-Anything-ONNX; Hugging Face is blocked here, GitHub is not; the model is not kept in the
   repo, the maps are). build.py gives each photo with a map a data-depth attribute. DEPTH in app.js: one WebGL
   canvas laid over the photo that is showing (the deck's top card, the cover's photograph), moved when it changes;
-  each pixel looks along its line of sight (20 steps) and takes the first surface it meets, so nearer things hide
+  each pixel looks along its line of sight (14 steps) and takes the first surface it meets, so nearer things hide
   what is behind them (a plain shift by depth left ghosts of ears and hair). It draws when the light moves (a
-  lightHooks entry) and at rest draws the photo exactly. No WebGL or reduce motion: plain photos.
+  lightHooks entry), at 1.5x at most, and at rest draws the photo exactly. Fail-safe (after the couple saw a black
+  photo on their phone, 7 Oct): the canvas only shows once it has drawn a photo and a read-back of a few points is
+  not black; any failure (WebGL refusing the photo, a blank drawing, a lost context) leaves plain photos for the rest
+  of the visit. No WebGL or reduce motion: plain photos.
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct

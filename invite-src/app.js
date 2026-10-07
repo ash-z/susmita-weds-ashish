@@ -742,7 +742,7 @@ var refit = (function(){
   var FS = 'precision mediump float;uniform sampler2D img,dep;uniform vec2 L;varying vec2 uv;' +
     'const float FOCUS=.55;' +
     'void main(){vec2 s=uv;' +
-    'for(int i=0;i<=20;i++){float h=1.-float(i)/20.;vec2 q=uv+L*(h-FOCUS);' +
+    'for(int i=0;i<=14;i++){float h=1.-float(i)/14.;vec2 q=uv+L*(h-FOCUS);' +
     'if(texture2D(dep,q).r>=h){s=q;break;}}' +
     'gl_FragColor=texture2D(img,clamp(s,0.,1.));}';
   function sh(type, src){ var o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; }
@@ -763,7 +763,7 @@ var refit = (function(){
     var t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
     [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(function(k){ gl.texParameteri(gl.TEXTURE_2D, k, gl.LINEAR); });
     [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(function(k){ gl.texParameteri(gl.TEXTURE_2D, k, gl.CLAMP_TO_EDGE); });
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, source);
+    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
     return t;
   }
   function loaded(im, fn){ if(im.complete && im.naturalWidth) fn(); else im.addEventListener('load', fn, { once:true }); }
@@ -775,30 +775,50 @@ var refit = (function(){
     if(page.id === 'front') return page.querySelector('.seal .cover img[data-depth]');
     return null;
   }
+  // anything wrong (a browser that will not hand the photo to WebGL, a phone that draws nothing): the photos stay
+  // plain photos for the rest of the visit. The canvas only shows once it has drawn a photo and the drawing checks out.
+  var dead = false;
+  function die(){ dead = true; ready = false; cur = null; if(cv.parentNode) cv.parentNode.removeChild(cv); }
+  function drawn(){                                          // read back a few points: all black means nothing was drawn
+    var px = new Uint8Array(4), ok = false, W = cv.width, H = cv.height;
+    [[.5,.5],[.3,.3],[.7,.3],[.3,.7],[.7,.7]].forEach(function(p){
+      gl.readPixels(Math.floor(W * p[0]), Math.floor(H * p[1]), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
+      if(px[0] + px[1] + px[2] > 12) ok = true;
+    });
+    return ok && gl.getError() === gl.NO_ERROR;
+  }
   function bind(){
+    if(dead) return;
     var im = target();
     if(im === cur) return;
     cur = im; ready = false;
-    if(!im){ if(cv.parentNode) cv.parentNode.removeChild(cv); return; }
-    im.parentNode.insertBefore(cv, im.nextSibling);
+    if(cv.parentNode) cv.parentNode.removeChild(cv);
+    if(!im) return;
     var key = im.getAttribute('data-depth');
     function go(){
-      if(cur !== im) return;
+      if(cur !== im || dead) return;
       var c = cache[key];
+      cv.style.visibility = 'hidden';
+      im.parentNode.insertBefore(cv, im.nextSibling);
       gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, c.img);
       gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, c.dep);
       ready = true; size(); draw(light.x, light.y);
+      if(!drawn()) return die();
+      cv.style.visibility = '';
     }
     if(cache[key]){ go(); return; }
     var d = new Image(); d.decoding = 'async'; d.src = key;
+    d.addEventListener('error', die, { once:true });
     loaded(im, function(){ loaded(d, function(){
-      if(!cache[key]) cache[key] = { img:tex(im), dep:tex(d) };
+      if(dead) return;
+      try{ if(!cache[key]) cache[key] = { img:tex(im), dep:tex(d) }; }catch(e){ return die(); }
+      if(gl.getError() !== gl.NO_ERROR) return die();
       go();
     }); });
   }
   function size(){
     if(!cv.parentNode) return;
-    var r = Math.min(devicePixelRatio || 1, 2), w = Math.round(cv.clientWidth * r), h = Math.round(cv.clientHeight * r);
+    var r = Math.min(devicePixelRatio || 1, 1.5), w = Math.round(cv.clientWidth * r), h = Math.round(cv.clientHeight * r);
     if(w && h && (cv.width !== w || cv.height !== h)){ cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); }
   }
   function draw(x, y){
@@ -806,7 +826,7 @@ var refit = (function(){
     gl.uniform2f(uL, -x * SHIFT, y * SHIFT * 0.8);        // (the photo is 4:5, so the same pixels up and down)
     gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
   }
-  cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); ready = false; cur = null; cache = {}; if(cv.parentNode) cv.parentNode.removeChild(cv); });
+  cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); die(); });
   lightHooks.push(draw);
   document.addEventListener('pagesettle', bind);
   document.addEventListener('pagechange', function(){ setTimeout(bind, 0); });
