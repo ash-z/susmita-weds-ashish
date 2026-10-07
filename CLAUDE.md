@@ -3,6 +3,10 @@
 `invite-src/` is Sai Susmita and Ashish's wedding invitation; `invite-src/HANDOFF.md` has everything about it.
 
 ## Branches
+- **On `claude/invite-3d`** (branched from dev on 7 Oct): the 3D version of the invitation is worked on here. Work and
+  commit here, and share this branch's own previews (published as separate artifacts, so the dev previews below stay
+  as they are). Nothing from here goes to dev or golden until the user asks; then it goes to dev first, and on to
+  golden only with the usual promote. Dev fixes can be brought in here by merging dev into this branch.
 - `golden` is the live site guests see (GitHub Pages, `/docs`). Never commit to it directly.
 - Work on `claude/add-threejs-library-ogt1s7`, and share the dev previews (`invite-src/build/artifact-dev.html`, `artifact-dev-friends.html`, `artifact-dev-groom.html`).
 - Promote dev to golden only when the user asks (steps in HANDOFF.md, "Golden and dev").
