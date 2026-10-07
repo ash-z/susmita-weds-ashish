@@ -78,6 +78,14 @@ Plan after researching 3D sites (7 Oct), in order: A light that moves with the p
   so they use `rotate`, in their wrap's perspective. Gold numbers and the cover's names stand proud (a light edge, a
   soft shadow). Tried and taken out the same day: sliding sheens/glints across the cards and photos (the old faint
   ticket foil too): "the glint in the middle looks very fake". Reduce motion: no tilt.
+- **B, photos with depth (7 Oct, on the branch):** `photos_depth.py MODEL.onnx` makes a depth map per photo
+  (photos/out/<name>-depth.webp, 2-3 KB, lighter is nearer) with Depth Anything V2 small (ONNX from the releases of
+  github.com/fabio-sim/Depth-Anything-ONNX; Hugging Face is blocked here, GitHub is not; the model is not kept in the
+  repo, the maps are). build.py gives each photo with a map a data-depth attribute. DEPTH in app.js: one WebGL
+  canvas laid over the photo that is showing (the deck's top card, the cover's photograph), moved when it changes;
+  each pixel looks along its line of sight (20 steps) and takes the first surface it meets, so nearer things hide
+  what is behind them (a plain shift by depth left ghosts of ears and hair). It draws when the light moves (a
+  lightHooks entry) and at rest draws the photo exactly. No WebGL or reduce motion: plain photos.
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct
