@@ -426,15 +426,6 @@ button{font:inherit;color:inherit}
 .t-count .past{grid-column:1/-1;text-align:center;font-family:"Marcellus",Georgia,serif;font-size:16px}
 .t-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
 .t-btns .btn{padding-inline:8px;letter-spacing:.08em;white-space:nowrap}
-/* The sheen slides as one layer (transform), never repainted: moving a background here left stale, hard-edged
-   tiles on Android, as did a blend mode before. Same travel as the old 260% background moved by 55%. */
-.t-foil{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
-.t-foil::before{
-  content:"";position:absolute;inset:-80%;
-  background:var(--sheen);
-  transform:translate(calc(var(--fx,0) * -22%),calc(var(--fy,0) * -22%));
-  will-change:transform;
-}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 16px;
   font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
@@ -776,22 +767,10 @@ button{font:inherit;color:inherit}
 }
 
 
-/* ============ LIGHT — the sheens it slides across things (see LIGHT in app.js) ============
-   Each is one oversized layer moved by transform with the light, never repainted. */
-:root{--sheen:linear-gradient(115deg,rgba(var(--shade),.06) 24%,transparent 37%,rgba(255,244,214,.42) 45%,rgba(255,253,244,.3) 50%,transparent 59%,rgba(var(--shade),.1) 74%)}
-/* (a glint alone is lost on ivory paper; the falloff away from the light is what shows it there) */
-.card.top .card-face::after,.seal .cover::after,.env-front::after{
-  content:"";position:absolute;inset:-80%;pointer-events:none;background:var(--sheen);
-  transform:translate(calc(var(--fx,0) * -22%),calc(var(--fy,0) * -22%));will-change:transform}
-/* (only the top photo of the deck: sheens on the four under it cost a fifth of the frame rate, unseen) */
+/* ============ LIGHT — what leans with it (see LIGHT in app.js) ============ */
 /* the cover's photograph leans with the light too (rotate: its transform is the breathing) */
 .front .reveal:has(> .seal){perspective:700px}
 .front .seal{rotate:var(--tilt,0 0 1 0deg)}
-/* the wax seal: a glint that slides over it */
-.env-seal{overflow:hidden}
-.env-seal::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at 50% 50%,rgba(255,236,224,.55),rgba(255,236,224,0) 32%);
-  transform:translate(calc(var(--fx,0) * -22% - 14%),calc(var(--fy,0) * -22% - 18%))}
 /* gold lettering stands slightly proud of the paper: a light edge above, a soft shadow below */
 .t-date b,.front .sp-names{text-shadow:-.5px -.75px 0 var(--hi),1px 1.5px 2px rgba(var(--shade),.24),0 6px 14px rgba(var(--shade),.1)}
 .env-names{text-shadow:-.5px -.75px 0 rgba(255,250,235,.8),1px 1.5px 2px rgba(62,32,12,.22)}

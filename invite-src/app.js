@@ -137,21 +137,21 @@ var fx = (function(){
 })();
 
 /* ===================================================================
-   LIGHT — one light for the whole invitation, moved by tilting the
-   phone (the mouse on a computer). What it falls on leans toward it and
-   a sheen slides across: the envelope, the cover's photograph, the
-   photo deck, the tickets and the RSVP card. Every value glides toward
-   where it is heading rather than jumping, which is what gives it
-   weight. Only transforms change each frame (nothing is repainted: a
-   moving background left stale tiles on Android). iOS asks permission
-   on a tap.
-     --fx --fy   the light, -1..1, on each lit element (sheens use it)
+   LIGHT — one light for the whole invitation. What it falls on leans
+   toward it: the envelope, the cover's photograph, the photo deck and
+   the tickets. It follows the phone's tilt where that needs no
+   permission (Android), and otherwise the finger while it touches the
+   screen (iPhones, which only give tilt after a permission prompt, and
+   the invitation never asks for one) or the mouse on a computer. Every
+   value glides toward where it is heading rather than jumping, which is
+   what gives it weight. Only transforms change each frame.
+     --fx --fy   the light, -1..1, on each lit element
      --rx --ry   its lean in degrees (the deck and the envelope use it)
      --tilt      the same lean as a rotate value, for the tickets (their
                  own transform belongs to the drift-in on arrival)
    =================================================================== */
-var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt], .rsvp-card');
-var light = { x:0, y:0, tx:0, ty:0, run:false }, tiltAsked = false;
+var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt]');
+var light = { x:0, y:0, tx:0, ty:0, run:false }, tilting = false;
 function aim(x, y){
   x = clamp(x, -1, 1); y = clamp(y, -1, 1);
   if(Math.abs(x - light.tx) < 0.004 && Math.abs(y - light.ty) < 0.004) return;
@@ -176,31 +176,23 @@ function glide(){
 }
 // a page coming into view takes the light as it is now (it was skipped while hidden)
 document.addEventListener('pagechange', function(){ if(!light.run){ light.run = true; requestAnimationFrame(glide); } });
-function onOrient(e){
-  if(e.gamma == null || e.beta == null) return;
-  aim(e.gamma / 22, (e.beta - 45) / 22);
-}
-function enableTilt(){
-  if(tiltAsked || reduced) return;
-  tiltAsked = true;
-  var D = window.DeviceOrientationEvent;
-  if(!D) return;
-  try{
-    if(typeof D.requestPermission === 'function'){
-      D.requestPermission().then(function(s){ if(s === 'granted') addEventListener('deviceorientation', onOrient); }).catch(function(){});
-    } else addEventListener('deviceorientation', onOrient);
-  }catch(e){}
-}
 (function tilt(){
   if(reduced) return;
-  addEventListener('pointermove', function(e){                         // a computer: the light follows the mouse
-    if(e.pointerType !== 'mouse') return;
-    aim((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2);
-  });
-  document.documentElement.addEventListener('mouseleave', function(){ aim(0, 0); });
   var D = window.DeviceOrientationEvent;
-  if(D && typeof D.requestPermission === 'function') addEventListener('click', enableTilt, { once:true });
-  else enableTilt();
+  // tilt only where it comes without asking (never DeviceOrientationEvent.requestPermission)
+  if(D && typeof D.requestPermission !== 'function') addEventListener('deviceorientation', function(e){
+    if(e.gamma == null || e.beta == null) return;
+    tilting = true;
+    aim(e.gamma / 22, (e.beta - 45) / 22);
+  });
+  function point(e){ aim((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2); }
+  addEventListener('pointermove', function(e){                         // the mouse; or a finger, where there is no tilt
+    if(e.pointerType === 'mouse' || !tilting) point(e);
+  }, { passive:true });
+  addEventListener('pointerdown', function(e){ if(e.pointerType !== 'mouse' && !tilting) point(e); }, { passive:true });
+  function home(e){ if(e.pointerType !== 'mouse' && !tilting) aim(0, 0); }   // the finger lifts: back to rest
+  addEventListener('pointerup', home); addEventListener('pointercancel', home);
+  document.documentElement.addEventListener('mouseleave', function(){ aim(0, 0); });
 })();
 
 /* ===================================================================
@@ -312,7 +304,7 @@ var envelope = (function(){
   btn.addEventListener('click', function(){ pager.go(1, 'scroll'); });
   // any way off page one: the music starts and the tab bar shimmers once
   function leave(){
-    music.start(); enableTilt();
+    music.start();
     if(!first || !tabs) return; first = false;
     tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer');
   }

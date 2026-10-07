@@ -68,53 +68,16 @@ Live (promoted to dev and golden on 7 Oct, at the couple's request): the envelop
 becomes the cover (page two), and the shadows on every page, all below. Further 3D work continues on the branch.
 Plan after researching 3D sites (7 Oct), in order: A light that moves with the phone; B photos with real depth
 (depth maps); C a real 3D envelope and petals in WebGL; D one continuous 3D world; E a scanned real place.
-- **A, the light (7 Oct, on the branch):** LIGHT in app.js replaces the old TILT. One light, aimed by the phone's tilt
-  (the mouse on a computer), glides toward its target (10% a frame) and writes --fx/--fy (-1..1), --rx/--ry (lean in
-  degrees) and --tilt (the lean as a rotate value) on the lit things that are showing: the envelope, the cover's
-  photograph, the photo deck, the tickets, the RSVP card. They lean with it and a sheen (--sheen: a glint plus a
-  falloff away from the light, since a glint alone is lost on ivory) slides across them as one transformed layer,
-  never repainted (moving backgrounds left stale tiles on Android). The tickets now really lean: their old tilt
-  transform was always overridden by the drift-in on arrival (.reveal.in), so they use `rotate` instead, in their
-  wrap's perspective. Gold numbers and the cover's names stand proud (a light edge, a soft shadow). Only the deck's
-  top photo has a sheen (on all five it cost a fifth of the frame rate). Reduce motion: no tilt.
-Kept: the 3D opening (below). Tried and taken out at the couple's request (7 Oct): "depth on every page" (layered
-tickets, tilt parallax, idle sway; too weak to notice on their phone) and booklet page turns ("as cliché as it
-gets"); both are in the history (commits 747a8f6 and a47c0c7, reverted). Researched real 3D sites (7 Oct);
-directions offered: one lit WebGL hero scene, a camera journey through the pages, or touchable 3D (gold seal,
-falling akshintalu, petals) with phone-tilt depth. Anything 3D must stay smooth on ordinary phones and skip or
-soften for "reduce motion".
-- **The envelope, then the cover (7 Oct):** no gate and no Open invitation button. Page one of the pager is the
-  envelope (`<section id="cover">` in body.html; "PAGE ONE" in style.html; the envelope module in app.js): ivory,
-  gold-edged, the names and date on the pocket, a maroon wax seal with Ganesha on the flap; it leans toward the
-  finger or pointer and floats. Turning the page (swipe, wheel, arrow keys, ▼) or tapping the seal opens it: the
-  seal pops, the flap swings open in 3D (pure CSS 3D transforms, no WebGL), and the letter rises almost all the way
-  out. The letter is the cover in miniature (the couple asked for the letter to be the opening page): when the
-  envelope opens, envelope.letter() copies page two (#front) into the card (.env-mini), laid out at the screen's
-  size and shrunk to fit; on Jewel it is the dark Jewel cover. Then envelope.morph puts the real cover page exactly
-  over the letter (same scale and position, cut to the letter's edges, over a sheet of its paper, .morph-paper)
-  and grows both to the screen on one timeline, while the envelope fades as one piece (the flap sits before the
-  card in the markup so that, drawn flat while fading, it stays behind the letter). The cover's kolam is already
-  drawn when it comes from the letter (it draws itself in on other arrivals). The cover (`<section id="front">`; the COVER module in
-  app.js): the old opening screen as a page, the photograph in its arch with the kolam drawing itself in, శుభలేఖ,
-  Wedding Invitation, the names and date, without the button. Then the home page, and the rest as before.
-  pager.go hands the envelope-to-cover turn to envelope.open. The tab bar, rail and colour switch show on both
-  (neither has a tab; ▲ is disabled on the envelope). Leaving the envelope by any route (a tab too) starts the
-  music; coming back (▲, ▼ on the last page, Home key) finds it sealed again. While the envelope or the cover is
-  up the home page sits drawn underneath, so the WebGL sea is ready when it is turned to (drawing it for the first
-  time mid-turn froze the turn for seconds). Links to a page (#rsvp) open on that page. Reduce motion: the same
-  pages, turning just moves on. groom_first swaps the names on both. Tried just before (same day) and replaced:
-  the envelope opening straight onto the home page ("option 3", commit 1ff0302). The old splash CSS (.splash,
-  .open-btn, .sp-a) is still in style.html, unused.
-  Shadows (7 Oct, "they are weak"): layered, in `--shade` (warm brown on Ivory, black on Jewel): the envelope's
-  body, a pool on the ground under it that breathes with its float (.env-shadow), the flap's shadow on the pocket
-  (.env-flap-shade: a blurred copy of the triangle, since a drop-shadow on the clipped flap is clipped away), the
-  seal, the rising card, and on the cover the photograph and the names. The envelope keeps the Ivory inks on Jewel
-  (it is ivory paper in both).
-  Then on every page (7 Oct): one depth scale per palette (`--shadow` layered for cards and photos, `--shadow-sm`
-  for things on them, `--rim` a light top edge; "SHADOWS" in style.html): buttons are raised chips (surface
-  background), the answer pills and the Ivory/Jewel-style toggles raised, the countdown, RSVP event boxes, name
-  field and toggle track pressed in; the garlands, gopuram, corner flowers, peacocks and page garlands cast drop
-  shadows onto the cards; the tab bar and rail (their glow keyframes carry the same shadow).
+- **A, the light (7 Oct, on the branch):** LIGHT in app.js replaces the old TILT. One light glides toward its target
+  (10% a frame) and writes --fx/--fy (-1..1), --rx/--ry (lean in degrees) and --tilt (the lean as a rotate value) on
+  the lit things that are showing: the envelope, the cover's photograph, the photo deck, the tickets. They lean with
+  it. It follows the phone's tilt only where that needs no permission (Android); **the invitation never asks for a
+  permission** (the couple's rule, 7 Oct), so on iPhones, where tilt needs DeviceOrientationEvent.requestPermission,
+  it follows the finger while it touches the screen and settles back when it lifts; the mouse on a computer. The
+  tickets now really lean: their old tilt transform was always overridden by the drift-in on arrival (.reveal.in),
+  so they use `rotate`, in their wrap's perspective. Gold numbers and the cover's names stand proud (a light edge, a
+  soft shadow). Tried and taken out the same day: sliding sheens/glints across the cards and photos (the old faint
+  ticket foil too): "the glint in the middle looks very fake". Reduce motion: no tilt.
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct

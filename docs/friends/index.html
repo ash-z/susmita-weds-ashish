@@ -445,15 +445,6 @@ button{font:inherit;color:inherit}
 .t-count .past{grid-column:1/-1;text-align:center;font-family:"Marcellus",Georgia,serif;font-size:16px}
 .t-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
 .t-btns .btn{padding-inline:8px;letter-spacing:.08em;white-space:nowrap}
-/* The sheen slides as one layer (transform), never repainted: moving a background here left stale, hard-edged
-   tiles on Android, as did a blend mode before. Same travel as the old 260% background moved by 55%. */
-.t-foil{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
-.t-foil::before{
-  content:"";position:absolute;inset:-80%;
-  background:var(--sheen);
-  transform:translate(calc(var(--fx,0) * -22%),calc(var(--fy,0) * -22%));
-  will-change:transform;
-}
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 16px;
   font-weight:600;font-size:12px;letter-spacing:.12em;text-transform:uppercase;
@@ -795,22 +786,10 @@ button{font:inherit;color:inherit}
 }
 
 
-/* ============ LIGHT — the sheens it slides across things (see LIGHT in app.js) ============
-   Each is one oversized layer moved by transform with the light, never repainted. */
-:root{--sheen:linear-gradient(115deg,rgba(var(--shade),.06) 24%,transparent 37%,rgba(255,244,214,.42) 45%,rgba(255,253,244,.3) 50%,transparent 59%,rgba(var(--shade),.1) 74%)}
-/* (a glint alone is lost on ivory paper; the falloff away from the light is what shows it there) */
-.card.top .card-face::after,.seal .cover::after,.env-front::after{
-  content:"";position:absolute;inset:-80%;pointer-events:none;background:var(--sheen);
-  transform:translate(calc(var(--fx,0) * -22%),calc(var(--fy,0) * -22%));will-change:transform}
-/* (only the top photo of the deck: sheens on the four under it cost a fifth of the frame rate, unseen) */
+/* ============ LIGHT — what leans with it (see LIGHT in app.js) ============ */
 /* the cover's photograph leans with the light too (rotate: its transform is the breathing) */
 .front .reveal:has(> .seal){perspective:700px}
 .front .seal{rotate:var(--tilt,0 0 1 0deg)}
-/* the wax seal: a glint that slides over it */
-.env-seal{overflow:hidden}
-.env-seal::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
-  background:radial-gradient(circle at 50% 50%,rgba(255,236,224,.55),rgba(255,236,224,0) 32%);
-  transform:translate(calc(var(--fx,0) * -22% - 14%),calc(var(--fy,0) * -22% - 18%))}
 /* gold lettering stands slightly proud of the paper: a light edge above, a soft shadow below */
 .t-date b,.front .sp-names{text-shadow:-.5px -.75px 0 var(--hi),1px 1.5px 2px rgba(var(--shade),.24),0 6px 14px rgba(var(--shade),.1)}
 .env-names{text-shadow:-.5px -.75px 0 rgba(255,250,235,.8),1px 1.5px 2px rgba(62,32,12,.22)}
@@ -1017,7 +996,6 @@ button{font:inherit;color:inherit}
             </a>
           </div>
         </div>
-        <span class="t-foil" aria-hidden="true"></span>
       </article>
     </div>
   </section>
@@ -1062,7 +1040,6 @@ button{font:inherit;color:inherit}
             </a>
           </div>
         </div>
-        <span class="t-foil" aria-hidden="true"></span>
       </article>
     </div>
   </section>
@@ -1108,7 +1085,6 @@ button{font:inherit;color:inherit}
             </a>
           </div>
         </div>
-        <span class="t-foil" aria-hidden="true"></span>
       </article>
     </div>
   </section>
@@ -1177,7 +1153,6 @@ button{font:inherit;color:inherit}
             <button type="button" class="btn ghost" id="rsvpAnother">RSVP for someone else</button>
           </div>
         </div>
-        <span class="t-foil" aria-hidden="true"></span>
       </div>
     </div>
   </section>
@@ -5629,21 +5604,21 @@ var fx = (function(){
 })();
 
 /* ===================================================================
-   LIGHT — one light for the whole invitation, moved by tilting the
-   phone (the mouse on a computer). What it falls on leans toward it and
-   a sheen slides across: the envelope, the cover's photograph, the
-   photo deck, the tickets and the RSVP card. Every value glides toward
-   where it is heading rather than jumping, which is what gives it
-   weight. Only transforms change each frame (nothing is repainted: a
-   moving background left stale tiles on Android). iOS asks permission
-   on a tap.
-     --fx --fy   the light, -1..1, on each lit element (sheens use it)
+   LIGHT — one light for the whole invitation. What it falls on leans
+   toward it: the envelope, the cover's photograph, the photo deck and
+   the tickets. It follows the phone's tilt where that needs no
+   permission (Android), and otherwise the finger while it touches the
+   screen (iPhones, which only give tilt after a permission prompt, and
+   the invitation never asks for one) or the mouse on a computer. Every
+   value glides toward where it is heading rather than jumping, which is
+   what gives it weight. Only transforms change each frame.
+     --fx --fy   the light, -1..1, on each lit element
      --rx --ry   its lean in degrees (the deck and the envelope use it)
      --tilt      the same lean as a rotate value, for the tickets (their
                  own transform belongs to the drift-in on arrival)
    =================================================================== */
-var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt], .rsvp-card');
-var light = { x:0, y:0, tx:0, ty:0, run:false }, tiltAsked = false;
+var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt]');
+var light = { x:0, y:0, tx:0, ty:0, run:false }, tilting = false;
 function aim(x, y){
   x = clamp(x, -1, 1); y = clamp(y, -1, 1);
   if(Math.abs(x - light.tx) < 0.004 && Math.abs(y - light.ty) < 0.004) return;
@@ -5668,31 +5643,23 @@ function glide(){
 }
 // a page coming into view takes the light as it is now (it was skipped while hidden)
 document.addEventListener('pagechange', function(){ if(!light.run){ light.run = true; requestAnimationFrame(glide); } });
-function onOrient(e){
-  if(e.gamma == null || e.beta == null) return;
-  aim(e.gamma / 22, (e.beta - 45) / 22);
-}
-function enableTilt(){
-  if(tiltAsked || reduced) return;
-  tiltAsked = true;
-  var D = window.DeviceOrientationEvent;
-  if(!D) return;
-  try{
-    if(typeof D.requestPermission === 'function'){
-      D.requestPermission().then(function(s){ if(s === 'granted') addEventListener('deviceorientation', onOrient); }).catch(function(){});
-    } else addEventListener('deviceorientation', onOrient);
-  }catch(e){}
-}
 (function tilt(){
   if(reduced) return;
-  addEventListener('pointermove', function(e){                         // a computer: the light follows the mouse
-    if(e.pointerType !== 'mouse') return;
-    aim((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2);
-  });
-  document.documentElement.addEventListener('mouseleave', function(){ aim(0, 0); });
   var D = window.DeviceOrientationEvent;
-  if(D && typeof D.requestPermission === 'function') addEventListener('click', enableTilt, { once:true });
-  else enableTilt();
+  // tilt only where it comes without asking (never DeviceOrientationEvent.requestPermission)
+  if(D && typeof D.requestPermission !== 'function') addEventListener('deviceorientation', function(e){
+    if(e.gamma == null || e.beta == null) return;
+    tilting = true;
+    aim(e.gamma / 22, (e.beta - 45) / 22);
+  });
+  function point(e){ aim((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2); }
+  addEventListener('pointermove', function(e){                         // the mouse; or a finger, where there is no tilt
+    if(e.pointerType === 'mouse' || !tilting) point(e);
+  }, { passive:true });
+  addEventListener('pointerdown', function(e){ if(e.pointerType !== 'mouse' && !tilting) point(e); }, { passive:true });
+  function home(e){ if(e.pointerType !== 'mouse' && !tilting) aim(0, 0); }   // the finger lifts: back to rest
+  addEventListener('pointerup', home); addEventListener('pointercancel', home);
+  document.documentElement.addEventListener('mouseleave', function(){ aim(0, 0); });
 })();
 
 /* ===================================================================
@@ -5804,7 +5771,7 @@ var envelope = (function(){
   btn.addEventListener('click', function(){ pager.go(1, 'scroll'); });
   // any way off page one: the music starts and the tab bar shimmers once
   function leave(){
-    music.start(); enableTilt();
+    music.start();
     if(!first || !tabs) return; first = false;
     tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer');
   }
