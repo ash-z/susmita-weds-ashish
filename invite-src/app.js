@@ -147,14 +147,22 @@ function setTilt(el, x, y){
   el.style.setProperty('--fx', x.toFixed(3));
   el.style.setProperty('--fy', y.toFixed(3));
 }
+// the whole page's depth (--sx/--sy on :root, see "3D DEPTH" in style.html) follows the same tilt
+function setScene(x, y){
+  root.style.setProperty('--sx', x.toFixed(3));
+  root.style.setProperty('--sy', y.toFixed(3));
+}
+var oriented = false;                                             // real tilt readings have arrived
 function onOrient(e){
   if(e.gamma == null || e.beta == null) return;
   var x = clamp(e.gamma/22, -1, 1), y = clamp((e.beta - 45)/22, -1, 1);
+  oriented = true;
   if(tiltPending) return;
   tiltPending = true;
   requestAnimationFrame(function(){
     tiltPending = false;
     tiltTargets.forEach(function(t){ setTilt(t, x, y); });
+    setScene(x, y);
   });
 }
 function enableTilt(){
@@ -181,6 +189,24 @@ function enableTilt(){
   var D = window.DeviceOrientationEvent;
   if(D && typeof D.requestPermission === 'function') addEventListener('click', enableTilt, { once:true });
   else enableTilt();
+  // desktop: the page's layers follow the mouse
+  var fine = window.matchMedia && matchMedia('(hover: hover) and (pointer: fine)').matches, moved = 0;
+  if(fine) addEventListener('pointermove', function(e){
+    if(e.pointerType === 'touch') return;
+    moved = Date.now();
+    setScene((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2);
+  }, { passive:true });
+  // no tilt readings (or a still mouse): a slow idle sway, so the depth is still felt; the visible ticket rocks with it
+  var t0 = performance.now(), last = 0;
+  (function idle(now){
+    requestAnimationFrame(idle);
+    if(oriented || document.hidden || now - last < 33 || Date.now() - moved < 4000) return;
+    last = now;
+    var k = (now - t0) / 1000, x = 0.42 * Math.sin(k * 0.55), y = 0.28 * Math.sin(k * 0.41 + 1.3);
+    setScene(x, y);
+    var a = document.querySelector('.screen.is-active [data-tilt]');
+    if(a && !a.matches(':hover')) setTilt(a, x * 0.8, y * 0.8);
+  })(t0);
 })();
 
 /* ===================================================================
@@ -564,7 +590,8 @@ var refit = (function(){
   var TILT = [-1.5, 4.5, -5];
   var SPRING = 'transform .6s cubic-bezier(.2,.85,.25,1.12), opacity .4s ease';
   // three cards show in the stack; the rest wait, hidden, behind the third
-  function pose(pos){ var p = Math.min(pos, 2); return 'translate3d(0,' + (p*14) + 'px,0) scale(' + (1 - p*0.055) + ') rotate(' + TILT[p] + 'deg)'; }
+  // depth: cards further down the stack sit further back (the deck keeps 3D, see .deck in style.html)
+  function pose(pos){ var p = Math.min(pos, 2); return 'translate3d(0,' + (p*14) + 'px,' + (-p*46) + 'px) scale(' + (1 - p*0.025) + ') rotate(' + TILT[p] + 'deg)'; }
   function layout(anim){
     order.forEach(function(ci, pos){
       var c = cards[ci];
@@ -596,14 +623,14 @@ var refit = (function(){
     var c = cards[order[0]];
     if(reduced){ order.push(order.shift()); layout(false); arrive(); return; }
     c.style.transition = 'transform .34s cubic-bezier(.3,.5,.4,1)';
-    c.style.transform = 'translate3d(' + (dir*135) + '%,-4%,0) rotate(' + (dir*22) + 'deg)';
+    c.style.transform = 'translate3d(' + (dir*135) + '%,-4%,60px) rotate(' + (dir*22) + 'deg) rotateY(' + (dir*-38) + 'deg)';   // thrown, turning in 3D
     setTimeout(function(){ order.push(order.shift()); c.style.zIndex = '0'; layout(true); arrive(); }, 320);
   }
   function prev(){                                   // the previous photo slides back in from the left
     markUsed(); buzz(6);
     order.unshift(order.pop());
     var c = cards[order[0]];
-    if(!reduced){ c.style.transition = 'none'; c.style.transform = 'translate3d(-135%,-4%,0) rotate(-22deg)'; void c.offsetWidth; }
+    if(!reduced){ c.style.transition = 'none'; c.style.transform = 'translate3d(-135%,-4%,60px) rotate(-22deg) rotateY(38deg)'; void c.offsetWidth; }
     layout(true); arrive();
   }
   function go(i){
@@ -629,7 +656,7 @@ var refit = (function(){
     if(!drag || e.pointerId !== drag.id) return;
     drag.dx = e.clientX - drag.x; drag.dy = e.clientY - drag.y;
     if(!drag.cap && Math.abs(drag.dx) > 6){ drag.cap = true; try{ deck.setPointerCapture(e.pointerId); }catch(err){} }
-    drag.c.style.transform = 'translate3d(' + drag.dx + 'px,' + (drag.dy*0.25) + 'px,0) rotate(' + (TILT[0] + drag.dx*0.06) + 'deg)';
+    drag.c.style.transform = 'translate3d(' + drag.dx + 'px,' + (drag.dy*0.25) + 'px,' + Math.min(40, Math.abs(drag.dx)*0.2) + 'px) rotate(' + (TILT[0] + drag.dx*0.06) + 'deg) rotateY(' + (drag.dx*-0.12) + 'deg)';
   });
   function end(e){
     if(!drag || e.pointerId !== drag.id) return;
