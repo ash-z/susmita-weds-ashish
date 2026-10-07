@@ -313,7 +313,7 @@ button{font:inherit;color:inherit}
   width:clamp(190px,min(74vw,calc((100svh - 330px) * .8)),320px);aspect-ratio:4/5;margin:0 auto;
   touch-action:pan-y;-webkit-user-select:none;user-select:none;outline-offset:14px;
   transform:rotateX(calc(var(--ry,0) * .5deg)) rotateY(calc(var(--rx,0) * .5deg));
-  transition:transform .3s ease-out;transform-style:preserve-3d;   /* the stack has real depth (pose() in app.js) */
+  transition:transform .3s ease-out;
 }
 .card{
   position:absolute;inset:0;margin:0;border-radius:22px;
@@ -676,30 +676,6 @@ button{font:inherit;color:inherit}
 
 #fx{position:fixed;inset:0;width:100%;height:100%;z-index:60;pointer-events:none}
 
-/* ============ 3D DEPTH ============
-   Inside each ticket the layers sit at different depths (preserve-3d): the card at the back, its text a little in
-   front, the gopuram, garland and florals furthest out, so tilting the ticket moves them against each other. Across
-   each page, the garland, heading and ornaments drift by different amounts with --sx/--sy (phone tilt, the mouse, or
-   a slow idle sway when neither is there), set on :root by app.js. Uses `translate` so it adds to existing transforms. */
-.ticket{transform-style:preserve-3d}
-.ticket > .t-top,.ticket > .t-bot{transform:translateZ(18px)}
-.ticket > .t-foil{transform:translateZ(19px)}
-.t-gopuram{transform:translate(-50%,-84%) translateZ(60px)}
-.t-flora-l,.t-flora-r{transform:translateZ(44px) scaleY(-1)}
-.t-flora-b{transform:translateZ(44px)}
-.t-toranam{transform:translate(-50%,-38%) translateZ(50px)}
-.t-ganesha{transform:translateZ(52px)}
-/* the tilt itself (the fade-in rule below used to cancel it), and a 3D entrance: the ticket swings up into place */
-.js .ticket.reveal.in{transform:perspective(900px) rotateX(calc(var(--ry,0) * 1deg)) rotateY(calc(var(--rx,0) * 1deg));
-  transition:opacity .8s ease,transform .3s ease-out,filter .8s ease;animation:ticket-in 1.15s cubic-bezier(.2,.8,.2,1) var(--rd,0s) backwards}
-@keyframes ticket-in{from{opacity:0;transform:perspective(900px) translateY(60px) translateZ(-120px) rotateX(46deg)}}
-/* page parallax: far things drift against the tilt, near things with it */
-.crown,.head,.fams,.close,.card-diya,.pk,.deck-ui{transition:translate .35s ease-out}
-.crown{translate:calc(var(--sx,0) * -9px) calc(var(--sy,0) * -5px)}
-.head{translate:calc(var(--sx,0) * -4px) calc(var(--sy,0) * -3px)}
-.fams,.close{translate:calc(var(--sx,0) * 3px) calc(var(--sy,0) * 2px)}
-.card-diya,.pk{translate:calc(var(--sx,0) * 9px) calc(var(--sy,0) * 6px)}
-
 /* ============ MOTION ============ */
 .js .reveal{opacity:0;transform:translateY(22px);filter:blur(5px)}
 .js .reveal.in{opacity:1;transform:none;filter:none;
@@ -761,8 +737,6 @@ button{font:inherit;color:inherit}
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}
   .js .reveal{opacity:1!important;transform:none!important;transition:none!important}
-  .crown,.head,.fams,.close,.card-diya,.pk{translate:none!important}
-  .js .ticket.reveal.in{animation:none!important}
   .env-3d,.env-seal,.env-hint,.seal,.seal.sp-a,.sp-a,.card-face,.card-in,.swipe-cue svg,.hint::before,.open-btn svg,.open-btn::after,.rail,.rail svg,.mus .w,.tabs-in,.tabs-in::after{animation:none!important}
   .splash,.tabs,.ticket,.deck,.seg-pill{transition:none!important}
   .screen,.edge{animation:none!important}

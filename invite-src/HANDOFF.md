@@ -74,16 +74,6 @@ they suit. All must stay smooth on ordinary phones and skip or soften for "reduc
   envelope drops away as the cover rises in (the kolam then draws). Skipped for reduce motion and for links that
   open a page directly; going back to the cover shows the cover, not the envelope. The groom's side envelope names
   Ashish first (groom_first swaps both the cover's and the envelope's names).
-- **Stage 2, depth on every page (7 Oct):** "3D DEPTH" in style.html, "TILT" in app.js.
-  - Tickets keep real 3D inside (preserve-3d): card at the back, text 18px out, florals 44px, garland 50px, gopuram
-    60px, so tilting moves the layers against each other. The tilt works again (the fade-in rule used to cancel it).
-  - Tickets swing up into place in 3D when their page arrives (`ticket-in`).
-  - Page parallax: garland, heading, families, closing, diya and peacocks drift with `--sx/--sy` on :root (the
-    `translate` property, so existing transforms are untouched). The phone's tilt drives it; the mouse on desktop;
-    otherwise a slow idle sway (30fps, paused when the page is hidden), which also gently rocks the visible ticket.
-  - The photo deck has depth: cards further back sit 46px behind each other; a dragged photo turns in 3D and is
-    thrown off turning, and comes back the same way.
-  - Reduce motion: no parallax, no 3D entrance, no idle sway.
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct
