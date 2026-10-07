@@ -64,6 +64,8 @@ node og.mjs "$PWD/../docs/index.html" /tmp/og.png         # link-preview image; 
 - No algorithmic line-art or posterised portraits (tried twice, rejected).
 
 ## 3D (branch `claude/invite-3d`)
+Live (promoted to dev and golden on 7 Oct, at the couple's request): the envelope as page one, the letter that
+becomes the cover (page two), and the shadows on every page, all below. Further 3D work continues on the branch.
 Kept: the 3D opening (below). Tried and taken out at the couple's request (7 Oct): "depth on every page" (layered
 tickets, tilt parallax, idle sway; too weak to notice on their phone) and booklet page turns ("as cliché as it
 gets"); both are in the history (commits 747a8f6 and a47c0c7, reverted). Researched real 3D sites (7 Oct);
