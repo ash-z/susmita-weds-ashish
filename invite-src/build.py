@@ -114,16 +114,12 @@ photos = here / "photos" / "out"
 (root / "docs" / "photos").mkdir(exist_ok=True)
 for f in photos.glob("*.webp"):
     (root / "docs" / "photos" / f.name).write_bytes(f.read_bytes())
-# a photograph with a depth map (photos_depth.py) also gets data-depth, for the light to shift it by
 def photo_src(inline, up=""):
-    def url(n):
-        if inline:
-            return "data:image/webp;base64," + base64.b64encode((photos / f"{n}.webp").read_bytes()).decode()
-        return f"{up}photos/{n}.webp"
     def sub(m):
         n = m.group(1)
-        depth = f' data-depth="{url(n + "-depth")}"' if (photos / f"{n}-depth.webp").exists() else ""
-        return f'src="{url(n)}"' + depth
+        if inline:
+            return 'src="data:image/webp;base64,' + base64.b64encode((photos / f"{n}.webp").read_bytes()).decode() + '"'
+        return f'src="{up}photos/{n}.webp"'
     return sub
 badge = ('<div aria-hidden="true" style="position:fixed;top:calc(env(safe-area-inset-top,0px) + 8px);left:8px;'
          'z-index:9999;pointer-events:none;padding:2px 8px;border-radius:999px;background:#9A3A32;color:#fff;'

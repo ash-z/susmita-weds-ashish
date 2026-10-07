@@ -151,7 +151,7 @@ var fx = (function(){
                  own transform belongs to the drift-in on arrival)
    =================================================================== */
 var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt]');
-var light = { x:0, y:0, tx:0, ty:0, run:false }, tilting = false, lightHooks = [];   // hooks: called each frame it moves
+var light = { x:0, y:0, tx:0, ty:0, run:false }, tilting = false;
 function aim(x, y){
   x = clamp(x, -1, 1); y = clamp(y, -1, 1);
   if(Math.abs(x - light.tx) < 0.004 && Math.abs(y - light.ty) < 0.004) return;
@@ -171,7 +171,6 @@ function glide(){
     el.style.setProperty('--rx', rx.toFixed(2)); el.style.setProperty('--ry', ry.toFixed(2));
     el.style.setProperty('--tilt', tilt);
   });
-  lightHooks.forEach(function(f){ f(x, y); });
   if(settled){ light.run = false; return; }
   requestAnimationFrame(glide);
 }
@@ -719,125 +718,6 @@ var refit = (function(){
     document.addEventListener('pagesettle', function(e){ if(e.detail.id === 'us') teach(); });
     if(pager.current() === 'us') teach();
   }
-})();
-
-/* ===================================================================
-   DEPTH — the photograph that is showing (the deck's top card, or the
-   cover's) shifts with the light by its depth map (photos_depth.py):
-   nearer things one way, the background the other, as if seen from a
-   little to the side. One small WebGL canvas, laid over that photo and
-   moved to the next one when it changes; every other photo stays a
-   plain image. At rest it draws the photo exactly as it is. Without
-   WebGL, or with reduce motion, the photos are just photos.
-   =================================================================== */
-(function depth(){
-  if(reduced) return;
-  var cv = document.createElement('canvas'), gl = null;
-  cv.className = 'depth'; cv.setAttribute('aria-hidden', 'true');
-  try{ gl = cv.getContext('webgl', { alpha:false, antialias:false, premultipliedAlpha:false, preserveDrawingBuffer:false }); }catch(e){}
-  if(!gl) return;
-  var VS = 'attribute vec2 p;varying vec2 uv;void main(){uv=p*.5+.5;gl_Position=vec4(p,0.,1.);}';
-  // each pixel looks along its line of sight from nearest to farthest and takes the first surface it meets, so
-  // nearer things hide what is behind them (a single shift by depth left ghosts of hair and ears at the edges); then a
-  // few halvings between that step and the one before find the edge exactly (no stair-steps). The photo zooms in a
-  // little as the light moves off centre, so its own borders never come into view (at rest it is exactly the photo).
-  var FS = 'precision mediump float;uniform sampler2D img,dep;uniform vec2 L;varying vec2 uv;' +
-    'const float F=.55;' +
-    'void main(){vec2 c=(uv-.5)*(1.-1.2*length(L))+.5;vec2 s=c;float hp=1.;' +
-    'for(int i=0;i<=12;i++){float h=1.-float(i)/12.;' +
-    'if(texture2D(dep,c+L*(h-F)).r>=h){float a=h,b=hp;' +
-    'for(int j=0;j<3;j++){float m=(a+b)*.5;if(texture2D(dep,c+L*(m-F)).r>=m)a=m;else b=m;}' +
-    's=c+L*(a-F);break;}hp=h;}' +
-    'gl_FragColor=texture2D(img,clamp(s,0.,1.));}';
-  function sh(type, src){ var o = gl.createShader(type); gl.shaderSource(o, src); gl.compileShader(o); return o; }
-  var pr = gl.createProgram();
-  gl.attachShader(pr, sh(gl.VERTEX_SHADER, VS)); gl.attachShader(pr, sh(gl.FRAGMENT_SHADER, FS)); gl.linkProgram(pr);
-  if(!gl.getProgramParameter(pr, gl.LINK_STATUS)) return;
-  gl.useProgram(pr);
-  var buf = gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER, buf);
-  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
-  var ap = gl.getAttribLocation(pr, 'p'); gl.enableVertexAttribArray(ap); gl.vertexAttribPointer(ap, 2, gl.FLOAT, false, 0, 0);
-  gl.uniform1i(gl.getUniformLocation(pr, 'img'), 0); gl.uniform1i(gl.getUniformLocation(pr, 'dep'), 1);
-  var uL = gl.getUniformLocation(pr, 'L');
-  gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
-
-  var SHIFT = 0.06;                                        // the most a pixel moves, as a share of the photo's width
-  var cache = {}, cur = null, ready = false;
-  function tex(source){
-    var t = gl.createTexture(); gl.bindTexture(gl.TEXTURE_2D, t);
-    [gl.TEXTURE_MIN_FILTER, gl.TEXTURE_MAG_FILTER].forEach(function(k){ gl.texParameteri(gl.TEXTURE_2D, k, gl.LINEAR); });
-    [gl.TEXTURE_WRAP_S, gl.TEXTURE_WRAP_T].forEach(function(k){ gl.texParameteri(gl.TEXTURE_2D, k, gl.CLAMP_TO_EDGE); });
-    gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, source);
-    return t;
-  }
-  function loaded(im, fn){ if(im.complete && im.naturalWidth) fn(); else im.addEventListener('load', fn, { once:true }); }
-  // the photo to shift: the deck's top card on Moments, the cover's on page two
-  function target(){
-    var page = document.querySelector('.screen.is-active');
-    if(!page) return null;
-    if(page.id === 'us') return page.querySelector('#deck .card.top .card-face img[data-depth]');
-    if(page.id === 'front') return page.querySelector('.seal .cover img[data-depth]');
-    return null;
-  }
-  // anything wrong (a browser that will not hand the photo to WebGL, a phone that draws nothing): the photos stay
-  // plain photos for the rest of the visit. The canvas only shows once it has drawn a photo and the drawing checks out.
-  var dead = false;
-  function die(){ dead = true; ready = false; cur = null; if(cv.parentNode) cv.parentNode.removeChild(cv); }
-  function drawn(){                                          // read back a few points: all black means nothing was drawn
-    var px = new Uint8Array(4), ok = false, W = cv.width, H = cv.height;
-    [[.5,.5],[.3,.3],[.7,.3],[.3,.7],[.7,.7]].forEach(function(p){
-      gl.readPixels(Math.floor(W * p[0]), Math.floor(H * p[1]), 1, 1, gl.RGBA, gl.UNSIGNED_BYTE, px);
-      if(px[0] + px[1] + px[2] > 12) ok = true;
-    });
-    return ok && gl.getError() === gl.NO_ERROR;
-  }
-  function bind(){
-    if(dead) return;
-    var im = target();
-    if(im === cur) return;
-    cur = im; ready = false;
-    if(cv.parentNode) cv.parentNode.removeChild(cv);
-    if(!im) return;
-    var key = im.getAttribute('data-depth');
-    function go(){
-      if(cur !== im || dead) return;
-      var c = cache[key];
-      cv.style.visibility = 'hidden';
-      im.parentNode.insertBefore(cv, im.nextSibling);
-      gl.activeTexture(gl.TEXTURE0); gl.bindTexture(gl.TEXTURE_2D, c.img);
-      gl.activeTexture(gl.TEXTURE1); gl.bindTexture(gl.TEXTURE_2D, c.dep);
-      ready = true; size(); draw(light.x, light.y);
-      if(!drawn()) return die();
-      cv.style.visibility = '';
-    }
-    if(cache[key]){ go(); return; }
-    var d = new Image(); d.decoding = 'async'; d.src = key;
-    d.addEventListener('error', die, { once:true });
-    loaded(im, function(){ loaded(d, function(){
-      if(dead) return;
-      try{ if(!cache[key]) cache[key] = { img:tex(im), dep:tex(d) }; }catch(e){ return die(); }
-      if(gl.getError() !== gl.NO_ERROR) return die();
-      go();
-    }); });
-  }
-  function size(){
-    if(!cv.parentNode) return;
-    var r = Math.min(devicePixelRatio || 1, 1.5), w = Math.round(cv.clientWidth * r), h = Math.round(cv.clientHeight * r);
-    if(w && h && (cv.width !== w || cv.height !== h)){ cv.width = w; cv.height = h; gl.viewport(0, 0, w, h); }
-  }
-  function draw(x, y){
-    if(!ready) return;
-    gl.uniform2f(uL, -x * SHIFT, y * SHIFT * 0.8);        // (the photo is 4:5, so the same pixels up and down)
-    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-  }
-  cv.addEventListener('webglcontextlost', function(e){ e.preventDefault(); die(); });
-  lightHooks.push(draw);
-  document.addEventListener('pagesettle', bind);
-  document.addEventListener('pagechange', function(){ setTimeout(bind, 0); });
-  var deck = $('#deck');
-  if(deck && window.MutationObserver) new MutationObserver(bind).observe(deck, { subtree:true, attributes:true, attributeFilter:['class'] });
-  addEventListener('resize', function(){ if(ready){ size(); draw(light.x, light.y); } });
-  bind();
 })();
 
 /* =============== COUNTDOWNS (each ticket keeps its own) =============== */

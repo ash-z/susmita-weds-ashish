@@ -78,19 +78,12 @@ Plan after researching 3D sites (7 Oct), in order: A light that moves with the p
   so they use `rotate`, in their wrap's perspective. Gold numbers and the cover's names stand proud (a light edge, a
   soft shadow). Tried and taken out the same day: sliding sheens/glints across the cards and photos (the old faint
   ticket foil too): "the glint in the middle looks very fake". Reduce motion: no tilt.
-- **B, photos with depth (7 Oct, on the branch):** `photos_depth.py MODEL.onnx` makes a depth map per photo
-  (photos/out/<name>-depth.webp, 2-3 KB, lighter is nearer) with Depth Anything V2 small (ONNX from the releases of
-  github.com/fabio-sim/Depth-Anything-ONNX; Hugging Face is blocked here, GitHub is not; the model is not kept in the
-  repo, the maps are). build.py gives each photo with a map a data-depth attribute. DEPTH in app.js: one WebGL
-  canvas laid over the photo that is showing (the deck's top card, the cover's photograph), moved when it changes;
-  each pixel looks along its line of sight (12 steps, then 3 halvings to find the edge exactly) and takes the first
-  surface it meets, so nearer things hide what is behind them (a plain shift by depth left ghosts of ears and hair).
-  Strength SHIFT 0.06 of the width (0.04 was too faint to notice, 7 Oct); the photo zooms in slightly as the light
-  moves off centre so its borders never smear into view. It draws when the light moves (a lightHooks entry), at
-  1.5x at most, and at rest draws the photo exactly. Fail-safe (after the couple saw a black
-  photo on their phone, 7 Oct): the canvas only shows once it has drawn a photo and a read-back of a few points is
-  not black; any failure (WebGL refusing the photo, a blank drawing, a lost context) leaves plain photos for the rest
-  of the visit. No WebGL or reduce motion: plain photos.
+- **B, photos with depth: tried and taken out (7 Oct).** Depth maps (Depth Anything V2) and a WebGL canvas that shifted
+  each pixel by its depth as the light moved (commits ebc0985, b634eba, 75e80d3, reverted). The couple saw nothing 3D
+  in it ("making picture 3d is not working"), and one phone showed a black photo. Why it fails: it is one weak depth
+  cue (pixels shifted sideways), the depth in these photos is shallow (people a step in front of a wall), and it
+  only moves when the guest tilts or drags; a photo held still is flat. What reads as 3D on a screen is an object
+  that moves on its own, rotating or travelling through space (the envelope's flap was the part they liked).
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct
