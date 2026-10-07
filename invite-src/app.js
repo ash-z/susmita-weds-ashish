@@ -276,14 +276,18 @@ var cover = (function opening(){
       envBtn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
       envBtn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
     });
+    // one tap: the seal pops and the flap opens, the card rises, then grows toward you and becomes the invitation
     envBtn.addEventListener('click', function(){
-      if(env.classList.contains('open')) return;
+      if(done || env.classList.contains('open')) return;
       buzz([10, 40, 14]); music.start();                                   // the tap is the gesture that lets music play
       env.classList.add('open');
-      setTimeout(function(){ env.classList.add('leave'); }, 1850);
-      setTimeout(function(){ root.classList.remove('env-on'); drawSeal(); }, 2400);    // the cover rises as the envelope clears
-      setTimeout(function(){ env.hidden = true; try{ btn.focus({ preventScroll:true }); }catch(e){} }, 3000);
+      setTimeout(function(){ env.classList.add('zoom'); open(true); }, 1900);
     });
+  }
+  function reseal(){                                               // back to the cover: the envelope, sealed again
+    if(!env || reduced) return false;
+    env.classList.remove('open', 'zoom'); env.hidden = false; root.classList.add('env-on');
+    return true;
   }
   function drawSeal(){
     if(done || reduced) return;
@@ -297,21 +301,24 @@ var cover = (function opening(){
       drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
     }); });
   }
-  if(!envUp) drawSeal();                                           // with the envelope, the kolam draws as the card appears
+  if(!envUp) drawSeal();                                           // (with the envelope the cover is never shown, so no kolam)
 
   function shimmer(){ if(!tabs) return; tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer'); }
   if(done) shimmer();                                            // arrived on a page from a shared link
   function finish(){
-    root.classList.remove('locked');
+    root.classList.remove('locked', 'env-on');
     root.classList.add('opened');
-    sp.hidden = true;
+    sp.hidden = true; sp.classList.remove('fade');
+    if(env) env.hidden = true;
   }
-  function open(){
+  function open(fromEnvelope){
     if(done) return; done = true;
-    buzz(12); enableTilt(); music.start(); shimmer();
+    if(fromEnvelope !== true) buzz(12);
+    enableTilt(); music.start(); shimmer();
     root.classList.add('ui');
     [app, tabs, pal, rail].forEach(function(e){ if(e) e.inert = false; });
     if(reduced){ finish(); return; }
+    if(fromEnvelope === true){ sp.classList.add('fade'); setTimeout(finish, 1000); return; }   // the card dissolves into page one
     sp.classList.add('opening');
     setTimeout(function(){ sp.classList.add('gone'); }, 360);
     setTimeout(finish, 1400);
@@ -323,9 +330,10 @@ var cover = (function opening(){
     sp.classList.remove('opening'); sp.classList.add('gone');
     sp.hidden = false;
     root.classList.remove('opened', 'ui'); root.classList.add('locked');
+    var sealed = reseal();
     void sp.offsetWidth;
     requestAnimationFrame(function(){ sp.classList.remove('gone'); });
-    try{ btn.focus({ preventScroll:true }); }catch(e){}
+    try{ (sealed ? envBtn : btn).focus({ preventScroll:true }); }catch(e){}
     buzz(8);
   }
   btn.addEventListener('click', open);

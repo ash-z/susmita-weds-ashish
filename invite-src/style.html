@@ -98,8 +98,9 @@ button{font:inherit;color:inherit}
 .open-btn:active{transform:scale(.96)}
 /* ============ 3D OPENING — the envelope ============
    Before the cover: an ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the
-   finger or pointer. Tapping it pops the seal, swings the flap open towards you, a card rises out, and the envelope
-   drops away to reveal the cover (the card). html.env-on while it is up; .env.open runs the opening. */
+   finger or pointer. One tap pops the seal, swings the flap open towards you and lifts a card out, which grows toward
+   you and dissolves into the invitation's first page (no second "open" step). html.env-on while it is up (the old
+   cover stays hidden; it is only for reduce motion); .env.open runs the opening, .env.zoom the hand-off. */
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
   padding-top:min(calc(var(--crown) * .22),12vh);perspective:1200px;perspective-origin:50% 40%}
 .env[hidden]{display:none}
@@ -152,8 +153,12 @@ button{font:inherit;color:inherit}
 .env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
 .env.open .env-3d{animation:none}
 .env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
-.env.leave .env-btn{transform:translateY(55vh) rotateX(25deg) scale(.9);opacity:0;transition:transform .9s cubic-bezier(.6,0,.4,1),opacity .5s ease .1s}
-.env.leave{pointer-events:none}
+/* then the card grows toward you and dissolves as the envelope fades, and the splash fades into page one */
+.env.zoom .env-card{transform:translateZ(1px) translateY(-46%) scale(2.8);opacity:0;transition:transform 1s cubic-bezier(.5,0,.25,1),opacity .6s ease .4s}
+.env.zoom .env-back,.env.zoom .env-front,.env.zoom .env-flap{opacity:0;transition:opacity .45s ease}
+.env.zoom{pointer-events:none}
+.splash.fade{opacity:0;transition:opacity .9s ease .15s}
+.env-card-en{margin-top:5%;font-family:"Marcellus",Georgia,serif;font-size:.36em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}
 .open-btn svg{width:17px;height:17px;flex:none;animation:cue-nudge 1.4s ease-in-out infinite}

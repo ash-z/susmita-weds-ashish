@@ -117,8 +117,9 @@ button{font:inherit;color:inherit}
 .open-btn:active{transform:scale(.96)}
 /* ============ 3D OPENING — the envelope ============
    Before the cover: an ivory envelope, gold-edged, sealed with a wax seal bearing Ganesha. It leans in 3D toward the
-   finger or pointer. Tapping it pops the seal, swings the flap open towards you, a card rises out, and the envelope
-   drops away to reveal the cover (the card). html.env-on while it is up; .env.open runs the opening. */
+   finger or pointer. One tap pops the seal, swings the flap open towards you and lifts a card out, which grows toward
+   you and dissolves into the invitation's first page (no second "open" step). html.env-on while it is up (the old
+   cover stays hidden; it is only for reduce motion); .env.open runs the opening, .env.zoom the hand-off. */
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
   padding-top:min(calc(var(--crown) * .22),12vh);perspective:1200px;perspective-origin:50% 40%}
 .env[hidden]{display:none}
@@ -171,8 +172,12 @@ button{font:inherit;color:inherit}
 .env.open .env-card{transform:translateZ(1px) translateY(-46%);transition-delay:1s}
 .env.open .env-3d{animation:none}
 .env.open .env-hint{animation:none;opacity:0;transition:opacity .25s}
-.env.leave .env-btn{transform:translateY(55vh) rotateX(25deg) scale(.9);opacity:0;transition:transform .9s cubic-bezier(.6,0,.4,1),opacity .5s ease .1s}
-.env.leave{pointer-events:none}
+/* then the card grows toward you and dissolves as the envelope fades, and the splash fades into page one */
+.env.zoom .env-card{transform:translateZ(1px) translateY(-46%) scale(2.8);opacity:0;transition:transform 1s cubic-bezier(.5,0,.25,1),opacity .6s ease .4s}
+.env.zoom .env-back,.env.zoom .env-front,.env.zoom .env-flap{opacity:0;transition:opacity .45s ease}
+.env.zoom{pointer-events:none}
+.splash.fade{opacity:0;transition:opacity .9s ease .15s}
+.env-card-en{margin-top:5%;font-family:"Marcellus",Georgia,serif;font-size:.36em;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
 /* cues: the arrow nudges toward "open", and a ring pulses out from the button once it has risen in */
 .open-btn{display:inline-flex;align-items:center;gap:10px;position:relative}
 .open-btn svg{width:17px;height:17px;flex:none;animation:cue-nudge 1.4s ease-in-out infinite}
@@ -776,7 +781,7 @@ button{font:inherit;color:inherit}
     <button class="env-btn" id="envBtn" type="button" aria-label="Open the invitation">
       <span class="env-3d" aria-hidden="true">
         <span class="env-back"></span>
-        <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i></span>
+        <span class="env-card"><span class="telugu" lang="te">శుభలేఖ</span><i></i><span class="env-card-en">Wedding Invitation</span></span>
         <span class="env-front"><span class="env-names"><span class="n">Ashish</span><span class="amp">&amp;</span><span class="n">Sai Susmita</span></span><span class="env-date">29 · 10 · 2026</span></span>
         <span class="env-flap"></span>
         <span class="env-seal"></span>
@@ -5619,14 +5624,18 @@ var cover = (function opening(){
       envBtn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
       envBtn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
     });
+    // one tap: the seal pops and the flap opens, the card rises, then grows toward you and becomes the invitation
     envBtn.addEventListener('click', function(){
-      if(env.classList.contains('open')) return;
+      if(done || env.classList.contains('open')) return;
       buzz([10, 40, 14]); music.start();                                   // the tap is the gesture that lets music play
       env.classList.add('open');
-      setTimeout(function(){ env.classList.add('leave'); }, 1850);
-      setTimeout(function(){ root.classList.remove('env-on'); drawSeal(); }, 2400);    // the cover rises as the envelope clears
-      setTimeout(function(){ env.hidden = true; try{ btn.focus({ preventScroll:true }); }catch(e){} }, 3000);
+      setTimeout(function(){ env.classList.add('zoom'); open(true); }, 1900);
     });
+  }
+  function reseal(){                                               // back to the cover: the envelope, sealed again
+    if(!env || reduced) return false;
+    env.classList.remove('open', 'zoom'); env.hidden = false; root.classList.add('env-on');
+    return true;
   }
   function drawSeal(){
     if(done || reduced) return;
@@ -5640,21 +5649,24 @@ var cover = (function opening(){
       drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
     }); });
   }
-  if(!envUp) drawSeal();                                           // with the envelope, the kolam draws as the card appears
+  if(!envUp) drawSeal();                                           // (with the envelope the cover is never shown, so no kolam)
 
   function shimmer(){ if(!tabs) return; tabs.classList.remove('shimmer'); void tabs.offsetWidth; tabs.classList.add('shimmer'); }
   if(done) shimmer();                                            // arrived on a page from a shared link
   function finish(){
-    root.classList.remove('locked');
+    root.classList.remove('locked', 'env-on');
     root.classList.add('opened');
-    sp.hidden = true;
+    sp.hidden = true; sp.classList.remove('fade');
+    if(env) env.hidden = true;
   }
-  function open(){
+  function open(fromEnvelope){
     if(done) return; done = true;
-    buzz(12); enableTilt(); music.start(); shimmer();
+    if(fromEnvelope !== true) buzz(12);
+    enableTilt(); music.start(); shimmer();
     root.classList.add('ui');
     [app, tabs, pal, rail].forEach(function(e){ if(e) e.inert = false; });
     if(reduced){ finish(); return; }
+    if(fromEnvelope === true){ sp.classList.add('fade'); setTimeout(finish, 1000); return; }   // the card dissolves into page one
     sp.classList.add('opening');
     setTimeout(function(){ sp.classList.add('gone'); }, 360);
     setTimeout(finish, 1400);
@@ -5666,9 +5678,10 @@ var cover = (function opening(){
     sp.classList.remove('opening'); sp.classList.add('gone');
     sp.hidden = false;
     root.classList.remove('opened', 'ui'); root.classList.add('locked');
+    var sealed = reseal();
     void sp.offsetWidth;
     requestAnimationFrame(function(){ sp.classList.remove('gone'); });
-    try{ btn.focus({ preventScroll:true }); }catch(e){}
+    try{ (sealed ? envBtn : btn).focus({ preventScroll:true }); }catch(e){}
     buzz(8);
   }
   btn.addEventListener('click', open);

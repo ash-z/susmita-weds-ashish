@@ -64,15 +64,19 @@ node og.mjs "$PWD/../docs/index.html" /tmp/og.png         # link-preview image; 
 - No algorithmic line-art or posterised portraits (tried twice, rejected).
 
 ## 3D (branch `claude/invite-3d`)
-The plan, in stages, each previewed before the next: (1) the 3D opening; (2) depth on every page (layers that move
-with tilt or swipe, tickets that flip); (3) 3D page turns; (4) a walk-through mandapam; plus 3D touches wherever
-they suit. All must stay smooth on ordinary phones and skip or soften for "reduce motion".
+Kept: the 3D opening (below). Tried and taken out at the couple's request (7 Oct): "depth on every page" (layered
+tickets, tilt parallax, idle sway; too weak to notice on their phone) and booklet page turns ("as cliché as it
+gets"); both are in the history (commits 747a8f6 and a47c0c7, reverted). Next: look at real 3D sites (GitHub, wedding
+sites, portfolios) for ideas before building more. Anything 3D must stay smooth on ordinary phones and skip or
+soften for "reduce motion".
 - **Stage 1, the 3D opening (done 7 Oct):** before the cover, a sealed envelope (`#env` in body.html; "3D OPENING"
   in style.html; the cover module in app.js). Ivory, gold-edged, the names and date on the pocket, a maroon wax seal
-  with Ganesha on the flap; it leans toward the finger or pointer and floats. Tapping it (or Enter) pops the seal,
-  starts the music, swings the flap open in 3D (pure CSS 3D transforms, no WebGL), a శుభలేఖ card rises out, and the
-  envelope drops away as the cover rises in (the kolam then draws). Skipped for reduce motion and for links that
-  open a page directly; going back to the cover shows the cover, not the envelope. The groom's side envelope names
+  with Ganesha on the flap; it leans toward the finger or pointer and floats. One tap (or Enter) pops the seal,
+  starts the music, swings the flap open in 3D (pure CSS 3D transforms, no WebGL), lifts a card out (శుభలేఖ /
+  Wedding Invitation), which grows toward you and dissolves into the invitation's first page: there is no second
+  "Open invitation" step (the couple found two openings redundant, 7 Oct). The old cover, with its button, is only
+  for reduce motion. Links that open a page directly skip it all; going back to the cover (▲ on page one) shows
+  the envelope sealed again. The groom's side envelope names
   Ashish first (groom_first swaps both the cover's and the envelope's names).
 
 ## Three invitations
