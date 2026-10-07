@@ -7,7 +7,10 @@
   --bg:#F7F2E8; --bg2:#EFE6D5; --ink:#2B2318;
   --gold:#826019; --accent:#9A3A32; --muted:#6B5B47;
   --surface:#FFFCF6; --rule:rgba(169,124,43,.28); --card:rgba(169,124,43,.06);
-  --shadow:0 24px 50px -20px rgba(70,45,15,.42);
+  /* depth, layered: a tight contact shadow, then softer, wider ones */
+  --shadow:0 1px 2px rgba(62,32,12,.08),0 4px 8px -2px rgba(62,32,12,.1),0 14px 26px -8px rgba(62,32,12,.2),0 36px 60px -22px rgba(62,32,12,.42);
+  --shadow-sm:0 1px 2px rgba(62,32,12,.12),0 4px 10px -4px rgba(62,32,12,.24);
+  --rim:inset 0 1px 0 rgba(255,255,255,.75);       /* light catching a card's top edge */
   --bg-a0:rgba(247,242,232,0);
   --tab-h:66px;
   --ganesha:#8A2C22;
@@ -19,7 +22,9 @@
     --bg:#17100F; --bg2:#241419; --ink:#F5E9D4;
     --gold:#DCB262; --accent:#D0707A; --muted:#B39E8A;
     --surface:#2A1C1F; --rule:rgba(220,178,98,.26); --card:rgba(220,178,98,.07);
-    --shadow:0 24px 50px -20px rgba(0,0,0,.75);
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 12px -2px rgba(0,0,0,.34),0 18px 32px -8px rgba(0,0,0,.5),0 40px 70px -20px rgba(0,0,0,.72);
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 4px 10px -4px rgba(0,0,0,.6);
+    --rim:inset 0 1px 0 rgba(255,228,180,.13);
     --bg-a0:rgba(23,16,15,0);
     --ganesha:#DCB262;
     --shade:0,0,0;
@@ -30,7 +35,9 @@
   --bg:#17100F; --bg2:#241419; --ink:#F5E9D4;
   --gold:#DCB262; --accent:#D0707A; --muted:#B39E8A;
   --surface:#2A1C1F; --rule:rgba(220,178,98,.26); --card:rgba(220,178,98,.07);
-  --shadow:0 24px 50px -20px rgba(0,0,0,.75);
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 12px -2px rgba(0,0,0,.34),0 18px 32px -8px rgba(0,0,0,.5),0 40px 70px -20px rgba(0,0,0,.72);
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 4px 10px -4px rgba(0,0,0,.6);
+  --rim:inset 0 1px 0 rgba(255,228,180,.13);
   --bg-a0:rgba(23,16,15,0);
 }
 
@@ -231,7 +238,7 @@ button{font:inherit;color:inherit}
 .tabs.shimmer .tabs-in::after{animation:tab-sweep 1.7s ease-in-out 1.2s 3}
 .tabs.shimmer .tabs-in{animation:tab-glow 1.7s ease-in-out 1.2s 3}
 @keyframes tab-sweep{0%{transform:translateX(-110%);opacity:1}100%{transform:translateX(110%);opacity:1}}
-@keyframes tab-glow{0%,100%{box-shadow:0 14px 34px -14px rgba(0,0,0,.35)}50%{box-shadow:0 14px 34px -14px rgba(0,0,0,.35),0 0 0 1px rgba(220,178,98,.55),0 0 18px 2px rgba(220,178,98,.35)}}
+@keyframes tab-glow{0%,100%{box-shadow:0 1px 2px rgba(var(--shade),.08),0 6px 14px -6px rgba(var(--shade),.2),0 18px 38px -14px rgba(var(--shade),.38)}50%{box-shadow:0 1px 2px rgba(var(--shade),.08),0 6px 14px -6px rgba(var(--shade),.2),0 18px 38px -14px rgba(var(--shade),.38),0 0 0 1px rgba(220,178,98,.55),0 0 18px 2px rgba(220,178,98,.35)}}
 /* side rail: up and down a page, a dot per page between. Slim enough to sit in the page margin beside the
    tickets and cards (never over them), and low, beside their plain lower half rather than the ticket's tear
    line and notches; each arrow's tap area is larger than it looks */
@@ -252,7 +259,7 @@ button{font:inherit;color:inherit}
 @keyframes rail-blink{0%,100%{transform:translateY(-1px);opacity:1}50%{transform:translateY(2px);opacity:.4}}
 @keyframes rail-blink-up{0%,100%{transform:translateY(1px);opacity:1}50%{transform:translateY(-2px);opacity:.4}}
 .rail{animation:rail-glow 2.4s ease-in-out infinite}
-@keyframes rail-glow{0%,100%{box-shadow:0 8px 20px -10px rgba(0,0,0,.35),0 0 0 0 rgba(169,124,43,0)}50%{box-shadow:0 8px 20px -10px rgba(0,0,0,.35),0 0 10px 1px rgba(169,124,43,.45)}}
+@keyframes rail-glow{0%,100%{box-shadow:0 1px 2px rgba(var(--shade),.1),0 8px 20px -8px rgba(var(--shade),.38),0 0 0 0 rgba(169,124,43,0)}50%{box-shadow:0 1px 2px rgba(var(--shade),.1),0 8px 20px -8px rgba(var(--shade),.38),0 0 10px 1px rgba(169,124,43,.45)}}
 .rail-dots{display:flex;flex-direction:column;align-items:center;gap:5px}
 .rail-dots i{display:block;width:5px;height:5px;border-radius:50%;background:var(--rule);transition:background .3s,transform .3s}
 .rail-dots i.on{background:var(--gold);transform:scale(1.35)}
@@ -375,7 +382,7 @@ button{font:inherit;color:inherit}
 /* ============ TICKETS ============ */
 .ticket{
   position:relative;isolation:isolate;backface-visibility:hidden;width:min(100%,420px);margin:0 auto;border-radius:24px;
-  background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--rule);
+  background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--rule),var(--rim);
   transform:perspective(900px) rotateX(calc(var(--ry,0) * 1deg)) rotateY(calc(var(--rx,0) * 1deg));
   transition:transform .25s ease-out;
 }
@@ -462,7 +469,7 @@ button{font:inherit;color:inherit}
 /* ============ RSVP ============ */
 .rsvp-card{
   position:relative;width:min(100%,440px);margin:0 auto;padding:20px 18px 18px;border-radius:24px;
-  background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--rule);
+  background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--rule),var(--rim);
 }
 .rsvp-form{display:grid;gap:12px}
 .rsvp-soon{margin:18px 0 12px;padding:10px 14px;text-wrap:balance;border:1px dashed var(--rule);border-radius:12px;background:var(--card);
@@ -764,6 +771,33 @@ button{font:inherit;color:inherit}
   .pk{height:80px}
   .akshi{margin-top:6px}
 }
+
+
+/* ============ SHADOWS — depth on every page ============
+   One scale (--shadow for cards, --shadow-sm for the things on them, both per palette, in --shade) so the pages
+   read as layers: the page, a card on it, the buttons and boxes raised a little off the card, garlands hung over it. */
+.btn{background:var(--surface);box-shadow:var(--shadow-sm);transition:background .2s,color .2s,border-color .2s,transform .12s,box-shadow .2s}
+.btn.solid{box-shadow:0 1px 2px rgba(var(--shade),.2),0 8px 18px -6px rgba(130,96,25,.55)}
+.btn.ghost{background:transparent;box-shadow:none}
+.btn:active{box-shadow:0 1px 2px rgba(var(--shade),.16)}
+.t-count{box-shadow:inset 0 1px 3px rgba(var(--shade),.12)}
+.ev-rsvp{box-shadow:inset 0 1px 3px rgba(var(--shade),.08)}
+.pill span{box-shadow:var(--shadow-sm)}
+.pill input:checked + span{box-shadow:0 1px 2px rgba(var(--shade),.2),0 6px 14px -5px rgba(130,96,25,.5)}
+.pill:active span{box-shadow:0 1px 2px rgba(var(--shade),.14)}
+.seg{box-shadow:inset 0 1px 3px rgba(var(--shade),.12)}
+.seg-pill{box-shadow:0 1px 2px rgba(var(--shade),.2),0 4px 10px -3px rgba(130,96,25,.45)}
+.stepper{box-shadow:var(--shadow-sm)}
+.fld input[type="text"]{box-shadow:inset 0 1px 3px rgba(var(--shade),.1)}
+.fld input[type="text"]:focus{box-shadow:inset 0 1px 3px rgba(var(--shade),.1),0 0 0 4px var(--card)}
+/* garlands, the gopuram and the corner flowers hang over the cards: their shadows fall on them */
+.t-gopuram{filter:drop-shadow(0 2px 2px rgba(var(--shade),.18)) drop-shadow(0 10px 12px rgba(var(--shade),.26))}
+.t-toranam{filter:drop-shadow(0 2px 2px rgba(var(--shade),.2)) drop-shadow(0 9px 10px rgba(var(--shade),.26))}
+.t-flora{filter:drop-shadow(0 3px 4px rgba(var(--shade),.26))}
+.pk{filter:drop-shadow(0 6px 8px rgba(var(--shade),.22))}
+.crown .toranam{filter:drop-shadow(0 6px 8px rgba(var(--shade),.18))}
+.tabs-in{box-shadow:0 1px 2px rgba(var(--shade),.08),0 6px 14px -6px rgba(var(--shade),.2),0 18px 38px -14px rgba(var(--shade),.38)}
+.rail{box-shadow:0 1px 2px rgba(var(--shade),.1),0 8px 20px -8px rgba(var(--shade),.38)}
 
 @media (prefers-reduced-motion:reduce){
   html{scroll-behavior:auto}

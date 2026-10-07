@@ -91,6 +91,11 @@ soften for "reduce motion".
   (.env-flap-shade: a blurred copy of the triangle, since a drop-shadow on the clipped flap is clipped away), the
   seal, the rising card, and on the cover the photograph and the names. The envelope keeps the Ivory inks on Jewel
   (it is ivory paper in both).
+  Then on every page (7 Oct): one depth scale per palette (`--shadow` layered for cards and photos, `--shadow-sm`
+  for things on them, `--rim` a light top edge; "SHADOWS" in style.html): buttons are raised chips (surface
+  background), the answer pills and the Ivory/Jewel-style toggles raised, the countdown, RSVP event boxes, name
+  field and toggle track pressed in; the garlands, gopuram, corner flowers, peacocks and page garlands cast drop
+  shadows onto the cards; the tab bar and rail (their glow keyframes carry the same shadow).
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct
