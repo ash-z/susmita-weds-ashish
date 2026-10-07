@@ -30,6 +30,7 @@
   --shadow:0 1px 2px rgba(62,32,12,.08),0 4px 8px -2px rgba(62,32,12,.1),0 14px 26px -8px rgba(62,32,12,.2),0 36px 60px -22px rgba(62,32,12,.42);
   --shadow-sm:0 1px 2px rgba(62,32,12,.12),0 4px 10px -4px rgba(62,32,12,.24);
   --rim:inset 0 1px 0 rgba(255,255,255,.75);       /* light catching a card's top edge */
+  --hi:rgba(255,250,235,.7);                        /* light catching raised gold lettering */
   --bg-a0:rgba(247,242,232,0);
   --tab-h:66px;
   --ganesha:#8A2C22;
@@ -44,6 +45,7 @@
     --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 12px -2px rgba(0,0,0,.34),0 18px 32px -8px rgba(0,0,0,.5),0 40px 70px -20px rgba(0,0,0,.72);
     --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 4px 10px -4px rgba(0,0,0,.6);
     --rim:inset 0 1px 0 rgba(255,228,180,.13);
+    --hi:rgba(255,230,180,.16);
     --bg-a0:rgba(23,16,15,0);
     --ganesha:#DCB262;
     --shade:0,0,0;
@@ -57,6 +59,7 @@
   --shadow:0 1px 2px rgba(0,0,0,.3),0 6px 12px -2px rgba(0,0,0,.34),0 18px 32px -8px rgba(0,0,0,.5),0 40px 70px -20px rgba(0,0,0,.72);
   --shadow-sm:0 1px 2px rgba(0,0,0,.4),0 4px 10px -4px rgba(0,0,0,.6);
   --rim:inset 0 1px 0 rgba(255,228,180,.13);
+  --hi:rgba(255,230,180,.16);
   --bg-a0:rgba(23,16,15,0);
 }
 
@@ -134,7 +137,6 @@ button{font:inherit;color:inherit}
 /* the cover: the old opening screen's photograph, kolam, names and date, as a page */
 .js .screen.front{text-align:center;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
 .front .seal{display:block;cursor:default}
-.front .sp-names{text-shadow:0 1px 1px rgba(var(--shade),.12),0 6px 14px rgba(var(--shade),.16)}
 /* the cover page during that: drawn over the envelope, starting exactly where the letter is (set from app.js), then
    grown to the screen, over a sheet of its paper (.morph-paper) that grows from the letter's edges to the screen's */
 .js .screen.morph{visibility:visible;z-index:5;transform-origin:0 0;background:none}
@@ -146,8 +148,7 @@ button{font:inherit;color:inherit}
 .env.still,.env.still *{transition:none!important}
 .env-btn{all:unset;position:relative;display:block;cursor:pointer;-webkit-tap-highlight-color:transparent;
   --ew:min(84vw,440px,62vh);width:var(--ew);height:calc(var(--ew) * .66);
-  transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ety,0) * 1deg)) rotateY(calc(var(--etx,0) * 1deg));
-  transition:transform .35s ease-out}
+  transform-style:preserve-3d;transform:rotateX(calc(10deg + var(--ry,0) * .9deg)) rotateY(calc(var(--rx,0) * .9deg))}
 .env-btn:focus-visible{outline:2px solid var(--gold);outline-offset:10px;border-radius:12px}
 .env-3d{position:absolute;inset:0;transform-style:preserve-3d;animation:env-float 5.5s ease-in-out infinite}
 @keyframes env-float{50%{transform:translateY(-8px) rotateZ(-.6deg)}}
@@ -369,7 +370,6 @@ button{font:inherit;color:inherit}
   width:clamp(190px,min(74vw,calc((100svh - 330px) * .8)),320px);aspect-ratio:4/5;margin:0 auto;
   touch-action:pan-y;-webkit-user-select:none;user-select:none;outline-offset:14px;
   transform:rotateX(calc(var(--ry,0) * .5deg)) rotateY(calc(var(--rx,0) * .5deg));
-  transition:transform .3s ease-out;
 }
 .card{
   position:absolute;inset:0;margin:0;border-radius:22px;
@@ -405,9 +405,9 @@ button{font:inherit;color:inherit}
 .ticket{
   position:relative;isolation:isolate;backface-visibility:hidden;width:min(100%,420px);margin:0 auto;border-radius:24px;
   background:var(--surface);box-shadow:var(--shadow),inset 0 0 0 1px var(--rule),var(--rim);
-  transform:perspective(900px) rotateX(calc(var(--ry,0) * 1deg)) rotateY(calc(var(--rx,0) * 1deg));
-  transition:transform .25s ease-out;
+  rotate:var(--tilt,0 0 1 0deg);
 }
+.wrap:has(> .ticket){perspective:900px}
 .seg{
   position:relative;display:grid;grid-template-columns:1fr 1fr;width:min(100%,300px);margin:0 auto 22px;padding:4px;
   border:1px solid var(--rule);border-radius:999px;background:var(--card);
@@ -450,9 +450,9 @@ button{font:inherit;color:inherit}
 .t-foil{position:absolute;inset:0;border-radius:inherit;overflow:hidden;pointer-events:none}
 .t-foil::before{
   content:"";position:absolute;inset:-80%;
-  background:linear-gradient(115deg,transparent 34%,rgba(255,236,190,.16) 45%,rgba(255,250,235,.12) 50%,transparent 60%);
-  transform:translate(calc(var(--fx,0) * -34%),calc(var(--fy,0) * -34%));
-  transition:transform .25s ease-out;will-change:transform;
+  background:var(--sheen);
+  transform:translate(calc(var(--fx,0) * -22%),calc(var(--fy,0) * -22%));
+  will-change:transform;
 }
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:12px 16px;
@@ -795,6 +795,26 @@ button{font:inherit;color:inherit}
 }
 
 
+/* ============ LIGHT — the sheens it slides across things (see LIGHT in app.js) ============
+   Each is one oversized layer moved by transform with the light, never repainted. */
+:root{--sheen:linear-gradient(115deg,rgba(var(--shade),.06) 24%,transparent 37%,rgba(255,244,214,.42) 45%,rgba(255,253,244,.3) 50%,transparent 59%,rgba(var(--shade),.1) 74%)}
+/* (a glint alone is lost on ivory paper; the falloff away from the light is what shows it there) */
+.card.top .card-face::after,.seal .cover::after,.env-front::after{
+  content:"";position:absolute;inset:-80%;pointer-events:none;background:var(--sheen);
+  transform:translate(calc(var(--fx,0) * -22%),calc(var(--fy,0) * -22%));will-change:transform}
+/* (only the top photo of the deck: sheens on the four under it cost a fifth of the frame rate, unseen) */
+/* the cover's photograph leans with the light too (rotate: its transform is the breathing) */
+.front .reveal:has(> .seal){perspective:700px}
+.front .seal{rotate:var(--tilt,0 0 1 0deg)}
+/* the wax seal: a glint that slides over it */
+.env-seal{overflow:hidden}
+.env-seal::before{content:"";position:absolute;inset:0;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle at 50% 50%,rgba(255,236,224,.55),rgba(255,236,224,0) 32%);
+  transform:translate(calc(var(--fx,0) * -22% - 14%),calc(var(--fy,0) * -22% - 18%))}
+/* gold lettering stands slightly proud of the paper: a light edge above, a soft shadow below */
+.t-date b,.front .sp-names{text-shadow:-.5px -.75px 0 var(--hi),1px 1.5px 2px rgba(var(--shade),.24),0 6px 14px rgba(var(--shade),.1)}
+.env-names{text-shadow:-.5px -.75px 0 rgba(255,250,235,.8),1px 1.5px 2px rgba(62,32,12,.22)}
+
 /* ============ SHADOWS — depth on every page ============
    One scale (--shadow for cards, --shadow-sm for the things on them, both per palette, in --shade) so the pages
    read as layers: the page, a card on it, the buttons and boxes raised a little off the card, garlands hung over it. */
@@ -1114,6 +1134,7 @@ button{font:inherit;color:inherit}
             <button type="button" class="btn ghost" id="rsvpAnother">RSVP for someone else</button>
           </div>
         </div>
+        <span class="t-foil" aria-hidden="true"></span>
       </div>
     </div>
   </section>
@@ -5561,25 +5582,48 @@ var fx = (function(){
 })();
 
 /* ===================================================================
-   TILT — tickets (and the photo deck, gently) lean with the phone.
-   Desktop follows the mouse instead. iOS asks permission on a tap.
+   LIGHT — one light for the whole invitation, moved by tilting the
+   phone (the mouse on a computer). What it falls on leans toward it and
+   a sheen slides across: the envelope, the cover's photograph, the
+   photo deck, the tickets and the RSVP card. Every value glides toward
+   where it is heading rather than jumping, which is what gives it
+   weight. Only transforms change each frame (nothing is repainted: a
+   moving background left stale tiles on Android). iOS asks permission
+   on a tap.
+     --fx --fy   the light, -1..1, on each lit element (sheens use it)
+     --rx --ry   its lean in degrees (the deck and the envelope use it)
+     --tilt      the same lean as a rotate value, for the tickets (their
+                 own transform belongs to the drift-in on arrival)
    =================================================================== */
-var tiltTargets = $$('[data-tilt], #deck'), tiltAsked = false, tiltPending = false;
-function setTilt(el, x, y){
-  el.style.setProperty('--rx', (x*9).toFixed(2));
-  el.style.setProperty('--ry', (-y*7).toFixed(2));
-  el.style.setProperty('--fx', x.toFixed(3));
-  el.style.setProperty('--fy', y.toFixed(3));
+var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt], .rsvp-card');
+var light = { x:0, y:0, tx:0, ty:0, run:false }, tiltAsked = false;
+function aim(x, y){
+  x = clamp(x, -1, 1); y = clamp(y, -1, 1);
+  if(Math.abs(x - light.tx) < 0.004 && Math.abs(y - light.ty) < 0.004) return;
+  light.tx = x; light.ty = y;
+  if(!light.run){ light.run = true; requestAnimationFrame(glide); }
 }
+function glide(){
+  var dx = light.tx - light.x, dy = light.ty - light.y, settled = Math.abs(dx) < 0.002 && Math.abs(dy) < 0.002;
+  light.x = settled ? light.tx : light.x + dx * 0.1;
+  light.y = settled ? light.ty : light.y + dy * 0.1;
+  var x = light.x, y = light.y, rx = x * 9, ry = -y * 7, ang = Math.sqrt(rx * rx + ry * ry);
+  var tilt = ang < 0.01 ? '0 0 1 0deg' : (ry / ang).toFixed(4) + ' ' + (rx / ang).toFixed(4) + ' 0 ' + ang.toFixed(2) + 'deg';
+  lit.forEach(function(el){
+    var page = el.closest('.screen');
+    if(page && !page.classList.contains('is-active') && !page.classList.contains('enter')) return;   // only what is showing
+    el.style.setProperty('--fx', x.toFixed(3)); el.style.setProperty('--fy', y.toFixed(3));
+    el.style.setProperty('--rx', rx.toFixed(2)); el.style.setProperty('--ry', ry.toFixed(2));
+    el.style.setProperty('--tilt', tilt);
+  });
+  if(settled){ light.run = false; return; }
+  requestAnimationFrame(glide);
+}
+// a page coming into view takes the light as it is now (it was skipped while hidden)
+document.addEventListener('pagechange', function(){ if(!light.run){ light.run = true; requestAnimationFrame(glide); } });
 function onOrient(e){
   if(e.gamma == null || e.beta == null) return;
-  var x = clamp(e.gamma/22, -1, 1), y = clamp((e.beta - 45)/22, -1, 1);
-  if(tiltPending) return;
-  tiltPending = true;
-  requestAnimationFrame(function(){
-    tiltPending = false;
-    tiltTargets.forEach(function(t){ setTilt(t, x, y); });
-  });
+  aim(e.gamma / 22, (e.beta - 45) / 22);
 }
 function enableTilt(){
   if(tiltAsked || reduced) return;
@@ -5594,14 +5638,11 @@ function enableTilt(){
 }
 (function tilt(){
   if(reduced) return;
-  $$('[data-tilt]').forEach(function(t){
-    t.addEventListener('pointermove', function(e){
-      if(e.pointerType === 'touch') return;
-      var r = t.getBoundingClientRect();
-      setTilt(t, ((e.clientX - r.left)/r.width - 0.5)*2, ((e.clientY - r.top)/r.height - 0.5)*2);
-    });
-    t.addEventListener('pointerleave', function(){ setTilt(t, 0, 0); });
+  addEventListener('pointermove', function(e){                         // a computer: the light follows the mouse
+    if(e.pointerType !== 'mouse') return;
+    aim((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2);
   });
+  document.documentElement.addEventListener('mouseleave', function(){ aim(0, 0); });
   var D = window.DeviceOrientationEvent;
   if(D && typeof D.requestPermission === 'function') addEventListener('click', enableTilt, { once:true });
   else enableTilt();
@@ -5713,11 +5754,6 @@ var envelope = (function(){
   var page = $('#cover'), env = $('#env'), btn = $('#envBtn'), tabs = $('#tabs'), first = true;
   var card = $('.env-card'), front = $('#front'), fit = null, paper = document.createElement('div');
   if(!page || !env) return { leave:function(){}, open:function(){ return false; }, morph:function(p, d){ d(); }, reseal:function(){} };
-  if(!reduced) page.addEventListener('pointermove', function(e){
-    var r = page.getBoundingClientRect();
-    btn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
-    btn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
-  });
   btn.addEventListener('click', function(){ pager.go(1, 'scroll'); });
   // any way off page one: the music starts and the tab bar shimmers once
   function leave(){

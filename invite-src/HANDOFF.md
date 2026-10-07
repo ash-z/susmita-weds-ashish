@@ -66,6 +66,17 @@ node og.mjs "$PWD/../docs/index.html" /tmp/og.png         # link-preview image; 
 ## 3D (branch `claude/invite-3d`)
 Live (promoted to dev and golden on 7 Oct, at the couple's request): the envelope as page one, the letter that
 becomes the cover (page two), and the shadows on every page, all below. Further 3D work continues on the branch.
+Plan after researching 3D sites (7 Oct), in order: A light that moves with the phone; B photos with real depth
+(depth maps); C a real 3D envelope and petals in WebGL; D one continuous 3D world; E a scanned real place.
+- **A, the light (7 Oct, on the branch):** LIGHT in app.js replaces the old TILT. One light, aimed by the phone's tilt
+  (the mouse on a computer), glides toward its target (10% a frame) and writes --fx/--fy (-1..1), --rx/--ry (lean in
+  degrees) and --tilt (the lean as a rotate value) on the lit things that are showing: the envelope, the cover's
+  photograph, the photo deck, the tickets, the RSVP card. They lean with it and a sheen (--sheen: a glint plus a
+  falloff away from the light, since a glint alone is lost on ivory) slides across them as one transformed layer,
+  never repainted (moving backgrounds left stale tiles on Android). The tickets now really lean: their old tilt
+  transform was always overridden by the drift-in on arrival (.reveal.in), so they use `rotate` instead, in their
+  wrap's perspective. Gold numbers and the cover's names stand proud (a light edge, a soft shadow). Only the deck's
+  top photo has a sheen (on all five it cost a fifth of the frame rate). Reduce motion: no tilt.
 Kept: the 3D opening (below). Tried and taken out at the couple's request (7 Oct): "depth on every page" (layered
 tickets, tilt parallax, idle sway; too weak to notice on their phone) and booklet page turns ("as cliché as it
 gets"); both are in the history (commits 747a8f6 and a47c0c7, reverted). Researched real 3D sites (7 Oct);

@@ -137,25 +137,48 @@ var fx = (function(){
 })();
 
 /* ===================================================================
-   TILT — tickets (and the photo deck, gently) lean with the phone.
-   Desktop follows the mouse instead. iOS asks permission on a tap.
+   LIGHT — one light for the whole invitation, moved by tilting the
+   phone (the mouse on a computer). What it falls on leans toward it and
+   a sheen slides across: the envelope, the cover's photograph, the
+   photo deck, the tickets and the RSVP card. Every value glides toward
+   where it is heading rather than jumping, which is what gives it
+   weight. Only transforms change each frame (nothing is repainted: a
+   moving background left stale tiles on Android). iOS asks permission
+   on a tap.
+     --fx --fy   the light, -1..1, on each lit element (sheens use it)
+     --rx --ry   its lean in degrees (the deck and the envelope use it)
+     --tilt      the same lean as a rotate value, for the tickets (their
+                 own transform belongs to the drift-in on arrival)
    =================================================================== */
-var tiltTargets = $$('[data-tilt], #deck'), tiltAsked = false, tiltPending = false;
-function setTilt(el, x, y){
-  el.style.setProperty('--rx', (x*9).toFixed(2));
-  el.style.setProperty('--ry', (-y*7).toFixed(2));
-  el.style.setProperty('--fx', x.toFixed(3));
-  el.style.setProperty('--fy', y.toFixed(3));
+var lit = $$('#envBtn, #front .sp-inner, #deck, [data-tilt], .rsvp-card');
+var light = { x:0, y:0, tx:0, ty:0, run:false }, tiltAsked = false;
+function aim(x, y){
+  x = clamp(x, -1, 1); y = clamp(y, -1, 1);
+  if(Math.abs(x - light.tx) < 0.004 && Math.abs(y - light.ty) < 0.004) return;
+  light.tx = x; light.ty = y;
+  if(!light.run){ light.run = true; requestAnimationFrame(glide); }
 }
+function glide(){
+  var dx = light.tx - light.x, dy = light.ty - light.y, settled = Math.abs(dx) < 0.002 && Math.abs(dy) < 0.002;
+  light.x = settled ? light.tx : light.x + dx * 0.1;
+  light.y = settled ? light.ty : light.y + dy * 0.1;
+  var x = light.x, y = light.y, rx = x * 9, ry = -y * 7, ang = Math.sqrt(rx * rx + ry * ry);
+  var tilt = ang < 0.01 ? '0 0 1 0deg' : (ry / ang).toFixed(4) + ' ' + (rx / ang).toFixed(4) + ' 0 ' + ang.toFixed(2) + 'deg';
+  lit.forEach(function(el){
+    var page = el.closest('.screen');
+    if(page && !page.classList.contains('is-active') && !page.classList.contains('enter')) return;   // only what is showing
+    el.style.setProperty('--fx', x.toFixed(3)); el.style.setProperty('--fy', y.toFixed(3));
+    el.style.setProperty('--rx', rx.toFixed(2)); el.style.setProperty('--ry', ry.toFixed(2));
+    el.style.setProperty('--tilt', tilt);
+  });
+  if(settled){ light.run = false; return; }
+  requestAnimationFrame(glide);
+}
+// a page coming into view takes the light as it is now (it was skipped while hidden)
+document.addEventListener('pagechange', function(){ if(!light.run){ light.run = true; requestAnimationFrame(glide); } });
 function onOrient(e){
   if(e.gamma == null || e.beta == null) return;
-  var x = clamp(e.gamma/22, -1, 1), y = clamp((e.beta - 45)/22, -1, 1);
-  if(tiltPending) return;
-  tiltPending = true;
-  requestAnimationFrame(function(){
-    tiltPending = false;
-    tiltTargets.forEach(function(t){ setTilt(t, x, y); });
-  });
+  aim(e.gamma / 22, (e.beta - 45) / 22);
 }
 function enableTilt(){
   if(tiltAsked || reduced) return;
@@ -170,14 +193,11 @@ function enableTilt(){
 }
 (function tilt(){
   if(reduced) return;
-  $$('[data-tilt]').forEach(function(t){
-    t.addEventListener('pointermove', function(e){
-      if(e.pointerType === 'touch') return;
-      var r = t.getBoundingClientRect();
-      setTilt(t, ((e.clientX - r.left)/r.width - 0.5)*2, ((e.clientY - r.top)/r.height - 0.5)*2);
-    });
-    t.addEventListener('pointerleave', function(){ setTilt(t, 0, 0); });
+  addEventListener('pointermove', function(e){                         // a computer: the light follows the mouse
+    if(e.pointerType !== 'mouse') return;
+    aim((e.clientX / innerWidth - 0.5) * 2, (e.clientY / innerHeight - 0.5) * 2);
   });
+  document.documentElement.addEventListener('mouseleave', function(){ aim(0, 0); });
   var D = window.DeviceOrientationEvent;
   if(D && typeof D.requestPermission === 'function') addEventListener('click', enableTilt, { once:true });
   else enableTilt();
@@ -289,11 +309,6 @@ var envelope = (function(){
   var page = $('#cover'), env = $('#env'), btn = $('#envBtn'), tabs = $('#tabs'), first = true;
   var card = $('.env-card'), front = $('#front'), fit = null, paper = document.createElement('div');
   if(!page || !env) return { leave:function(){}, open:function(){ return false; }, morph:function(p, d){ d(); }, reseal:function(){} };
-  if(!reduced) page.addEventListener('pointermove', function(e){
-    var r = page.getBoundingClientRect();
-    btn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
-    btn.style.setProperty('--ety', (((e.clientY - r.top) / r.height - 0.5) * -12).toFixed(2));
-  });
   btn.addEventListener('click', function(){ pager.go(1, 'scroll'); });
   // any way off page one: the music starts and the tab bar shimmers once
   function leave(){
