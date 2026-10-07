@@ -75,7 +75,10 @@ soften for "reduce motion".
   gold-edged, the names and date on the pocket, a maroon wax seal with Ganesha on the flap; it leans toward the
   finger or pointer and floats. Turning the page (swipe, wheel, arrow keys, ▼) or tapping the seal opens it: the
   seal pops, the flap swings open in 3D (pure CSS 3D transforms, no WebGL), a card rises (శుభలేఖ / Wedding
-  Invitation), grows toward you and dissolves onto page two, the cover (`<section id="front">`; the COVER module in
+  Invitation), and the card becomes page two, the cover: envelope.morph sets the cover page shrunk onto the card
+  (scaled to the card's width, clipped to its height around the page's middle) and grows it to the whole screen
+  while the envelope fades as one piece (the flap sits before the card in the markup so that, drawn flat while
+  fading, it stays behind the risen card). The cover (`<section id="front">`; the COVER module in
   app.js): the old opening screen as a page, the photograph in its arch with the kolam drawing itself in, శుభలేఖ,
   Wedding Invitation, the names and date, without the button. Then the home page, and the rest as before.
   pager.go hands the envelope-to-cover turn to envelope.open. The tab bar, rail and colour switch show on both

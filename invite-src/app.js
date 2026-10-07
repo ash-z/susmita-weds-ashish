@@ -279,13 +279,14 @@ var music = (function(){
    ENVELOPE — page one is a sealed envelope, in 3D, leaning toward the
    finger or pointer. Leaving it for the next page (a turn, or a tap on
    the seal) opens it: the seal pops, the flap swings open, the card
-   rises, then grows toward you and dissolves into the cover. The
+   rises, and the card opens out to fill the screen: it becomes the
+   cover, page two, while the envelope fades away. The
    first page turn is also the tap that lets the music play. Coming back
    finds it sealed again.
    =================================================================== */
 var envelope = (function(){
   var page = $('#cover'), env = $('#env'), btn = $('#envBtn'), tabs = $('#tabs'), first = true;
-  if(!page || !env) return { leave:function(){}, open:function(){ return false; }, reseal:function(){} };
+  if(!page || !env) return { leave:function(){}, open:function(){ return false; }, morph:function(p, d){ d(); }, reseal:function(){} };
   if(!reduced) page.addEventListener('pointermove', function(e){
     var r = page.getBoundingClientRect();
     btn.style.setProperty('--etx', (((e.clientX - r.left) / r.width - 0.5) * 16).toFixed(2));
@@ -306,11 +307,26 @@ var envelope = (function(){
     setTimeout(function(){ env.classList.add('zoom'); done(); }, 1900);
     return true;
   }
+  // the risen card becomes the page: the page starts shrunk onto the card (its width the card's width, cut to the
+  // card's height, around the middle of the page) and grows to the whole screen
+  function morph(page, done){
+    var r = env.querySelector('.env-card').getBoundingClientRect();
+    var W = innerWidth, H = innerHeight, k = r.width / W, cut = Math.max(0, (H - r.height / k) / 2);
+    var dx = r.left + r.width / 2 - W / 2, dy = r.top + r.height / 2 - H / 2;
+    [].forEach.call(page.querySelectorAll('.reveal'), function(n){ n.classList.add('in'); });   // already in place
+    page.style.transform = 'translate(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px) scale(' + k.toFixed(4) + ')';
+    page.style.clipPath = 'inset(' + cut.toFixed(1) + 'px 0px round ' + (6 / k).toFixed(1) + 'px)';
+    page.classList.add('morph');
+    void page.offsetWidth;
+    page.classList.add('grow');
+    page.style.transform = ''; page.style.clipPath = 'inset(0px 0px round 0px)';
+    setTimeout(function(){ page.classList.remove('morph', 'grow'); page.style.clipPath = ''; done(); }, 1150);
+  }
   function reseal(){                                               // instantly, before the page comes back into view
     env.classList.add('still'); env.classList.remove('open', 'zoom');
     void env.offsetWidth; env.classList.remove('still');
   }
-  return { leave:leave, open:open, reseal:reseal };
+  return { leave:leave, open:open, morph:morph, reseal:reseal };
 })();
 
 /* ===================================================================
@@ -382,13 +398,9 @@ var pager = (function(){
     buzz(6);
     if(reduced){ settle(i); busy = false; return; }
 
-    // off the envelope onto the cover: it opens, and its card dissolves into the page underneath
+    // off the envelope onto the cover: it opens, and its card becomes the cover
     if(out.id === 'cover' && inn.id === 'front' && envelope.open(function(){
-      inn.classList.add('under'); out.classList.add('fade-away'); replay(inn);
-      setTimeout(function(){
-        out.classList.remove('fade-away'); inn.classList.remove('under');
-        settle(i); busy = false; quietUntil = performance.now() + 250;
-      }, 1050);
+      envelope.morph(inn, function(){ settle(i); busy = false; quietUntil = performance.now() + 250; });
     })) return;
 
     var enter, leave;
