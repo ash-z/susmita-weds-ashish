@@ -70,21 +70,22 @@ gets"); both are in the history (commits 747a8f6 and a47c0c7, reverted). Researc
 directions offered: one lit WebGL hero scene, a camera journey through the pages, or touchable 3D (gold seal,
 falling akshintalu, petals) with phone-tilt depth. Anything 3D must stay smooth on ordinary phones and skip or
 soften for "reduce motion".
-- **Page one is the envelope (7 Oct, "option 3", on trial):** no cover, no gate, no Open invitation button. The
-  first page of the pager is `<section id="cover">` (body.html): the toranam and corners, and a sealed envelope
-  (`#env`; "PAGE ONE" in style.html; the envelope module in app.js). Ivory, gold-edged, the names and date on the
-  pocket, a maroon wax seal with Ganesha on the flap; it leans toward the finger or pointer and floats. The tab bar,
-  rail and colour switch show on it like on any page (no tab is lit; ▲ is disabled). Turning the page (swipe, wheel,
-  arrow keys, ▼) or tapping the seal opens it: the seal pops, the flap swings open in 3D (pure CSS 3D transforms,
-  no WebGL), a card rises (శుభలేఖ / Wedding Invitation), grows toward you and dissolves while the page fades onto
-  the home page (pager.go hands that one turn to envelope.open). Leaving page one by any route (a tab too) starts
-  the music. Coming back (▲ on home, ▼ on the last page, Home key) shows it sealed again. While the envelope is up
-  the home page sits drawn underneath it, so the WebGL sea is ready when it opens (drawing it for the first time
-  at the hand-off froze the zoom). Links to a page (#rsvp) open on that page. Reduce motion: the envelope is still
-  page one; turning just moves on. The groom's side envelope names Ashish first (groom_first). If the couple prefer
-  the earlier design ("option 1": the old cover as page one, without its button), it is in the history before this
-  change (commit ed7215f: the splash in body.html, the cover module in app.js); its CSS (.splash, .sp-*, .seal,
-  .open-btn) is still in style.html, unused, until that is decided.
+- **The envelope, then the cover (7 Oct):** no gate and no Open invitation button. Page one of the pager is the
+  envelope (`<section id="cover">` in body.html; "PAGE ONE" in style.html; the envelope module in app.js): ivory,
+  gold-edged, the names and date on the pocket, a maroon wax seal with Ganesha on the flap; it leans toward the
+  finger or pointer and floats. Turning the page (swipe, wheel, arrow keys, ▼) or tapping the seal opens it: the
+  seal pops, the flap swings open in 3D (pure CSS 3D transforms, no WebGL), a card rises (శుభలేఖ / Wedding
+  Invitation), grows toward you and dissolves onto page two, the cover (`<section id="front">`; the COVER module in
+  app.js): the old opening screen as a page, the photograph in its arch with the kolam drawing itself in, శుభలేఖ,
+  Wedding Invitation, the names and date, without the button. Then the home page, and the rest as before.
+  pager.go hands the envelope-to-cover turn to envelope.open. The tab bar, rail and colour switch show on both
+  (neither has a tab; ▲ is disabled on the envelope). Leaving the envelope by any route (a tab too) starts the
+  music; coming back (▲, ▼ on the last page, Home key) finds it sealed again. While the envelope or the cover is
+  up the home page sits drawn underneath, so the WebGL sea is ready when it is turned to (drawing it for the first
+  time mid-turn froze the turn for seconds). Links to a page (#rsvp) open on that page. Reduce motion: the same
+  pages, turning just moves on. groom_first swaps the names on both. Tried just before (same day) and replaced:
+  the envelope opening straight onto the home page ("option 3", commit 1ff0302). The old splash CSS (.splash,
+  .open-btn, .sp-a) is still in style.html, unused.
 
 ## Three invitations
 - **Relatives** `/`, **Friends** `/friends/` (adds the 28 Oct page), and **Groom's side** `/bhimanpalliwar/` (added 2 Oct

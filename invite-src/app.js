@@ -184,6 +184,68 @@ function enableTilt(){
 })();
 
 /* ===================================================================
+   COVER — page two: the couple's photograph in a temple-arch window,
+   a kolam drawing itself around it each time the page arrives.
+   =================================================================== */
+function buildSeal(host){
+  if(!host) return [];
+  var NS = 'http://www.w3.org/2000/svg';
+  var s = document.createElementNS(NS, 'svg');
+  s.setAttribute('viewBox', '0 0 200 200');
+  s.setAttribute('aria-hidden', 'true');
+  host.insertBefore(s, host.firstChild);
+  var cx = 100, cy = 100, drawn = [];
+  function el(tag, a, stroke, w, draw){
+    var n = document.createElementNS(NS, tag);
+    for(var k in a) n.setAttribute(k, a[k]);
+    n.style.fill = 'none'; n.style.stroke = stroke; n.style.strokeWidth = w;
+    n.style.strokeLinecap = 'round'; n.style.strokeLinejoin = 'round';
+    s.appendChild(n);
+    if(draw) drawn.push(n);
+    return n;
+  }
+  function petal(ang, r0, r1, wid, stroke, w){
+    var mr = (r0 + r1)/2;
+    var sx = cx + r0*Math.cos(ang), sy = cy + r0*Math.sin(ang);
+    var tx = cx + r1*Math.cos(ang), ty = cy + r1*Math.sin(ang);
+    var c1x = cx + mr*Math.cos(ang + wid), c1y = cy + mr*Math.sin(ang + wid);
+    var c2x = cx + mr*Math.cos(ang - wid), c2y = cy + mr*Math.sin(ang - wid);
+    el('path', { d:'M'+sx.toFixed(1)+' '+sy.toFixed(1)+' Q'+c1x.toFixed(1)+' '+c1y.toFixed(1)+' '+tx.toFixed(1)+' '+ty.toFixed(1)+
+                   ' Q'+c2x.toFixed(1)+' '+c2y.toFixed(1)+' '+sx.toFixed(1)+' '+sy.toFixed(1) }, stroke, w, true);
+  }
+  el('circle', { cx:cx, cy:cy, r:58 }, 'var(--gold)', 0.9, true);
+  el('circle', { cx:cx, cy:cy, r:52 }, 'var(--gold)', 0.5, true);
+  for(var i = 0; i < 24; i++) petal(i/24*Math.PI*2, 60, 92, 0.1, 'var(--gold)', 1.1);
+  for(var j = 0; j < 8; j++)  petal((j + 0.5)/8*Math.PI*2, 60, 78, 0.16, '#6A9A6E', 1);
+  for(var k2 = 0; k2 < 36; k2++){
+    var a = k2/36*Math.PI*2;
+    var d = document.createElementNS(NS, 'circle');
+    d.setAttribute('cx', (cx + 97*Math.cos(a)).toFixed(1));
+    d.setAttribute('cy', (cy + 97*Math.sin(a)).toFixed(1));
+    d.setAttribute('r', k2 % 3 === 0 ? 2 : 1.2);
+    d.style.fill = k2 % 3 === 0 ? 'var(--accent)' : 'var(--gold)';
+    s.appendChild(d);
+  }
+  return drawn;
+}
+(function cover(){
+  var drawn = buildSeal($('#seal'));
+  function draw(){
+    drawn.forEach(function(p, i){
+      var len = 0; try{ len = p.getTotalLength(); }catch(e){}
+      if(!len) return;
+      p.style.transition = 'none'; p.style.strokeDasharray = len; p.style.strokeDashoffset = len;
+      void p.getBoundingClientRect();
+      p.style.transition = 'stroke-dashoffset 1.6s cubic-bezier(.3,.8,.3,1) ' + (0.35 + i*0.035) + 's';
+    });
+    requestAnimationFrame(function(){ requestAnimationFrame(function(){
+      drawn.forEach(function(p){ p.style.strokeDashoffset = 0; });
+    }); });
+  }
+  if(!reduced) document.addEventListener('pagechange', function(e){ if(e.detail.id === 'front') draw(); });
+})();
+
+/* ===================================================================
    MUSIC — the couple's song from docs/music (song.mp3, .m4a or .wav).
    Phones only allow sound after a tap, so it starts when the invitation
    is opened. The speaker beside the colour switch pauses and resumes it
@@ -217,7 +279,7 @@ var music = (function(){
    ENVELOPE — page one is a sealed envelope, in 3D, leaning toward the
    finger or pointer. Leaving it for the next page (a turn, or a tap on
    the seal) opens it: the seal pops, the flap swings open, the card
-   rises, then grows toward you and dissolves into the invitation. The
+   rises, then grows toward you and dissolves into the cover. The
    first page turn is also the tap that lets the music play. Coming back
    finds it sealed again.
    =================================================================== */
@@ -284,14 +346,14 @@ var pager = (function(){
   // page goes back to the envelope
   var railUp = $('#railUp'), railDown = $('#railDown'), railDots = $('#railDots');
   if(railDots) pages.forEach(function(){ railDots.appendChild(document.createElement('i')); });
-  function tabName(i){ var l = links.filter(function(a){ return a.hash === '#' + pages[i].id; })[0]; return l ? l.textContent.trim() : ''; }
+  function tabName(i){ var l = links.filter(function(a){ return a.hash === '#' + pages[i].id; })[0]; return l ? l.textContent.trim() : pages[i].getAttribute('aria-label'); }
   function cue(i){
     if(!railDots) return;
     var last = i >= pages.length - 1;
     [].forEach.call(railDots.children, function(d, k){ d.classList.toggle('on', k === i); });
     railUp.disabled = i === 0;
-    if(i > 0) railUp.setAttribute('aria-label', 'Previous: ' + (tabName(i - 1) || 'the envelope'));
-    railDown.setAttribute('aria-label', last ? 'Back to the envelope' : 'Next: ' + (tabName(i + 1) || 'the invitation'));
+    if(i > 0) railUp.setAttribute('aria-label', 'Previous: ' + tabName(i - 1));
+    railDown.setAttribute('aria-label', last ? 'Back to the envelope' : 'Next: ' + tabName(i + 1));
   }
   function setPh(){ root.style.setProperty('--ph', innerHeight + 'px'); }
   addEventListener('resize', setPh); setPh();
@@ -320,11 +382,11 @@ var pager = (function(){
     buzz(6);
     if(reduced){ settle(i); busy = false; return; }
 
-    // off the envelope onto the invitation: it opens, and its card dissolves into the page underneath
-    if(out.id === 'cover' && inn.id === 'home' && envelope.open(function(){
-      out.classList.add('fade-away'); replay(inn);
+    // off the envelope onto the cover: it opens, and its card dissolves into the page underneath
+    if(out.id === 'cover' && inn.id === 'front' && envelope.open(function(){
+      inn.classList.add('under'); out.classList.add('fade-away'); replay(inn);
       setTimeout(function(){
-        out.classList.remove('fade-away');
+        out.classList.remove('fade-away'); inn.classList.remove('under');
         settle(i); busy = false; quietUntil = performance.now() + 250;
       }, 1050);
     })) return;

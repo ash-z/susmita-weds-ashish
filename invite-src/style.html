@@ -102,8 +102,10 @@ button{font:inherit;color:inherit}
    a card out, which grows toward you and dissolves into the invitation (.env.open runs the opening, .env.zoom the
    hand-off, while the page fades away over the next one). */
 .js .screen.cover{justify-content:center;padding:0;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
-/* the invitation's first page waits underneath the envelope, drawn, so the sea is ready when the envelope opens */
-.js .screen.cover.is-active ~ .hero{visibility:visible;z-index:0}
+.js .screen.under{visibility:visible;z-index:1}
+/* the cover: the old opening screen's photograph, kolam, names and date, as a page */
+.js .screen.front{text-align:center;background:radial-gradient(120% 78% at 50% 36%,var(--surface) 0%,var(--bg) 52%,var(--bg2) 100%)}
+.front .seal{display:block;cursor:default}
 .js .screen.fade-away{visibility:visible;z-index:4;opacity:0;transition:opacity .9s ease .15s}
 .env{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:clamp(14px,3vh,26px);
   padding:min(calc(var(--crown) * .22),12vh) 0 calc(var(--tab-h) + 26px + env(safe-area-inset-bottom,0px));perspective:1200px;perspective-origin:50% 40%}
@@ -563,6 +565,10 @@ button{font:inherit;color:inherit}
 .js .screen.is-active{visibility:visible;z-index:1}
 .js .screen.leave{visibility:visible;z-index:2}
 .js .screen.enter{visibility:visible;z-index:3}
+/* the sea's page waits underneath the envelope and the cover, drawn, so it is ready when it is turned to
+   (drawing it for the first time mid-turn freezes the turn); after .js .screen, and
+   a turn's own classes outrank it */
+.js :where(.screen.cover.is-active,.screen.front.is-active) ~ .hero{visibility:visible;z-index:-1}
 
 /* ============ PAGE TRANSITIONS ============
    Scrolling: the next page rises under a row of temple arches (a gold

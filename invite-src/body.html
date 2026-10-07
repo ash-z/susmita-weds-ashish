@@ -11,8 +11,8 @@
 <main id="app">
 
   <!-- page one: a sealed envelope (3D). Tapping the seal, or turning the page, opens it: the flap swings open,
-       the card rises and grows into the next page -->
-  <section class="screen cover" id="cover" aria-label="Wedding invitation">
+       the card rises and grows into page two, the cover -->
+  <section class="screen cover" id="cover" aria-label="Envelope">
     <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
     <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
     <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
@@ -27,6 +27,23 @@
         </span>
       </button>
       <p class="env-hint" aria-hidden="true">Tap the seal to open</p>
+    </div>
+  </section>
+
+  <!-- page two: the cover -->
+  <section class="screen front" id="front" aria-label="Wedding invitation">
+    <div class="crown"><img class="toranam" data-art="toranam" alt="" aria-hidden="true" decoding="async"><span class="ganesha" role="img" aria-label="Lord Ganesha"></span></div>
+    <img class="sp-corner sp-corner-l" data-art="corner-left" alt="" aria-hidden="true" decoding="async">
+    <img class="sp-corner sp-corner-r" data-art="corner-right" alt="" aria-hidden="true" decoding="async">
+    <div class="wrap">
+      <div class="sp-inner">
+        <p class="invocation telugu reveal" lang="te">॥ శ్రీ గణేశాయ నమః ॥</p>
+        <div class="reveal"><div class="seal" id="seal" aria-hidden="true"><span class="cover"><img data-photo="cover" alt="" decoding="async"></span></div></div>
+        <p class="eyebrow telugu reveal" lang="te">శుభలేఖ</p>
+        <p class="sp-en reveal">Wedding Invitation</p>
+        <h2 class="sp-names reveal"><span class="n">Sai Susmita</span><span class="amp">&amp;</span><span class="n">Ashish</span></h2>
+        <p class="sp-date reveal">29 · 10 · 2026</p>
+      </div>
     </div>
   </section>
 
