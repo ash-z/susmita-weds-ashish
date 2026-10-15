@@ -1,0 +1,47 @@
+body { padding: 16px; margin: 0; background: #fbf7f4; color: #2b2024; }
+
+.clipper { max-width: 760px; margin: 0 auto; }
+.clipper h1 { margin-bottom: 4px; }
+.lede { margin-top: 0; color: #6b5a60; }
+
+.drop {
+  display: block; padding: 28px 16px; text-align: center; cursor: pointer;
+  border: 2px dashed #c9a9b4; border-radius: 12px; background: #fff;
+}
+.drop.over { border-color: #b03a62; background: #fdf0f4; }
+.drop input { display: none; }
+
+.song-name { font-weight: bold; word-break: break-word; }
+
+.wave-wrap {
+  position: relative; height: 120px; margin: 8px 0; border-radius: 8px;
+  background: #fff; border: 1px solid #e6d8dd; touch-action: none; user-select: none;
+}
+#wave { width: 100%; height: 100%; display: block; cursor: pointer; }
+.handle {
+  position: absolute; top: 0; bottom: 0; width: 14px; margin-left: -7px;
+  cursor: ew-resize; background: transparent;
+}
+.handle::after {
+  content: ''; position: absolute; left: 6px; top: 0; bottom: 0; width: 3px; background: #b03a62;
+}
+.playhead {
+  position: absolute; top: 0; bottom: 0; width: 2px; background: #2b2024; display: none; pointer-events: none;
+}
+
+.times, .controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 10px 0; }
+.times input { width: 90px; margin-left: 6px; font: inherit; padding: 4px 6px; }
+.length { color: #6b5a60; }
+select { margin-left: 6px; font: inherit; }
+
+button, .primary {
+  font: inherit; padding: 8px 14px; border-radius: 8px; border: 1px solid #c9a9b4;
+  background: #fff; color: #2b2024; cursor: pointer; text-decoration: none; display: inline-block;
+}
+.primary { background: #b03a62; border-color: #b03a62; color: #fff; }
+button:disabled { opacity: .5; cursor: default; }
+
+progress { width: 100%; margin-top: 10px; }
+.status { color: #6b5a60; min-height: 1.2em; }
+#result audio { width: 100%; margin: 8px 0; }
+.actions { display: flex; gap: 10px; flex-wrap: wrap; }

@@ -1,0 +1,52 @@
+extends layout
+
+block content
+  link(rel='stylesheet', href='/stylesheets/clip.css')
+  main.clipper
+    h1= title
+    p.lede Pick a song, choose the part you love, and save it as a shareable MP3.
+
+    label#drop.drop
+      input#file(type='file', accept='audio/*')
+      span#drop-text Drop a song here or tap to choose one
+
+    section#editor(hidden)
+      p#song-name.song-name
+      .wave-wrap
+        canvas#wave
+        .handle#h-start(title='Drag to set start')
+        .handle#h-end(title='Drag to set end')
+        .playhead#playhead
+      .times
+        label Start
+          input#start(type='text', inputmode='decimal')
+        label End
+          input#end(type='text', inputmode='decimal')
+        span#length.length
+
+      .controls
+        button#play(type='button') ▶ Preview
+        label
+          input#fade(type='checkbox', checked)
+          |  Fade in / out
+        label Quality
+          select#bitrate
+            option(value='128') 128 kbps
+            option(value='192', selected) 192 kbps
+            option(value='320') 320 kbps
+        label
+          input#mono(type='checkbox')
+          |  Mono (smaller file)
+
+      button#export.primary(type='button') Make MP3 clip
+      progress#progress(max='1', value='0', hidden)
+      p#status.status(role='status')
+
+      #result(hidden)
+        audio#result-audio(controls)
+        .actions
+          a#download.primary(download) Download MP3
+          button#share(type='button', hidden) Share
+
+  script(src='/vendor/lamejs/lame.min.js')
+  script(src='/javascripts/clipper.js')
