@@ -54,11 +54,13 @@
     stopPreview();
     setStatus('Reading ' + file.name + '…');
     songBase = file.name.replace(/\.[^.]+$/, '').replace(/[^\w\- ]+/g, '').trim() || 'song';
-    file.arrayBuffer().then(function (data) {
-      return new Promise(function (resolve, reject) {
-        // callback form for older Safari
-        audioCtx().decodeAudioData(data, resolve, reject);
-      });
+    file.arrayBuffer().then(decode).catch(function () {
+      // the browser can't read this format, so let the server's ffmpeg convert it
+      setStatus('Converting ' + file.name + '… this can take a moment for big files.');
+      return fetch('/clip/convert', { method: 'POST', body: file }).then(function (res) {
+        if (!res.ok) throw new Error('convert failed');
+        return res.arrayBuffer();
+      }).then(decode);
     }).then(function (decoded) {
       buffer = decoded;
       sel.start = 0;
@@ -71,7 +73,14 @@
       render();
       setStatus('Drag the pink handles or type times to pick your clip.');
     }).catch(function () {
-      setStatus('Sorry, this browser could not read that file. Try an MP3, M4A or WAV.');
+      setStatus('Could not find any audio in ' + file.name + '. Check that it is a song or video file.');
+    });
+  }
+
+  function decode(data) {
+    return new Promise(function (resolve, reject) {
+      // callback form for older Safari
+      audioCtx().decodeAudioData(data, resolve, reject);
     });
   }
 
