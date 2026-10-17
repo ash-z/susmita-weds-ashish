@@ -46,13 +46,39 @@ Upload a PDF, choose your options, then watch and download the clips in the brow
 | `--seconds` | 45 | target clip length (guides the narration length) |
 | `--format` | vertical | `vertical` 1080×1920, `landscape` 1920×1080, `square` |
 | `--language` | English | narration language (Claude translates Japanese pages, for example) |
+| `--style` | recap | narrator: `recap`, `dramatic`, `funny`, `hype`, or your own description in quotes |
 | `--ltr` | off | left-to-right panel order (western comics, manhwa) |
-| `--tts` | edge | `edge` (free neural voices), `gtts`, `pyttsx3` (offline), `silent` |
-| `--voice` | en-US-GuyNeural | any edge-tts voice (`edge-tts --list-voices`) |
+| `--tts` | auto | `auto` (edge → piper → gtts → pyttsx3), or one of `edge`, `piper`, `gtts`, `pyttsx3`, `silent` |
+| `--voice` | en-US-AndrewMultilingualNeural | edge voice (`edge-tts --list-voices`), Piper voice (`en_US-ryan-high`), or a `.onnx` path |
+| `--rate` | +5% | base speaking rate |
 | `--engine` | auto | `claude`, or `heuristic` for offline mode with no API key |
 | `--sfx-dir` | | folder of your own SFX files, e.g. `impact.wav` or `whoosh.mp3` |
 | `--first-page/--last-page` | | limit which pages are considered |
 | `--no-captions`, `--no-music` | | |
+
+## Narration
+
+The narration is the core of each clip, so it gets the most care:
+
+- **It's written as one story.** Claude keeps a cast list while scanning, so characters are
+  named and introduced consistently. Each clip is narrated for someone who hasn't read the manga:
+  who people are, what is at stake, and the key dialogue retold in the narrator's own words.
+- **Its length fits the clip.** `--seconds` becomes a spoken-word budget (about 2.5 words per
+  second). Each panel stays on screen until its line is finished, so a line is never cut off.
+- **Lines are written for the ear.** The prompt asks for short sentences and no symbols, emojis
+  or parentheses, and the text is cleaned again before it reaches the voice.
+- **Each line has a tone.** `neutral`, `tense`, `excited`, `whisper`, `sad` or `comedic` changes
+  the voice's rate, pitch and volume.
+- **It's never silently missing.** If a voice engine fails (no internet, for example), the next
+  one is used and a warning is printed. If none work, the run stops with an error rather than
+  producing a mute clip. The run ends with a line like
+  `Narration: 12 lines in 2 clip(s), voice engine: edge`.
+
+Voice engines, best first: **edge** (free Microsoft neural voices, needs internet), **piper**
+(offline neural voices; the voice downloads once to `~/.cache/mangaclip/piper`), **gtts**, and
+**pyttsx3** (robotic, offline; needs espeak on Linux).
+
+To polish a clip, edit the narration lines in `script.json` and re-render with `--script`.
 
 ## How it works
 

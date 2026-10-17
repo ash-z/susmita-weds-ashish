@@ -10,6 +10,8 @@ SFX_NAMES = [
     "sting", "chime", "boing", "rumble", "gasp",
 ]
 MOODS = ["tense", "action", "sad", "comedic", "mysterious", "epic", "romantic", "calm"]
+# How a narration line is delivered; mapped to voice rate/pitch in tts.py.
+TONES = ["neutral", "tense", "excited", "whisper", "sad", "comedic"]
 
 
 @dataclass
@@ -18,6 +20,7 @@ class Shot:
     narration: str = ""
     sfx: str = "none"
     emphasis: bool = False  # punch-in zoom + shake for big moments
+    tone: str = "neutral"
 
 
 @dataclass
@@ -46,7 +49,8 @@ class ClipScript:
         scenes = [Scene(page=s["page"], shots=[Shot(box=tuple(sh["box"]),
                                                      narration=sh.get("narration", ""),
                                                      sfx=sh.get("sfx", "none"),
-                                                     emphasis=sh.get("emphasis", False))
+                                                     emphasis=sh.get("emphasis", False),
+                                                     tone=sh.get("tone", "neutral"))
                                                 for sh in s["shots"]])
                   for s in d["scenes"]]
         return cls(title=d["title"], hook=d.get("hook", ""), mood=d.get("mood", "tense"),

@@ -51,14 +51,18 @@
       <label>Reading direction
         <select name="direction"><option value="rtl">Right-to-left (manga)</option>
           <option value="ltr">Left-to-right (comics/manhwa)</option></select></label>
+      <label>Narrator style
+        <select name="style"><option value="recap">Recap storyteller</option><option value="dramatic">Dramatic trailer</option>
+          <option value="funny">Funny / witty</option><option value="hype">Anime hype</option></select></label>
       <label>Narration language <input name="language" value="English"></label>
       <label>Script writer
         <select name="engine"><option value="auto">Auto (Claude if API key set)</option>
           <option value="claude">Claude</option><option value="heuristic">Offline heuristic</option></select></label>
       <label>Voice engine
-        <select name="tts"><option value="edge">Edge neural voices</option><option value="gtts">Google TTS</option>
+        <select name="tts"><option value="auto">Auto (best available)</option><option value="edge">Edge neural voices</option>
+          <option value="piper">Piper (offline neural)</option><option value="gtts">Google TTS</option>
           <option value="pyttsx3">Offline system voice</option><option value="silent">Silent (test)</option></select></label>
-      <label>Voice (optional) <input name="voice" placeholder="en-US-GuyNeural"></label>
+      <label>Voice (optional) <input name="voice" placeholder="en-US-AndrewMultilingualNeural"></label>
     </div>
     <div class="checks">
       <label><input type="checkbox" name="captions" checked> Captions</label>

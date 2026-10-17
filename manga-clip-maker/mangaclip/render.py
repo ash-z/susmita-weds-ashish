@@ -150,11 +150,14 @@ class Renderer:
         sfx_cues: list[tuple[float, str]] = []
         t = 0.0
 
-        def speak(text: str) -> np.ndarray:
-            return self.tts.speak(text) if text else np.zeros(0, np.float32)
+        def speak(text: str, tone: str = "neutral") -> np.ndarray:
+            return self.tts.speak(text, tone) if text else np.zeros(0, np.float32)
+
+        frame_tone = {"action": "excited", "epic": "excited", "comedic": "comedic",
+                      "sad": "sad", "romantic": "neutral", "calm": "neutral"}.get(script.mood, "tense")
 
         # Title card over the first page.
-        hook = speak(script.hook)
+        hook = speak(script.hook, frame_tone)
         full0 = worlds[0].full()
         zoom_in = (full0[0], full0[1], full0[2] * 0.94)
         dur = max(2.6, len(hook) / SR + 0.7)
@@ -183,7 +186,7 @@ class Renderer:
                 if shot.sfx in ("whoosh", "slash"):
                     sfx_cues.append((t, shot.sfx))
                 t += move
-                voice = speak(shot.narration)
+                voice = speak(shot.narration, shot.tone)
                 hold = max(1.5 if shot.narration else 1.2, len(voice) / SR + 0.35)
                 if shot.emphasis:
                     hold = max(hold, 1.8)
@@ -201,7 +204,7 @@ class Renderer:
                 segs[-1].fade_out = 0.25
 
         # Outro over the last page.
-        outro = speak(script.outro)
+        outro = speak(script.outro, frame_tone)
         lw = len(worlds) - 1
         full = worlds[lw].full()
         segs.append(Segment(lw, cam, full, 0.7))

@@ -15,11 +15,22 @@ from dataclasses import dataclass
 
 from .panels import detect_panels, snap, sort_reading_order, visual_stats
 from .pdf import Page
-from .script import MOODS, SFX_NAMES, ClipScript, Scene, Shot
+from .script import MOODS, SFX_NAMES, TONES, ClipScript, Scene, Shot
 
 log = logging.getLogger(__name__)
 
 MODEL = "claude-opus-5-5"
+WORDS_PER_SECOND = 2.5  # comfortable narration pace for TTS voices
+
+STYLES = {
+    "recap": "a manga recap channel: clear, gripping storytelling that explains who is who and "
+             "why each moment matters, like a friend catching you up on the story",
+    "dramatic": "a cinematic trailer narrator: weighty, suspenseful, short sentences, "
+                "builds tension toward the biggest moment",
+    "funny": "a witty, playful narrator who reacts to the scene and finds the humor, "
+             "without mocking the story",
+    "hype": "an excited anime hype narrator: high energy, punchy lines, celebrates the big moments",
+}
 
 
 @dataclass
@@ -73,8 +84,20 @@ SCAN_SCHEMA = {
                 "additionalProperties": False,
             },
         },
+        "cast": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {"type": "string"},
+                    "description": {"type": "string"},
+                },
+                "required": ["name", "description"],
+                "additionalProperties": False,
+            },
+        },
     },
-    "required": ["pages"],
+    "required": ["pages", "cast"],
     "additionalProperties": False,
 }
 
@@ -100,8 +123,9 @@ SCRIPT_SCHEMA = {
                                 "narration": {"type": "string"},
                                 "sfx": {"type": "string", "enum": SFX_NAMES},
                                 "emphasis": {"type": "boolean"},
+                                "tone": {"type": "string", "enum": TONES},
                             },
-                            "required": ["box", "narration", "sfx", "emphasis"],
+                            "required": ["box", "narration", "sfx", "emphasis", "tone"],
                             "additionalProperties": False,
                         },
                     },
@@ -123,12 +147,14 @@ voice-over, the way a good storyteller recaps a scene for someone watching along
 
 class ClaudeAnalyzer:
     def __init__(self, language: str = "English", right_to_left: bool = True,
-                 scan_batch: int = 16, effort: str = "medium"):
+                 style: str = "recap", scan_batch: int = 16, effort: str = "medium"):
         import anthropic
 
         self.client = anthropic.Anthropic()
         self.language = language
         self.rtl = right_to_left
+        self.style = STYLES.get(style, style)  # a preset name or a free-form description
+        self.cast: dict[str, str] = {}  # character name -> who they are, built while scanning
         self.scan_batch = scan_batch
         self.effort = effort
 
@@ -158,6 +184,7 @@ class ClaudeAnalyzer:
             batch = pages[i:i + self.scan_batch]
             log.info("Scanning pages %d-%d", batch[0].number, batch[-1].number)
             story_so_far = "\n".join(f"p{x.page}: {x.summary}" for x in infos[-40:])
+            cast = self._cast_text()
             content: list = []
             for p in batch:
                 content.append({"type": "text", "text": f"Page {p.number}:"})
@@ -167,13 +194,24 @@ class ClaudeAnalyzer:
 Story so far (from earlier pages):
 {story_so_far or "(this is the start of the file)"}
 
+Characters identified so far:
+{cast or "(none yet)"}
+
 For each page above, give:
-- summary: one sentence on what happens (who, what), in English.
+- summary: one sentence on what happens, naming the characters involved, in English.
 - score: 0-10, how good this page is as part of a short narrated clip. High scores go to \
 reveals, fights, big emotional beats, twists, cliffhangers, funny gags and striking splash \
 art. Low scores go to quiet transitions and exposition.
-- is_story: false for covers, credits, table of contents, ads, afterwords or blank pages."""})
+- is_story: false for covers, credits, table of contents, ads, afterwords or blank pages.
+
+Also return `cast`: every named character seen in these pages, with a short description \
+(role, look, relationships) so they can be recognized later. Use the names the manga uses \
+(from dialogue, captions or name boxes). If a character's name is not known yet, use a \
+short descriptive label like "the masked swordsman" and keep using the same label."""})
             data = self._ask(content, SCAN_SCHEMA)
+            for c in data["cast"]:
+                if c["name"] and c["name"] not in self.cast:
+                    self.cast[c["name"]] = c["description"]
             by_page = {d["page"]: d for d in data["pages"]}
             for p in batch:
                 d = by_page.get(p.number, {"summary": "", "score": 0, "is_story": True})
@@ -181,9 +219,13 @@ art. Low scores go to quiet transitions and exposition.
                                       float(max(0, min(10, d["score"]))), d["is_story"]))
         return infos
 
+    def _cast_text(self) -> str:
+        return "\n".join(f"- {n}: {d}" for n, d in list(self.cast.items())[:40])
+
     def write_script(self, pages: list[Page], infos: list[PageInfo],
                      target_seconds: int) -> ClipScript:
         first = pages[0].number
+        words = int(target_seconds * WORDS_PER_SECOND)
         context = "\n".join(f"p{x.page}: {x.summary}" for x in infos if x.page < first)
         direction = "right-to-left (Japanese manga)" if self.rtl else "left-to-right"
         content: list = []
@@ -195,22 +237,48 @@ art. Low scores go to quiet transitions and exposition.
 Story context before these pages:
 {context or "(these are the first pages)"}
 
-Write a narrated clip of about {target_seconds} seconds covering the pages above.
+Characters:
+{self._cast_text() or "(unknown; identify them from the pages)"}
 
+Write the voice-over for a short video clip covering the pages above. The viewer has \
+NOT read this manga. The narration is the heart of the clip: it must make a stranger \
+understand what is happening, care about it, and want to see what comes next.
+
+Narrator voice: {self.style}.
+
+Length: about {words} spoken words in total (hook + all panel lines + outro), which is \
+about {target_seconds} seconds at a natural pace. Stay within 15% of that.
+
+How to write it:
+- It is ONE continuous story told aloud. Each line follows from the previous one; use \
+connective flow ("But...", "Then...", "That's when...") instead of a list of disconnected \
+captions.
+- Name characters and say who they are the first time they appear ("Kaito, the \
+rookie who swore he'd never fight again"). Briefly set up any context the viewer needs.
+- Tell the story and the stakes, not the drawing. Never say "in this panel", "we see" or \
+"the page shows". Convey the key dialogue in your own words; quote a line directly only \
+when it really hits.
+- Write for the ear: short sentences, plain words, natural rhythm. Spell out numbers. \
+No emojis, symbols, parentheses, ellipses or stage directions; they are read aloud literally.
+- Build toward the biggest moment, and let it land with a short line or with silence.
+- Do not invent events that are not on the pages.
+
+Fields:
 - title: a short catchy title for the clip.
-- hook: one opening line (under 15 words) that makes viewers stay.
+- hook: the first spoken line, under 15 words. Open with tension or a question, not \
+"In this chapter".
 - mood: overall mood, used to choose background music.
 - scenes: one per page, in order. Each has the panels to show as `shots`, in {direction} \
 reading order. Use the panels that carry the story; skip filler panels.
   - box: [x0, y0, x1, y1] bounding box of the panel on a 0-1000 scale of the page \
 width/height (origin top-left). Fit the panel border tightly.
-  - narration: what the narrator says while this panel is on screen, 0-25 words. \
-Present tense, vivid, explain the dialogue instead of reading every bubble. Leave it \
-empty for a panel that should just breathe (a big impact, a silent stare).
+  - narration: what the narrator says while this panel is on screen, usually 6-25 words. \
+Leave it empty for a panel that should just breathe (a big impact, a silent stare).
+  - tone: how to deliver this line: neutral, tense, excited, whisper, sad or comedic.
   - sfx: a sound effect that fits the panel (match drawn sound-effect lettering when \
 there is any), or "none". Use sfx sparingly, not on every panel.
   - emphasis: true only for the one or two biggest moments (adds a punch-in zoom).
-- outro: a closing line, e.g. a cliffhanger question.
+- outro: the last spoken line, a cliffhanger or question that makes people want more.
 
 Write all narration, hook, title and outro in {self.language}."""})
         data = self._ask(content, SCRIPT_SCHEMA)
@@ -231,7 +299,7 @@ Write all narration, hook, title and outro in {self.language}."""})
                 if box[2] - box[0] < 0.05 or box[3] - box[1] < 0.05:
                     box = (0.0, 0.0, 1.0, 1.0)
                 shots.append(Shot(box=snap(box, detected), narration=sh["narration"].strip(),
-                                  sfx=sh["sfx"], emphasis=sh["emphasis"]))
+                                  sfx=sh["sfx"], emphasis=sh["emphasis"], tone=sh["tone"]))
             if shots:
                 scenes.append(Scene(page=page.number, shots=shots))
         if not scenes:

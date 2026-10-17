@@ -20,10 +20,14 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--engine", choices=["auto", "claude", "heuristic"], default="auto",
                    help="who picks scenes and writes narration (auto = claude if an API key is set)")
     p.add_argument("--language", default="English", help="narration language")
+    p.add_argument("--style", default="recap",
+                   help="narrator style: recap, dramatic, funny, hype, or your own description")
     p.add_argument("--ltr", action="store_true", help="left-to-right reading (comics/manhwa)")
-    p.add_argument("--tts", choices=["edge", "gtts", "pyttsx3", "silent"], default="edge")
-    p.add_argument("--voice", help="TTS voice, e.g. en-US-GuyNeural, en-GB-RyanNeural, ja-JP-KeitaNeural")
-    p.add_argument("--rate", default="+8%", help="edge-tts speaking rate, e.g. +0%%, +15%%")
+    p.add_argument("--tts", choices=["auto", "edge", "piper", "gtts", "pyttsx3", "silent"],
+                   default="auto", help="voice engine (auto tries edge, piper, gtts, pyttsx3)")
+    p.add_argument("--voice", help="edge voice (en-US-AndrewMultilingualNeural, en-GB-RyanNeural...) "
+                                   "or piper voice (en_US-ryan-high) or path to a .onnx model")
+    p.add_argument("--rate", default="+5%", help="base speaking rate, e.g. +0%%, +15%%")
     p.add_argument("--format", choices=list(FORMATS), default="vertical")
     p.add_argument("--fps", type=int, default=30)
     p.add_argument("--no-captions", action="store_true")
@@ -38,7 +42,7 @@ def main(argv: list[str] | None = None) -> None:
     logging.basicConfig(level=logging.INFO if a.verbose else logging.WARNING,
                         format="%(levelname)s %(message)s")
     opts = Options(num_clips=a.clips, pages_per_clip=a.pages, clip_seconds=a.seconds,
-                   engine=a.engine, language=a.language, right_to_left=not a.ltr, tts=a.tts,
+                   engine=a.engine, language=a.language, style=a.style, right_to_left=not a.ltr, tts=a.tts,
                    voice=a.voice, rate=a.rate, format=a.format, fps=a.fps,
                    captions=not a.no_captions, music=not a.no_music, sfx_dir=a.sfx_dir,
                    first_page=a.first_page, last_page=a.last_page, script_file=a.script)

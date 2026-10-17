@@ -24,10 +24,11 @@ class Options:
     clip_seconds: int = 45
     engine: str = "auto"  # auto | claude | heuristic
     language: str = "English"
+    style: str = "recap"  # recap | dramatic | funny | hype | free-form description
     right_to_left: bool = True
-    tts: str = "edge"
+    tts: str = "auto"
     voice: str | None = None
-    rate: str = "+8%"
+    rate: str = "+5%"
     format: str = "vertical"
     fps: int = 30
     captions: bool = True
@@ -58,8 +59,12 @@ def make_clips(pdf_path: str, out_dir: str, opts: Options,
                                   or os.environ.get("ANTHROPIC_AUTH_TOKEN")) else "heuristic"
         progress(f"Analyzing {len(pages)} pages ({engine})")
         title = os.path.splitext(os.path.basename(pdf_path))[0].replace("_", " ")
-        analyzer = (ClaudeAnalyzer(opts.language, opts.right_to_left) if engine == "claude"
-                    else HeuristicAnalyzer(opts.right_to_left, title=title))
+        if engine == "claude":
+            analyzer = ClaudeAnalyzer(opts.language, opts.right_to_left, opts.style)
+        else:
+            progress("WARNING: no Claude API key, so the narration is only a placeholder. "
+                     "Set ANTHROPIC_API_KEY for real story narration.")
+            analyzer = HeuristicAnalyzer(opts.right_to_left, title=title)
         infos = analyzer.scan(pages)
         with open(os.path.join(out_dir, "pages.json"), "w", encoding="utf-8") as f:
             json.dump([asdict(i) for i in infos], f, indent=2, ensure_ascii=False)
@@ -72,7 +77,8 @@ def make_clips(pdf_path: str, out_dir: str, opts: Options,
         with open(os.path.join(out_dir, "script.json"), "w", encoding="utf-8") as f:
             f.write("[\n" + ",\n".join(s.to_json() for s in scripts) + "\n]\n")
 
-    tts = TTS(opts.tts, opts.voice, opts.rate, cache_dir=os.path.join(out_dir, ".tts-cache"))
+    tts = TTS(opts.tts, opts.voice, opts.rate, cache_dir=os.path.join(out_dir, ".tts-cache"),
+              language=opts.language)
     renderer = Renderer(opts.format, opts.fps, opts.captions, tts, opts.sfx_dir, opts.music)
     outputs = []
     for i, script in enumerate(scripts, 1):
@@ -83,5 +89,7 @@ def make_clips(pdf_path: str, out_dir: str, opts: Options,
         out = os.path.join(out_dir, f"clip_{i:02d}_p{script.pages[0]}-{script.pages[-1]}.mp4")
         renderer.render(script, by_num, out)
         outputs.append(out)
+    lines = sum(1 for s in scripts for sc in s.scenes for sh in sc.shots if sh.narration)
+    progress(f"Narration: {lines} lines in {len(scripts)} clip(s), voice engine: {tts.describe()}")
     progress("Done")
     return outputs
