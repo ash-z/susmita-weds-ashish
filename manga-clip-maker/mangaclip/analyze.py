@@ -129,8 +129,10 @@ SCRIPT_SCHEMA = {
                             "additionalProperties": False,
                         },
                     },
+                    "music_mood": {"type": "string", "enum": MOODS},
+                    "music_energy": {"type": "integer"},
                 },
-                "required": ["page", "shots"],
+                "required": ["page", "shots", "music_mood", "music_energy"],
                 "additionalProperties": False,
             },
         },
@@ -278,6 +280,10 @@ Leave it empty for a panel that should just breathe (a big impact, a silent star
   - sfx: a sound effect that fits the panel (match drawn sound-effect lettering when \
 there is any), or "none". Use sfx sparingly, not on every panel.
   - emphasis: true only for the one or two biggest moments (adds a punch-in zoom).
+- For each scene, also choose its background music: music_mood (one of the moods above) \
+and music_energy from 1 (quiet, ambient) to 5 (driving, intense). Follow the emotional arc: \
+music changes only where the feeling of the story really shifts (calm before the storm, \
+then action), so consecutive pages often share a mood.
 - outro: the last spoken line, a cliffhanger or question that makes people want more.
 
 Write all narration, hook, title and outro in {self.language}."""})
@@ -301,7 +307,8 @@ Write all narration, hook, title and outro in {self.language}."""})
                 shots.append(Shot(box=snap(box, detected), narration=sh["narration"].strip(),
                                   sfx=sh["sfx"], emphasis=sh["emphasis"], tone=sh["tone"]))
             if shots:
-                scenes.append(Scene(page=page.number, shots=shots))
+                scenes.append(Scene(page=page.number, shots=shots, music_mood=s["music_mood"],
+                                    music_energy=max(1, min(5, s["music_energy"]))))
         if not scenes:
             raise RuntimeError("Claude returned a script with no usable scenes")
         return ClipScript(title=data["title"], hook=data["hook"], mood=data["mood"],

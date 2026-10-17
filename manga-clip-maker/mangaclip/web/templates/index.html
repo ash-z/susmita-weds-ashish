@@ -67,6 +67,7 @@
     <div class="checks">
       <label><input type="checkbox" name="captions" checked> Captions</label>
       <label><input type="checkbox" name="music" checked> Background music</label>
+      <label><input type="checkbox" name="monetized" checked> Monetized channel (no NonCommercial music)</label>
     </div>
     <button id="go" type="submit">Make clips</button>
   </form>
@@ -101,6 +102,10 @@ document.getElementById('f').onsubmit = async e => {
     for (const c of j.clips) {
       const url = `/jobs/${body.id}/files/${c}`;
       clips.insertAdjacentHTML('beforeend', `<div><video src="${url}" controls playsinline></video><a href="${url}" download>Download ${c}</a></div>`);
+    }
+    for (const c of j.clips) {
+      const credits = c.replace(/\.mp4$/, '.credits.txt');
+      clips.insertAdjacentHTML('beforeend', `<div><a href="/jobs/${body.id}/files/${credits}" target="_blank">Music credits for ${c}</a></div>`);
     }
     clips.insertAdjacentHTML('beforeend', `<div><a href="/jobs/${body.id}/files/script.json" target="_blank">View script.json</a></div>`);
   };

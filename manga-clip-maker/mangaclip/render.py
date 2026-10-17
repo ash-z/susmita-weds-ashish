@@ -15,7 +15,8 @@ from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageFont
 from . import audio as A
 from .pdf import Page
 from .script import ClipScript
-from .sfx import SR, get_sfx, music_bed
+from .music import MusicLibrary, MusicPolicy, Track, render_cues
+from .sfx import SR, get_sfx
 from .tts import TTS
 
 log = logging.getLogger(__name__)
@@ -130,7 +131,9 @@ def _wrap(draw: ImageDraw.ImageDraw, text: str, font, max_w: int) -> list[str]:
 class Renderer:
     def __init__(self, fmt: str = "vertical", fps: int = 30, captions: bool = True,
                  tts: TTS | None = None, sfx_dir: str | None = None, music: bool = True,
-                 music_volume: float = 0.22, sfx_volume: float = 0.7):
+                 music_volume: float = 0.22, sfx_volume: float = 0.7,
+                 music_library: MusicLibrary | None = None,
+                 music_policy: MusicPolicy | None = None):
         self.size = FORMATS[fmt]
         self.aspect = self.size[0] / self.size[1]
         self.fps = fps
@@ -140,6 +143,9 @@ class Renderer:
         self.music = music
         self.music_volume = music_volume
         self.sfx_volume = sfx_volume
+        self.music_library = music_library
+        self.music_policy = music_policy or MusicPolicy()
+        self.last_music: list[Track] = []  # tracks used by the most recent render
 
     # ---------------------------------------------------------------- build
 
@@ -148,6 +154,8 @@ class Renderer:
         segs: list[Segment] = []
         voice_cues: list[tuple[float, np.ndarray]] = []
         sfx_cues: list[tuple[float, str]] = []
+        music_cues: list[tuple[float, float, str, int]] = []  # start, end, mood, energy
+        hits: list[float] = []  # emphasis moments: music dips so the impact lands
         t = 0.0
 
         def speak(text: str, tone: str = "neutral") -> np.ndarray:
@@ -170,6 +178,7 @@ class Renderer:
 
         for wi, scene in enumerate(script.scenes):
             world = worlds[wi]
+            scene_start = 0.0 if wi == 0 else t
             if wi > 0:
                 # New page: quick establishing look at the whole page.
                 cam = world.full()
@@ -197,11 +206,15 @@ class Renderer:
                                     shake=0.35 if shot.emphasis else 0.0, ease=False))
                 if shot.sfx not in ("none", "whoosh", "slash"):
                     sfx_cues.append((t, shot.sfx))
+                if shot.emphasis:
+                    hits.append(t)
                 voice_cues.append((t + 0.1, voice))
                 t += hold
                 cam = end
             if wi < len(script.scenes) - 1:
                 segs[-1].fade_out = 0.25
+            music_cues.append((scene_start, t, scene.music_mood or script.mood,
+                               scene.music_energy))
 
         # Outro over the last page.
         outro = speak(script.outro, frame_tone)
@@ -216,11 +229,13 @@ class Renderer:
         voice_cues.append((t + 0.2, outro))
         sfx_cues.append((t, "rumble" if script.mood in ("tense", "mysterious", "epic") else "chime"))
         t += dur
-        return worlds, segs, voice_cues, sfx_cues, t
+        last = music_cues[-1]
+        music_cues[-1] = (last[0], t, last[2], last[3])  # last scene's music carries the outro
+        return worlds, segs, voice_cues, sfx_cues, music_cues, hits, t
 
     # ---------------------------------------------------------------- audio
 
-    def mix_audio(self, mood: str, total: float, voice_cues, sfx_cues) -> np.ndarray:
+    def mix_audio(self, total: float, voice_cues, sfx_cues, music_cues, hits) -> np.ndarray:
         n = int(total * SR) + SR
         voice = np.zeros(n, np.float32)
         for at, clip in voice_cues:
@@ -229,13 +244,19 @@ class Renderer:
         for at, name in sfx_cues:
             A.add(fx, get_sfx(name, self.sfx_dir), at)
         mix = voice + fx * self.sfx_volume
+        self.last_music = []
         if self.music:
-            bed = music_bed(mood, n / SR)[:n]
+            bed, self.last_music = render_cues(music_cues, n / SR, self.music_library,
+                                               self.music_policy)
             fade = np.ones(n, np.float32)
             k = int(1.5 * SR)
             fade[:k] = np.linspace(0, 1, k)
             fade[-k:] = np.linspace(1, 0, k)
-            mix += bed * self.music_volume * A.duck_envelope(voice) * fade
+            for at in hits:  # brief dip under big impacts
+                i, d = int(at * SR), int(0.6 * SR)
+                dip = 1 - 0.7 * np.sin(np.linspace(0, np.pi, d)) ** 0.5
+                fade[i:i + d] *= dip[:max(0, min(d, n - i))]
+            mix += bed[:n] * self.music_volume * A.duck_envelope(voice) * fade
         return A.master(mix)[:int(total * SR)]
 
     # ---------------------------------------------------------------- video
@@ -286,7 +307,7 @@ class Renderer:
         return frame
 
     def render(self, script: ClipScript, pages: dict[int, Page], out_path: str) -> str:
-        worlds, segs, voice_cues, sfx_cues, total = self.build(script, pages)
+        worlds, segs, voice_cues, sfx_cues, music_cues, hits, total = self.build(script, pages)
         n_frames = int(round(total * self.fps))
         total = n_frames / self.fps
         log.info("Rendering %s: %.1fs, %d frames", out_path, total, n_frames)
@@ -304,7 +325,7 @@ class Renderer:
 
         tmp = tempfile.mkdtemp(prefix="mangaclip-")
         wav = os.path.join(tmp, "mix.wav")
-        A.write_wav(wav, self.mix_audio(script.mood, total, voice_cues, sfx_cues))
+        A.write_wav(wav, self.mix_audio(total, voice_cues, sfx_cues, music_cues, hits))
 
         cmd = ["ffmpeg", "-y", "-v", "error",
                "-f", "rawvideo", "-pix_fmt", "rgb24", "-s", f"{W}x{H}", "-r", str(self.fps),

@@ -11,6 +11,7 @@ from typing import Callable
 from .analyze import ClaudeAnalyzer, HeuristicAnalyzer, pick_segments
 from .pdf import load_pages
 from .render import Renderer
+from .music import MusicLibrary, MusicPolicy, write_credits
 from .script import ClipScript
 from .tts import TTS
 
@@ -34,6 +35,9 @@ class Options:
     captions: bool = True
     music: bool = True
     sfx_dir: str | None = None
+    music_dir: str | None = None  # license-aware track library (see music.py)
+    commercial: bool = True  # monetized channel: skip NonCommercial-licensed music
+    allow_unlicensed_music: bool = False  # private previews only
     first_page: int | None = None
     last_page: int | None = None
     script_file: str | None = None  # re-render an edited script.json instead of analyzing
@@ -79,7 +83,17 @@ def make_clips(pdf_path: str, out_dir: str, opts: Options,
 
     tts = TTS(opts.tts, opts.voice, opts.rate, cache_dir=os.path.join(out_dir, ".tts-cache"),
               language=opts.language)
-    renderer = Renderer(opts.format, opts.fps, opts.captions, tts, opts.sfx_dir, opts.music)
+    library = None
+    policy = MusicPolicy(opts.commercial, opts.allow_unlicensed_music)
+    if opts.music and opts.music_dir:
+        library = MusicLibrary.load(opts.music_dir)
+        skipped = [line for line in library.report(policy) if line.startswith("SKIP")]
+        allowed = len(library.tracks) - len(skipped)
+        progress(f"Music library: {allowed} usable track(s), {len(skipped)} skipped")
+        for line in skipped[:10]:
+            progress("  " + line)
+    renderer = Renderer(opts.format, opts.fps, opts.captions, tts, opts.sfx_dir, opts.music,
+                        music_library=library, music_policy=policy)
     outputs = []
     for i, script in enumerate(scripts, 1):
         missing = [p for p in script.pages if p not in by_num]
@@ -89,6 +103,11 @@ def make_clips(pdf_path: str, out_dir: str, opts: Options,
         out = os.path.join(out_dir, f"clip_{i:02d}_p{script.pages[0]}-{script.pages[-1]}.mp4")
         renderer.render(script, by_num, out)
         outputs.append(out)
+        write_credits(out[:-4] + ".credits.txt", renderer.last_music)
+        if any(not policy.allows(t)[0] or t.license in ("copyrighted", "unknown")
+               for t in renderer.last_music):
+            progress("WARNING: this clip uses unlicensed music. Do not upload it publicly; "
+                     "it will likely be claimed or muted.")
     lines = sum(1 for s in scripts for sc in s.scenes for sh in sc.shots if sh.narration)
     progress(f"Narration: {lines} lines in {len(scripts)} clip(s), voice engine: {tts.describe()}")
     progress("Done")

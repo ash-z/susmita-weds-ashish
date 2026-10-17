@@ -27,6 +27,8 @@ class Shot:
 class Scene:
     page: int
     shots: list[Shot] = field(default_factory=list)
+    music_mood: str = ""  # empty = use the clip's mood
+    music_energy: int = 3  # 1 (ambient) .. 5 (driving)
 
 
 @dataclass
@@ -51,7 +53,8 @@ class ClipScript:
                                                      sfx=sh.get("sfx", "none"),
                                                      emphasis=sh.get("emphasis", False),
                                                      tone=sh.get("tone", "neutral"))
-                                                for sh in s["shots"]])
+                                                for sh in s["shots"]],
+                        music_mood=s.get("music_mood", ""), music_energy=s.get("music_energy", 3))
                   for s in d["scenes"]]
         return cls(title=d["title"], hook=d.get("hook", ""), mood=d.get("mood", "tense"),
                    outro=d.get("outro", ""), scenes=scenes)

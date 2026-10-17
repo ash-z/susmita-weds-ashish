@@ -16,6 +16,7 @@ from werkzeug.utils import secure_filename
 from ..pipeline import Options, make_clips
 
 DATA_DIR = os.environ.get("MANGACLIP_DATA", os.path.abspath("mangaclip-jobs"))
+MUSIC_DIR = os.environ.get("MANGACLIP_MUSIC_DIR")  # license-aware music library, optional
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 300 * 1024 * 1024
 jobs: dict[str, dict] = {}
@@ -66,6 +67,8 @@ def create_job():
         format=form.get("format", "vertical"),
         captions=form.get("captions") == "on",
         music=form.get("music") == "on",
+        music_dir=MUSIC_DIR,
+        commercial=form.get("monetized") == "on",
     )
     jobs[job_id] = {"status": "running", "log": [], "clips": [], "error": None}
     threading.Thread(target=_run, args=(job_id, pdf, out_dir, opts), daemon=True).start()

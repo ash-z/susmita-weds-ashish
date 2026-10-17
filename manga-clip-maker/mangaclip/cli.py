@@ -32,6 +32,11 @@ def main(argv: list[str] | None = None) -> None:
     p.add_argument("--fps", type=int, default=30)
     p.add_argument("--no-captions", action="store_true")
     p.add_argument("--no-music", action="store_true")
+    p.add_argument("--music-dir", help="license-aware music library (python -m mangaclip.music init DIR)")
+    p.add_argument("--non-commercial", action="store_true",
+                   help="channel is not monetized: also allow NonCommercial (CC BY-NC) music")
+    p.add_argument("--allow-unlicensed-music", action="store_true",
+                   help="use copyrighted/unknown-license tracks (private previews only)")
     p.add_argument("--sfx-dir", help="folder of custom SFX files named like impact.wav")
     p.add_argument("--first-page", type=int, help="only consider pages from here")
     p.add_argument("--last-page", type=int, help="only consider pages up to here")
@@ -45,6 +50,8 @@ def main(argv: list[str] | None = None) -> None:
                    engine=a.engine, language=a.language, style=a.style, right_to_left=not a.ltr, tts=a.tts,
                    voice=a.voice, rate=a.rate, format=a.format, fps=a.fps,
                    captions=not a.no_captions, music=not a.no_music, sfx_dir=a.sfx_dir,
+                   music_dir=a.music_dir, commercial=not a.non_commercial,
+                   allow_unlicensed_music=a.allow_unlicensed_music,
                    first_page=a.first_page, last_page=a.last_page, script_file=a.script)
     outputs = make_clips(a.pdf, a.out, opts, progress=lambda m: print(f"• {m}", flush=True))
     for o in outputs:
