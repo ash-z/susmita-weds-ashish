@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+clips/
+mangaclip-jobs/
+.tts-cache/
+*.mp4
