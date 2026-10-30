@@ -12,6 +12,7 @@ import base64, hashlib, html, pathlib, re, subprocess, urllib.parse, urllib.requ
 
 HERE = pathlib.Path(__file__).resolve().parent
 ART = HERE.parent / "art"
+PHOTOS = HERE.parent / "photos"
 FONTS = HERE / "fonts"; FONTS.mkdir(exist_ok=True)
 OUT = HERE / "out"; OUT.mkdir(exist_ok=True)
 W, H = 2400, 3600                          # CSS px: 100 per inch; rendered at 1.5x (150 dpi) and as a print PDF
@@ -109,21 +110,32 @@ def arrow(direction, color=MAROON):
     return (f'<svg width="420" height="150" viewBox="-210 -75 420 150"><g transform="{flip}">'
             f'<path d="M-200 -20 L110 -20 L110 -62 L200 0 L110 62 L110 20 L-200 20 Z" fill="{color}"/></g></svg>')
 
+def photo(top, w=880, h=1100, rim=14, mat=10):
+    """the engagement portrait (the site's cover crop) in the site's temple-arch window: gold rim, ivory mat"""
+    src, (cx, cy, cw) = PHOTOS / "Screenshot_2026-09-23-07-59-16-387_com.google.android.apps.nbu.files.jpg", (140, 100, 960)
+    iw = w - 2 * (rim + mat); k = iw / cw                 # show the 960-wide crop across the window
+    uri = "data:image/jpeg;base64," + base64.b64encode(src.read_bytes()).decode()
+    arch = lambda r: f"border-radius:{r}px {r}px 24px 24px"
+    return (f'<div class="foil-img" style="position:absolute;left:{(W-w)/2}px;top:{top}px;width:{w}px;height:{h}px;padding:{rim}px;{arch(w)};'
+            f'filter:drop-shadow(0 14px 22px rgba(0,0,0,.5))"><div style="width:100%;height:100%;padding:{mat}px;background:#fbf4e3;{arch(w)}">'
+            f'<div style="position:relative;width:100%;height:100%;overflow:hidden;{arch(w)}"><img src="{uri}" style="position:absolute;'
+            f'width:{1200*k}px;left:{-cx*k}px;top:{-cy*k}px"></div></div></div>')
+
 def plaque(top, direction=None):
     """the hall and floor on ivory, in a gold-edged cartouche"""
-    pw, ph = 1360, (640 if direction is None else 830)
+    pw, ph = 1360, (440 if direction is None else 600)
     x0 = (W - pw) / 2
     shape = (f"M{40} 0 L{pw-40} 0 C{pw-40} 30 {pw-10} 40 {pw} 40 L{pw} {ph-40} C{pw-10} {ph-40} {pw-40} {ph-30} {pw-40} {ph} "
              f"L40 {ph} C40 {ph-30} 10 {ph-40} 0 {ph-40} L0 40 C10 40 40 30 40 0 Z")
     svg = (f'<svg width="{pw}" height="{ph}" viewBox="-14 -14 {pw+28} {ph+28}" style="position:absolute;inset:0;overflow:visible">{foil_defs("fp")}'
            f'<path d="{shape}" fill="#fbf4e3" stroke="url(#fp)" stroke-width="14"/>'
            f'<path d="{shape}" transform="translate({pw*.03} {ph*.065}) scale(.94 .87)" fill="none" stroke="#a77b2c" stroke-width="3.5"/></svg>')
-    inner = (f'<div style="position:absolute;left:0;right:0;top:70px;text-align:center;font-family:Marcellus;'
-             f'font-size:210px;line-height:1.05;color:{MAROON_LO};letter-spacing:4px">{E(T["hall"])}</div>'
-             f'<div style="position:absolute;left:0;right:0;top:300px;text-align:center;font-family:Marcellus;'
-             f'font-size:150px;line-height:1.1;color:{MAROON};letter-spacing:3px">{E(T["floor"])}</div>')
+    inner = (f'<div style="position:absolute;left:0;right:0;top:40px;text-align:center;font-family:Marcellus;'
+             f'font-size:180px;line-height:1.05;color:{MAROON_LO};letter-spacing:4px">{E(T["hall"])}</div>'
+             f'<div style="position:absolute;left:0;right:0;top:238px;text-align:center;font-family:Marcellus;'
+             f'font-size:124px;line-height:1.1;color:{MAROON};letter-spacing:3px">{E(T["floor"])}</div>')
     if direction:                                         # the arrow, centred under the floor
-        inner += f'<div style="position:absolute;left:0;right:0;top:{530 if direction != "up" else 505}px;text-align:center">{arrow(direction)}</div>'
+        inner += f'<div style="position:absolute;left:0;right:0;top:{405 if direction != "up" else 385}px;text-align:center">{arrow(direction)}</div>'
     return f'<div style="position:absolute;left:{x0}px;top:{top}px;width:{pw}px;height:{ph}px">{svg}{inner}</div>'
 
 def sign(direction=None):
@@ -134,20 +146,18 @@ def sign(direction=None):
     b = [frame(W, H)]                      # everything from here sits inside the trim
     b.append(masked("toranam", 220, 205, 1960, 693))
     b.append(masked("ganesha", 1050, 470, 300, 390))
-    b.append(f'<div class="c foil" style="top:880px;font-family:\'Tiro Telugu\';font-size:120px">{E(T["te"])}</div>')
-    b.append(f'<div class="c foil" style="top:1105px;font-family:Marcellus;font-size:200px;letter-spacing:28px;text-indent:28px">{E(T["heading"].upper())}</div>')
-    b.append(ornament(1370))
-    b.append(f'<div class="c foil" style="top:1400px;font-family:\'Alex Brush\';font-size:330px;line-height:1.1">{E(T["bride"])}</div>')
-    b.append(f'<div class="c foil" style="top:1755px;font-family:Marcellus;font-size:120px">&amp;</div>')
-    b.append(f'<div class="c foil" style="top:1850px;font-family:\'Alex Brush\';font-size:330px;line-height:1.1">{E(T["groom"])}</div>')
-    b.append(f'<div class="c" style="top:2260px;font-family:Marcellus;font-size:74px;letter-spacing:3px;color:#f3e6c8">{E(T["when"])}</div>')
-    b.append(ornament(2420, 300))
-    b.append(f'<div class="c" style="top:2470px;font-family:Marcellus;font-size:84px;letter-spacing:6px;color:#e9cf86">{E(T["hotel"].upper())}</div>')
-    # the peacock pair from Blessings, facing each other across the plaque
+    b.append(f'<div class="c foil" style="top:852px;font-family:\'Tiro Telugu\';font-size:104px">{E(T["te"])}</div>')
+    b.append(f'<div class="c foil" style="top:1012px;font-family:Marcellus;font-size:165px;letter-spacing:24px;text-indent:24px">{E(T["heading"].upper())}</div>')
+    # the engagement portrait, with the peacock pair from Blessings facing each other across it
     pk = art("peacock")
-    b.append(f'<img src="{pk}" style="position:absolute;left:150px;top:2560px;height:880px;transform:scaleX(-1);filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
-    b.append(f'<img src="{pk}" style="position:absolute;right:150px;top:2560px;height:880px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
-    b.append(plaque(2660 if direction is None else 2600, direction))
+    b.append(f'<img src="{pk}" style="position:absolute;left:330px;top:1432px;height:880px;transform:scaleX(-1);filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
+    b.append(f'<img src="{pk}" style="position:absolute;right:330px;top:1432px;height:880px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
+    b.append(photo(1238, h=1074))
+    b.append(f'<div class="c foil" style="top:2320px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1">{E(T["bride"])}'
+             f'<span style="font-family:Marcellus;font-size:100px;margin:0 50px;vertical-align:middle">&amp;</span>{E(T["groom"])}</div>')
+    b.append(f'<div class="c" style="top:2606px;font-family:Marcellus;font-size:64px;letter-spacing:3px;color:#f3e6c8">{E(T["when"])}</div>')
+    b.append(f'<div class="c" style="top:2712px;font-family:Marcellus;font-size:72px;letter-spacing:6px;color:#e9cf86">{E(T["hotel"].upper())}</div>')
+    b.append(plaque(2900 if direction is None else 2822, direction))
     css = (font("Alex Brush") + font("Tiro Telugu") + font("Marcellus") + font("Karla", 500) +
            f"*{{margin:0;padding:0;box-sizing:border-box}}html,body{{width:{W+2*BLEED}px;height:{H+2*BLEED}px;overflow:hidden}}"
            f"body{{position:relative;background:radial-gradient(120% 85% at 50% 40%,{MAROON_HI} 0%,{MAROON} 55%,{MAROON_LO} 100%)}}"
