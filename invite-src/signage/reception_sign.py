@@ -9,15 +9,13 @@ with maroon type and deep gold ornament: light ink on dark only where it must re
 Rendering needs node + Playwright's Chromium (render.mjs, next to this file). Fonts are Google Fonts subsets of the
 text used, cached in fonts/ (network once); the art is the invitation's own (invite-src/art).
 """
-import base64, hashlib, html, pathlib, re, subprocess, urllib.parse, urllib.request
+import base64, html, pathlib, subprocess
+import common
+from common import W, H, BLEED, OUT
 
 HERE = pathlib.Path(__file__).resolve().parent
 ART = HERE.parent / "art"
 PHOTOS = HERE.parent / "photos"
-FONTS = HERE / "fonts"; FONTS.mkdir(exist_ok=True)
-OUT = HERE / "out"; OUT.mkdir(exist_ok=True)
-W, H = 2400, 3600                          # CSS px: 100 per inch; rendered at 1.5x (150 dpi) and as a print PDF
-BLEED = 20                                 # 0.2 in (5 mm) of background past the trim on every side, for the printer
 # colours chosen inside the CMYK gamut (checked against a press profile): the deeper #5a0d1a / #3f0812 the site uses
 # print as muddy brown
 MAROON, MAROON_LO = "#7a2b32", "#5e2429"
@@ -30,15 +28,7 @@ E = lambda s: html.escape(s, quote=False)
 
 # ---------------- fonts: the invitation's pairing ----------------
 TEXT = "".join(sorted(set(" ".join(T.values()) + " &·‘’0123456789 ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz")))
-def font(family, weight=400):
-    key = hashlib.sha1(f"{family}|{weight}|{TEXT}".encode()).hexdigest()[:10]
-    f = FONTS / f"{family.replace(' ', '')}-{weight}-{key}.woff2"
-    if not f.exists():
-        url = f"https://fonts.googleapis.com/css2?family={family.replace(' ', '+')}:wght@{weight}&text={urllib.parse.quote(TEXT)}"
-        css = urllib.request.urlopen(urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0 Chrome/120"})).read().decode()
-        f.write_bytes(urllib.request.urlopen(re.search(r"src: url\((https://[^)]+)\)", css).group(1)).read())
-    return (f"@font-face{{font-family:'{family}';font-weight:{weight};"
-            f"src:url(data:font/woff2;base64,{base64.b64encode(f.read_bytes()).decode()}) format('woff2')}}")
+def font(family, weight=400): return common.font(family, weight, TEXT)
 
 def art(name): return "data:image/png;base64," + base64.b64encode((ART / f"{name}.png").read_bytes()).decode()
 def outline(name):                         # traced silhouette (trace_art.py) for the gold masks; prints crisp at any size

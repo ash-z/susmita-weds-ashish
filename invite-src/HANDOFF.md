@@ -136,6 +136,13 @@ no peacocks; it's a daytime reception and the board stands outdoors, so ivory wi
 profile): the site's deep maroons print as muddy brown. The toranam and Ganesha are traced to vector outlines
 (`signage/trace_art.py` → `signage/vector/`, committed) because the PNGs would print at ~65 dpi. The photo is a phone
 screenshot (~130 dpi at this size); if the couple upload the photographer's original, point `photo()` at it.
+A second board in a soft illustrated style (after a "dusty floral" card the couple liked):
+`signage/reception_floral.py` → `out/reception-floral.{png,pdf}`, same size and wording. Blush paper, pastel pink
+lotus / jasmine / lotus-leaf clusters off the corners and sides (the engagement's lotus garlands and backdrop), and
+the couple drawn flat in a simple outlined style as at the engagement (Ashish: beard, grey-blue kurta, silver
+brocade jacket; Sai Susmita: green saree, pink blouse and pallu, jasmine in her bun; jasmine-and-lotus garlands).
+All vector, hand-drawn in the script (not traced from photos), so the PDF is ~1 MB. `common.py` holds the font
+subsetting and page geometry both boards share.
 
 ## Screens
 Invite (the sea) · Us (photo deck) · Wedding · Reception · RSVP · Blessings — six tabs, each its own full screen. Both tickets carry the same days/hours/mins/secs countdown.
