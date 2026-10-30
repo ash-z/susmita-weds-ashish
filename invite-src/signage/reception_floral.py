@@ -124,6 +124,8 @@ def couple():
     """drawn on a 1000 x 1600 canvas (shown cropped to the figures): Ashish on the left (named first), Sai Susmita on the right"""
     o = f'stroke="{LINE}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"'
     skin_a, skin_s, hair = "#c98d68", "#d6a07f", "#2b1e19"
+    JAW = ("M234 270 C234 210 276 182 330 182 C384 182 426 210 426 270 C426 330 410 372 380 392 C362 404 346 408 330 408 "
+           "C314 408 298 404 280 392 C250 372 234 330 234 270 Z")   # Ashish's face: broad, full in the cheeks
     face = lambda cx, cy, w=1: (f'<path d="M{cx-38*w} {cy-26} q10 -8 22 -2 M{cx+16*w} {cy-28} q12 -6 22 2" fill="none" {o} stroke-width="3.5"/>'
                                 f'<ellipse cx="{cx-26*w}" cy="{cy}" rx="6.5" ry="9" fill="{hair}"/><ellipse cx="{cx+26*w}" cy="{cy}" rx="6.5" ry="9" fill="{hair}"/>'
                                 f'<circle cx="{cx-46*w}" cy="{cy+32}" r="17" fill="#e8806e" opacity=".42"/><circle cx="{cx+46*w}" cy="{cy+32}" r="17" fill="#e8806e" opacity=".42"/>'
@@ -148,19 +150,32 @@ def couple():
         "".join(f'<circle cx="338" cy="{y}" r="6" fill="#c9a24a" stroke="{LINE}" stroke-width="1.6"/>' for y in range(500, 860, 64)),
         f'<path d="M298 366 L298 420 C318 434 342 434 362 420 L362 366 Z" fill="{skin_a}" {o}/>',
         f'<path d="M294 424 C312 440 348 440 366 424 L364 404 C346 414 314 414 296 404 Z" fill="#e7e9f1" {o}/>',
-        f'<ellipse cx="236" cy="286" rx="15" ry="23" fill="{skin_a}" {o}/><ellipse cx="424" cy="286" rx="15" ry="23" fill="{skin_a}" {o}/>',
-        f'<ellipse cx="330" cy="282" rx="96" ry="98" fill="{skin_a}" {o}/>',
-        # beard along the jaw from the sideburns, a moustache with lifted tips, the smile showing under it
-        f'<path d="M240 258 C232 308 246 360 292 390 C310 400 350 400 368 390 C414 360 428 308 420 258 L410 258 C410 304 396 338 366 350 '
-        f'C348 356 312 356 294 350 C264 338 250 304 250 258 Z" fill="{hair}" {o} stroke-width="2.4"/>',
-        f'<path d="M302 337 C312 329 324 329 330 334 C336 329 348 329 358 337 C348 336 340 338 330 339 C320 338 312 336 302 337 Z" fill="{hair}"/>',
-        f'<path d="M316 356 q14 10 28 0" fill="none" stroke="#f3d2c4" stroke-width="3.5" stroke-linecap="round"/>',
-        # short hair: a side-swept top with volume, a soft hairline, cut close above the ears
-        f'<path d="M242 264 C224 194 262 142 330 136 C402 132 446 180 420 264 C416 238 404 220 382 212 C356 204 326 206 304 186 '
-        f'C300 208 278 218 264 230 C254 240 246 252 242 264 Z" fill="{hair}" {o}/>',
-        f'<path d="M292 164 C326 146 376 148 404 172" fill="none" stroke="#4d3d36" stroke-width="3"/>',
-        face(330, 280, 1.12),
-        f'<ellipse cx="330" cy="226" rx="5" ry="10" fill="#c8323c"/>',
+        # his head, from his photographs: a broad round face, thick tousled hair with a fringe falling to one side,
+        # dark rectangular glasses, a short trimmed beard (light on the cheeks, fuller at the chin), a round tilak
+        "".join([
+            f'<ellipse cx="232" cy="292" rx="14" ry="22" fill="{skin_a}" {o}/><ellipse cx="428" cy="292" rx="14" ry="22" fill="{skin_a}" {o}/>',
+            f'<path d="{JAW}" fill="{skin_a}"/>',
+            f'<path d="M238 268 C238 330 254 372 282 392 C298 404 314 408 330 408 C346 408 362 404 378 392 C406 372 422 330 422 268 L414 268 '
+            f'C412 312 398 340 372 350 C358 356 344 352 330 352 C316 352 302 356 288 350 C262 340 248 312 246 268 Z" fill="{hair}" opacity=".66"/>',
+            f'<path d="M290 352 C294 384 312 402 330 404 C348 402 366 384 370 352 C356 366 344 372 330 372 C316 372 304 366 290 352 Z" fill="{hair}" opacity=".35"/>',
+            f'<path d="{JAW}" fill="none" {o}/>',
+            f'<circle cx="282" cy="322" r="15" fill="#e8806e" opacity=".3"/><circle cx="378" cy="322" r="15" fill="#e8806e" opacity=".3"/>',
+            f'<path d="M328 308 q-9 16 -5 22 q8 5 15 0" fill="none" {o} stroke-width="2.4"/>',
+            f'<path d="M300 341 C310 333 322 332 330 336 C338 332 350 333 360 341 C362 347 358 351 354 349 C346 343 338 342 330 344 '
+            f'C322 342 314 343 306 349 C302 351 298 347 300 341 Z" fill="{hair}" opacity=".9"/>',
+            f'<path d="M314 360 q16 9 32 0" fill="none" stroke="#5a2a22" stroke-width="3" stroke-linecap="round"/>',
+            f'<ellipse cx="299" cy="285" rx="7.5" ry="6.5" fill="{hair}"/><ellipse cx="361" cy="285" rx="7.5" ry="6.5" fill="{hair}"/>',
+            f'<path d="M274 254 C288 247 306 247 318 251 M342 251 C354 247 372 247 386 254" fill="none" stroke="{hair}" stroke-width="8" stroke-linecap="round"/>',
+            f'<g fill="#ffffff" fill-opacity=".08" stroke="#2f2f33" stroke-width="6.5"><rect x="264" y="262" width="68" height="46" rx="12"/>'
+            f'<rect x="338" y="262" width="68" height="46" rx="12"/></g>',
+            f'<path d="M332 279 q3 -5 6 0 M264 276 L240 272 M406 276 L420 272" fill="none" stroke="#2f2f33" stroke-width="6" stroke-linecap="round"/>',
+            f'<path d="M236 272 C220 210 242 160 286 142 C304 126 330 120 354 126 C380 120 410 134 420 158 C440 182 440 226 426 272 '
+            f'C422 252 418 240 410 232 C404 240 394 238 388 226 C378 232 364 228 358 216 C346 224 330 222 322 210 C310 220 294 220 286 212 '
+            f'C276 224 262 226 254 234 C246 244 240 256 236 272 Z" fill="{hair}" {o}/>',
+            f'<path d="M288 160 C306 146 330 142 350 150 M330 134 C352 128 378 134 398 152 M262 196 C272 176 290 164 306 160 M372 172 C388 178 400 192 406 208" '
+            f'fill="none" stroke="#54443d" stroke-width="3" stroke-linecap="round"/>',
+            f'<circle cx="330" cy="236" r="7" fill="#c8323c"/>',
+        ]),
         garland((282, 440), (378, 440), (330, 884)),
     ]
     s = [  # Sai Susmita, centre x 670
@@ -199,7 +214,7 @@ def couple():
     ]
     # widen the bodies and faces about each figure's centre (strokes stay even)
     wide = lambda cx, k, dx=0: f'<g transform="translate({cx + dx} 0) scale({k} 1) translate({-cx} 0)">'
-    ashish = (wide(330, 1.14) + "".join(a[:13]) + "</g>" + wide(330, 1.08) + "".join(a[13:22]) + "</g>" + wide(330, 1.14) + a[22] + "</g>")
+    ashish = (wide(330, 1.14) + "".join(a[:13]) + "</g>" + wide(330, 1.08) + a[13] + "</g>" + wide(330, 1.14) + a[14] + "</g>")
     susmita = (wide(670, 1.1, 18) + "".join(s[:19]) + "</g>" + wide(670, 1.06, 18) + "".join(s[19:29]) + "</g>" + wide(670, 1.1, 18) + s[29] + "</g>")
     return (f'<svg viewBox="70 120 860 1450" width="100%" height="100%" style="overflow:visible"><defs>{pais}</defs>'
             f'<ellipse cx="500" cy="1552" rx="420" ry="16" fill="#7c5a4a" opacity=".12"/>{ashish}{susmita}</svg>')
