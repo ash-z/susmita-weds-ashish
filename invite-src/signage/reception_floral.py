@@ -124,79 +124,85 @@ def couple():
     """drawn on a 1000 x 1600 canvas (shown cropped to the figures): Ashish on the left (named first), Sai Susmita on the right"""
     o = f'stroke="{LINE}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"'
     skin_a, skin_s, hair = "#c98d68", "#d6a07f", "#2b1e19"
-    face = lambda cx, cy: (f'<path d="M{cx-38} {cy-26} q10 -8 22 -2 M{cx+16} {cy-28} q12 -6 22 2" fill="none" {o} stroke-width="3.5"/>'
-                           f'<ellipse cx="{cx-26}" cy="{cy}" rx="6.5" ry="9" fill="{hair}"/><ellipse cx="{cx+26}" cy="{cy}" rx="6.5" ry="9" fill="{hair}"/>'
-                           f'<circle cx="{cx-44}" cy="{cy+30}" r="15" fill="#e8806e" opacity=".42"/><circle cx="{cx+44}" cy="{cy+30}" r="15" fill="#e8806e" opacity=".42"/>'
-                           f'<path d="M{cx-3} {cy+12} q5 14 -2 20" fill="none" {o} stroke-width="2.4"/>')
+    face = lambda cx, cy, w=1: (f'<path d="M{cx-38*w} {cy-26} q10 -8 22 -2 M{cx+16*w} {cy-28} q12 -6 22 2" fill="none" {o} stroke-width="3.5"/>'
+                                f'<ellipse cx="{cx-26*w}" cy="{cy}" rx="6.5" ry="9" fill="{hair}"/><ellipse cx="{cx+26*w}" cy="{cy}" rx="6.5" ry="9" fill="{hair}"/>'
+                                f'<circle cx="{cx-46*w}" cy="{cy+32}" r="17" fill="#e8806e" opacity=".42"/><circle cx="{cx+46*w}" cy="{cy+32}" r="17" fill="#e8806e" opacity=".42"/>'
+                                f'<path d="M{cx-3} {cy+12} q5 14 -2 20" fill="none" {o} stroke-width="2.4"/>')
     pais = ('<pattern id="jk" width="46" height="56" patternUnits="userSpaceOnUse"><rect width="46" height="56" fill="#e7e9f1"/>'
             '<path d="M10 22 c0 -8 8 -12 14 -9 c7 3 8 12 2 16 c-6 3 -14 0 -16 -7 z" fill="#bfc8de"/><circle cx="36" cy="44" r="3" fill="#bfc8de"/></pattern>'
             '<pattern id="sr" width="44" height="44" patternUnits="userSpaceOnUse"><rect width="44" height="44" fill="#bdd5a8"/>'
             '<circle cx="11" cy="11" r="3.4" fill="#c9a24a"/><circle cx="33" cy="33" r="3.4" fill="#c9a24a"/></pattern>')
+    # both drawn full and round: broad shoulders, soft middles, full arms and faces
     a = [  # Ashish, centre x 330
-        f'<path d="M262 1040 L318 1040 L312 1500 L274 1500 Z" fill="#9aa6c6" {o}/><path d="M342 1040 L398 1040 L386 1500 L348 1500 Z" fill="#9aa6c6" {o}/>',
-        f'<path d="M276 1440 q18 6 34 0 M276 1462 q18 6 34 0 M350 1440 q18 6 34 0 M350 1462 q18 6 34 0" fill="none" stroke="#7d89aa" stroke-width="2.4"/>',
-        f'<path d="M274 1500 C262 1514 250 1532 262 1546 L318 1546 C322 1528 316 1508 312 1500 Z" fill="#f0e3c6" {o}/>',
-        f'<path d="M348 1500 C344 1508 338 1528 342 1546 L398 1546 C410 1532 398 1514 386 1500 Z" fill="#f0e3c6" {o}/>',
-        f'<path d="M252 432 C222 445 205 480 200 540 L186 862 L228 866 L242 560 Z" fill="#a9b4d2" {o}/>',
-        f'<path d="M408 432 C438 445 455 480 460 540 L474 862 L432 866 L418 560 Z" fill="#a9b4d2" {o}/>',
-        f'<ellipse cx="206" cy="892" rx="22" ry="30" fill="{skin_a}" {o}/><ellipse cx="454" cy="892" rx="22" ry="30" fill="{skin_a}" {o}/>',
-        f'<path d="M255 430 C240 440 230 470 228 520 L214 1060 C272 1076 388 1076 446 1060 L432 520 C430 470 420 440 405 430 Z" fill="#a9b4d2" {o}/>',
-        f'<path d="M260 430 C246 470 242 520 242 560 L240 842 C272 852 310 854 328 852 L328 452 L300 430 Z" fill="url(#jk)" {o}/>',
-        f'<path d="M400 430 C414 470 418 520 418 560 L420 842 C388 852 350 854 332 852 L332 452 L360 430 Z" fill="url(#jk)" {o}/>',
-        "".join(f'<circle cx="338" cy="{y}" r="6" fill="#c9a24a" stroke="{LINE}" stroke-width="1.6"/>' for y in range(500, 830, 64)),
-        f'<path d="M305 362 L305 420 C320 432 340 432 355 420 L355 362 Z" fill="{skin_a}" {o}/>',
-        f'<path d="M296 424 C312 440 348 440 364 424 L362 404 C346 414 314 414 298 404 Z" fill="#e7e9f1" {o}/>',
-        f'<ellipse cx="246" cy="282" rx="14" ry="22" fill="{skin_a}" {o}/><ellipse cx="414" cy="282" rx="14" ry="22" fill="{skin_a}" {o}/>',
-        f'<ellipse cx="330" cy="275" rx="86" ry="102" fill="{skin_a}" {o}/>',
+        f'<path d="M240 1050 L326 1050 L320 1500 L258 1500 Z" fill="#9aa6c6" {o}/><path d="M334 1050 L420 1050 L402 1500 L340 1500 Z" fill="#9aa6c6" {o}/>',
+        f'<path d="M264 1440 q26 6 52 0 M264 1462 q26 6 52 0 M344 1440 q26 6 52 0 M344 1462 q26 6 52 0" fill="none" stroke="#7d89aa" stroke-width="2.4"/>',
+        f'<path d="M258 1500 C246 1514 234 1532 246 1546 L324 1546 C328 1528 324 1508 320 1500 Z" fill="#f0e3c6" {o}/>',
+        f'<path d="M340 1500 C336 1508 332 1528 336 1546 L414 1546 C426 1532 414 1514 402 1500 Z" fill="#f0e3c6" {o}/>',
+        f'<path d="M244 430 C206 444 192 494 190 560 C184 680 158 800 164 900 C170 980 184 1030 190 1066 C262 1088 398 1088 470 1066 '
+        f'C476 1030 490 980 496 900 C502 800 476 680 470 560 C468 494 454 444 416 430 Z" fill="#a9b4d2" {o}/>',
+        f'<path d="M240 434 C196 446 170 494 164 562 C156 670 150 780 152 884 L206 890 C206 790 210 690 220 610 Z" fill="#a9b4d2" {o}/>',
+        f'<path d="M420 434 C464 446 490 494 496 562 C504 670 510 780 508 884 L454 890 C454 790 450 690 440 610 Z" fill="#a9b4d2" {o}/>',
+        f'<ellipse cx="179" cy="918" rx="28" ry="33" fill="{skin_a}" {o}/><ellipse cx="481" cy="918" rx="28" ry="33" fill="{skin_a}" {o}/>',
+        f'<path d="M248 432 C226 470 214 530 212 600 C208 700 210 790 216 858 C264 872 308 874 328 872 L328 452 L300 430 Z" fill="url(#jk)" {o}/>',
+        f'<path d="M412 432 C434 470 446 530 448 600 C452 700 450 790 444 858 C396 872 352 874 332 872 L332 452 L360 430 Z" fill="url(#jk)" {o}/>',
+        "".join(f'<circle cx="338" cy="{y}" r="6" fill="#c9a24a" stroke="{LINE}" stroke-width="1.6"/>' for y in range(500, 860, 64)),
+        f'<path d="M298 366 L298 420 C318 434 342 434 362 420 L362 366 Z" fill="{skin_a}" {o}/>',
+        f'<path d="M294 424 C312 440 348 440 366 424 L364 404 C346 414 314 414 296 404 Z" fill="#e7e9f1" {o}/>',
+        f'<ellipse cx="236" cy="286" rx="15" ry="23" fill="{skin_a}" {o}/><ellipse cx="424" cy="286" rx="15" ry="23" fill="{skin_a}" {o}/>',
+        f'<ellipse cx="330" cy="282" rx="96" ry="98" fill="{skin_a}" {o}/>',
         # beard along the jaw from the sideburns, a moustache with lifted tips, the smile showing under it
-        f'<path d="M252 258 C246 300 256 350 296 382 C312 392 348 392 364 382 C404 350 414 300 408 258 L400 258 C400 300 388 332 362 344 '
-        f'C346 350 314 350 298 344 C272 332 260 300 260 258 Z" fill="{hair}" {o} stroke-width="2.4"/>',
-        f'<path d="M302 335 C312 327 324 327 330 332 C336 327 348 327 358 335 C348 334 340 336 330 337 C320 336 312 334 302 335 Z" fill="{hair}"/>',
-        f'<path d="M316 354 q14 10 28 0" fill="none" stroke="#f3d2c4" stroke-width="3.5" stroke-linecap="round"/>',
+        f'<path d="M240 258 C232 308 246 360 292 390 C310 400 350 400 368 390 C414 360 428 308 420 258 L410 258 C410 304 396 338 366 350 '
+        f'C348 356 312 356 294 350 C264 338 250 304 250 258 Z" fill="{hair}" {o} stroke-width="2.4"/>',
+        f'<path d="M302 337 C312 329 324 329 330 334 C336 329 348 329 358 337 C348 336 340 338 330 339 C320 338 312 336 302 337 Z" fill="{hair}"/>',
+        f'<path d="M316 356 q14 10 28 0" fill="none" stroke="#f3d2c4" stroke-width="3.5" stroke-linecap="round"/>',
         # short hair: a side-swept top with volume, a soft hairline, cut close above the ears
-        f'<path d="M254 262 C240 196 272 148 330 142 C392 138 432 178 414 262 C410 238 400 220 380 212 C356 204 326 206 304 186 '
-        f'C300 208 280 218 268 230 C260 240 256 250 254 262 Z" fill="{hair}" {o}/>',
-        f'<path d="M296 168 C326 152 372 154 400 176" fill="none" stroke="#4d3d36" stroke-width="3"/>',
-        face(330, 278),
+        f'<path d="M242 264 C224 194 262 142 330 136 C402 132 446 180 420 264 C416 238 404 220 382 212 C356 204 326 206 304 186 '
+        f'C300 208 278 218 264 230 C254 240 246 252 242 264 Z" fill="{hair}" {o}/>',
+        f'<path d="M292 164 C326 146 376 148 404 172" fill="none" stroke="#4d3d36" stroke-width="3"/>',
+        face(330, 280, 1.12),
         f'<ellipse cx="330" cy="226" rx="5" ry="10" fill="#c8323c"/>',
-        garland((284, 438), (376, 438), (330, 870)),
+        garland((282, 440), (378, 440), (330, 884)),
     ]
     s = [  # Sai Susmita, centre x 670
-        f'<path d="M732 512 C772 540 792 700 802 1120 L762 1112 C754 800 746 620 724 540 Z" fill="#e7a0b5" {o}/>',
-        f'<path d="M762 1112 L802 1120" stroke="#c9a24a" stroke-width="10"/>',
-        f'<path d="M600 830 C590 1000 576 1300 562 1530 C622 1550 718 1550 778 1530 C764 1300 750 1000 740 830 Z" fill="url(#sr)" {o}/>',
-        "".join(f'<path d="M{x0} 850 L{x1} 1530" stroke="#9cb987" stroke-width="3"/>' for x0, x1 in ((652, 628), (664, 652), (676, 676), (688, 700), (700, 724))),
-        f'<path d="M566 1504 C624 1522 716 1522 774 1504" fill="none" stroke="#e48aa5" stroke-width="16"/><path d="M566 1490 C624 1508 716 1508 774 1490" fill="none" stroke="#c9a24a" stroke-width="5"/>',
-        f'<path d="M604 700 C640 712 700 712 736 700 L742 800 C700 812 640 812 598 800 Z" fill="url(#sr)" {o}/>',
-        f'<path d="M612 520 C598 540 596 600 600 640 L606 702 C640 714 700 714 734 702 L740 640 C744 600 742 540 728 520 C700 505 640 505 612 520 Z" fill="#d97f9b" {o}/>',
-        f'<path d="M596 795 C640 808 700 808 744 795 L746 830 C700 843 640 843 594 830 Z" fill="#d8b25a" {o}/>',
-        f'<path d="M596 764 L636 802 C680 702 720 602 746 530 L718 512 C690 590 640 690 596 764 Z" fill="#e7a0b5" {o}/>',
-        f'<path d="M604 770 C648 694 694 600 724 520 M630 796 C672 700 716 604 742 532" fill="none" stroke="#c9a24a" stroke-width="5"/>',
-        f'<path d="M612 522 C590 530 578 560 574 600 L570 652 L606 658 L610 600 Z" fill="#d97f9b" {o}/>',
-        f'<path d="M728 522 C750 530 762 560 766 600 L770 652 L734 658 L730 600 Z" fill="#d97f9b" {o}/>',
-        f'<path d="M571 650 L605 657 C616 702 642 760 672 790 L652 812 C612 780 580 712 571 650 Z" fill="{skin_s}" {o}/>',
-        f'<path d="M769 650 L735 657 C724 702 698 760 668 790 L688 812 C728 780 760 712 769 650 Z" fill="{skin_s}" {o}/>',
+        f'<path d="M742 512 C786 540 808 700 818 1120 L776 1112 C768 800 760 620 734 540 Z" fill="#e7a0b5" {o}/>',
+        f'<path d="M776 1112 L818 1120" stroke="#c9a24a" stroke-width="10"/>',
+        f'<path d="M572 830 C556 1000 542 1300 532 1530 C604 1552 736 1552 808 1530 C798 1300 784 1000 768 830 Z" fill="url(#sr)" {o}/>',
+        "".join(f'<path d="M{x0} 850 L{x1} 1534" stroke="#9cb987" stroke-width="3"/>' for x0, x1 in ((648, 620), (660, 644), (672, 670), (684, 696), (696, 722))),
+        f'<path d="M538 1504 C604 1524 736 1524 802 1504" fill="none" stroke="#e48aa5" stroke-width="16"/><path d="M540 1490 C606 1510 734 1510 800 1490" fill="none" stroke="#c9a24a" stroke-width="5"/>',
+        f'<path d="M582 700 C630 716 710 716 758 700 L770 802 C712 818 628 818 570 802 Z" fill="url(#sr)" {o}/>',
+        f'<path d="M600 522 C578 544 574 604 578 644 L584 704 C630 718 710 718 756 704 L762 644 C766 604 762 544 740 522 C706 506 634 506 600 522 Z" fill="#d97f9b" {o}/>',
+        f'<path d="M568 798 C628 814 712 814 772 798 L774 834 C712 850 628 850 566 834 Z" fill="#d8b25a" {o}/>',
+        f'<path d="M572 766 L620 806 C668 706 716 606 752 532 L726 512 C692 592 630 690 572 766 Z" fill="#e7a0b5" {o}/>',
+        f'<path d="M582 772 C630 694 682 600 718 520 M612 800 C662 702 712 606 744 536" fill="none" stroke="#c9a24a" stroke-width="5"/>',
+        f'<path d="M602 524 C572 532 558 566 554 606 L548 664 L594 672 L600 608 Z" fill="#d97f9b" {o}/>',
+        f'<path d="M738 524 C768 532 782 566 786 606 L792 664 L746 672 L740 608 Z" fill="#d97f9b" {o}/>',
+        f'<path d="M549 662 L595 670 C608 714 636 766 670 794 L646 822 C598 788 560 722 549 662 Z" fill="{skin_s}" {o}/>',
+        f'<path d="M791 662 L745 670 C732 714 704 766 670 794 L694 822 C742 788 780 722 791 662 Z" fill="{skin_s}" {o}/>',
         "".join(f'<path d="M{x} {y} l{dx} {dy}" stroke="{c}" stroke-width="7" stroke-linecap="round"/>' for x, y, dx, dy, c in (
-            (628, 752, 22, -16, "#c8323c"), (634, 762, 22, -16, "#c9a24a"), (640, 772, 22, -16, "#c8323c"),
-            (712, 752, -22, -16, "#c8323c"), (706, 762, -22, -16, "#c9a24a"), (700, 772, -22, -16, "#c8323c"))),
-        f'<ellipse cx="670" cy="806" rx="38" ry="26" fill="{skin_s}" {o}/>',
-        "".join(f'<circle cx="{x}" cy="{y}" r="3" fill="#a0522d"/>' for x, y in ((656, 800), (670, 796), (684, 800), (662, 812), (678, 812))),
-        f'<path d="M646 486 L646 522 C660 532 680 532 694 522 L694 486 Z" fill="{skin_s}" {o}/>',
-        f'<path d="M640 512 C650 552 690 552 700 512" fill="none" stroke="#c9a24a" stroke-width="8"/><circle cx="670" cy="552" r="10" fill="#c9a24a" stroke="{LINE}" stroke-width="2"/>',
-        f'<circle cx="744" cy="452" r="44" fill="{hair}" {o}/>',
-        "".join(f'<circle cx="{744+50*math.cos(math.radians(t)):.1f}" cy="{452+50*math.sin(math.radians(t)):.1f}" r="8" fill="#fffdf8" stroke="#9c8b7c" stroke-width="1.6"/>' for t in range(-70, 100, 17)),
-        f'<path d="M592 420 C585 330 625 306 670 306 C715 306 755 330 748 420 C745 456 735 470 730 482 L610 482 C600 470 595 456 592 420 Z" fill="{hair}" {o}/>',
-        f'<ellipse cx="596" cy="424" rx="12" ry="19" fill="{skin_s}" {o}/><ellipse cx="744" cy="424" rx="12" ry="19" fill="{skin_s}" {o}/>',
-        f'<ellipse cx="670" cy="412" rx="76" ry="88" fill="{skin_s}" {o}/>',
-        f'<path d="M594 414 C590 352 620 318 670 318 C720 318 750 352 746 414 C738 382 718 362 690 354 C680 351 672 346 670 336 C668 346 660 351 650 354 C622 362 602 382 594 414 Z" fill="{hair}" {o}/>',
-        face(670, 418),
-        f'<path d="M654 462 q16 12 32 0" fill="none" {o}/>',
-        f'<circle cx="670" cy="376" r="6.5" fill="#c8323c"/>',
-        "".join(f'<path d="M{x} 442 l0 10 M{x-12} 470 C{x-12} 452 {x+12} 452 {x+12} 470 Z" fill="#c9a24a" stroke="#a07a2a" stroke-width="2.4"/>' for x in (596, 744)),
-        garland((632, 528), (708, 528), (670, 762), n=28),
+            (608, 760, 24, -18, "#c8323c"), (614, 771, 24, -18, "#c9a24a"), (620, 782, 24, -18, "#c8323c"),
+            (732, 760, -24, -18, "#c8323c"), (726, 771, -24, -18, "#c9a24a"), (720, 782, -24, -18, "#c8323c"))),
+        f'<ellipse cx="670" cy="810" rx="44" ry="29" fill="{skin_s}" {o}/>',
+        "".join(f'<circle cx="{x}" cy="{y}" r="3" fill="#a0522d"/>' for x, y in ((654, 804), (670, 800), (686, 804), (660, 817), (680, 817))),
+        f'<path d="M640 488 L640 524 C656 536 684 536 700 524 L700 488 Z" fill="{skin_s}" {o}/>',
+        f'<path d="M636 516 C646 558 694 558 704 516" fill="none" stroke="#c9a24a" stroke-width="8"/><circle cx="670" cy="558" r="10" fill="#c9a24a" stroke="{LINE}" stroke-width="2"/>',
+        f'<circle cx="756" cy="452" r="46" fill="{hair}" {o}/>',
+        "".join(f'<circle cx="{756+52*math.cos(math.radians(t)):.1f}" cy="{452+52*math.sin(math.radians(t)):.1f}" r="8" fill="#fffdf8" stroke="#9c8b7c" stroke-width="1.6"/>' for t in range(-70, 100, 17)),
+        f'<path d="M582 420 C575 326 620 302 670 302 C720 302 765 326 758 420 C755 456 745 472 740 486 L600 486 C590 472 585 456 582 420 Z" fill="{hair}" {o}/>',
+        f'<ellipse cx="586" cy="426" rx="13" ry="20" fill="{skin_s}" {o}/><ellipse cx="754" cy="426" rx="13" ry="20" fill="{skin_s}" {o}/>',
+        f'<ellipse cx="670" cy="416" rx="88" ry="86" fill="{skin_s}" {o}/>',
+        f'<path d="M584 414 C580 350 615 314 670 314 C725 314 760 350 756 414 C748 380 724 360 692 352 C681 349 672 344 670 334 C668 344 659 349 648 352 C616 360 592 380 584 414 Z" fill="{hair}" {o}/>',
+        face(670, 420, 1.1),
+        f'<path d="M652 466 q18 13 36 0" fill="none" {o}/>',
+        f'<circle cx="670" cy="378" r="6.5" fill="#c8323c"/>',
+        "".join(f'<path d="M{x} 444 l0 10 M{x-12} 472 C{x-12} 454 {x+12} 454 {x+12} 472 Z" fill="#c9a24a" stroke="#a07a2a" stroke-width="2.4"/>' for x in (586, 754)),
+        garland((628, 532), (712, 532), (670, 766), n=28),
     ]
-    return (f'<svg viewBox="160 120 680 1450" width="100%" height="100%" style="overflow:visible"><defs>{pais}</defs>'
-            f'<ellipse cx="500" cy="1552" rx="380" ry="16" fill="#7c5a4a" opacity=".12"/>{"".join(a)}{"".join(s)}</svg>')
+    # widen the bodies and faces about each figure's centre (strokes stay even)
+    wide = lambda cx, k, dx=0: f'<g transform="translate({cx + dx} 0) scale({k} 1) translate({-cx} 0)">'
+    ashish = (wide(330, 1.14) + "".join(a[:13]) + "</g>" + wide(330, 1.08) + "".join(a[13:22]) + "</g>" + wide(330, 1.14) + a[22] + "</g>")
+    susmita = (wide(670, 1.1, 18) + "".join(s[:19]) + "</g>" + wide(670, 1.06, 18) + "".join(s[19:29]) + "</g>" + wide(670, 1.1, 18) + s[29] + "</g>")
+    return (f'<svg viewBox="70 120 860 1450" width="100%" height="100%" style="overflow:visible"><defs>{pais}</defs>'
+            f'<ellipse cx="500" cy="1552" rx="420" ry="16" fill="#7c5a4a" opacity=".12"/>{ashish}{susmita}</svg>')
 
 def ganesha(x, y, w, h):
     uri = "data:image/svg+xml;base64," + base64.b64encode((HERE / "vector" / "ganesha.svg").read_bytes()).decode()
@@ -210,7 +216,7 @@ def board():
     b.append(f'<div class="c" style="top:560px;font-family:\'Alex Brush\';font-size:220px;line-height:1.1;color:{ROSE}">{E(T["groom"])}'
              f'<span style="font-family:Marcellus;font-size:92px;margin:0 46px;vertical-align:middle;color:#b08944">&amp;</span>{E(T["bride"])}</div>')
     b.append(f'<div class="c" style="top:835px;font-family:Marcellus;font-size:62px;letter-spacing:4px;color:{INK}">{E(T["when"])}</div>')
-    b.append(f'<div style="position:absolute;left:{(W-900)/2}px;top:950px;width:900px;height:1920px">{couple()}</div>')
+    b.append(f'<div style="position:absolute;left:{(W-1139)/2}px;top:950px;width:1139px;height:1920px">{couple()}</div>')
     b.append(f'<div class="c" style="top:2905px;font-family:Marcellus;font-size:150px;letter-spacing:3px;color:{ROSE}">{E(T["hall"])}</div>')
     b.append(f'<div class="c" style="top:3118px;font-family:Marcellus;font-size:66px;letter-spacing:12px;text-indent:12px;color:{INK}">{E(T["hotel"].upper())}</div>')
     css = (font("Alex Brush") + font("Tiro Telugu") + font("Marcellus") +

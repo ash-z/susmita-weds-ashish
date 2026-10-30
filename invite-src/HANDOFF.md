@@ -139,7 +139,7 @@ screenshot (~130 dpi at this size); if the couple upload the photographer's orig
 A second board in a soft illustrated style (after a "dusty floral" card the couple liked):
 `signage/reception_floral.py` → `out/reception-floral.{png,pdf}`, same size and wording. Blush paper, pastel pink
 lotus / jasmine / lotus-leaf clusters off the corners and sides (the engagement's lotus garlands and backdrop), and
-the couple drawn flat in a simple outlined style as at the engagement (Ashish: beard, grey-blue kurta, silver
+the couple drawn flat in a simple outlined style as at the engagement, full and round as they asked (Ashish: beard, grey-blue kurta, silver
 brocade jacket; Sai Susmita: green saree, pink blouse and pallu, jasmine in her bun; jasmine-and-lotus garlands).
 All vector, hand-drawn in the script (not traced from photos), so the PDF is ~1 MB. `common.py` holds the font
 subsetting and page geometry both boards share.
