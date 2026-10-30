@@ -118,17 +118,17 @@ def photo(top, w=880, h=1100, rim=14, mat=8):
 
 def plaque(top):
     """the hall and floor, light on maroon in a gold-edged cartouche: the one thing that must read from afar"""
-    pw, ph = 1560, 440
+    pw, ph = 1560, 400
     x0 = (W - pw) / 2
     shape = (f"M{40} 0 L{pw-40} 0 C{pw-40} 30 {pw-10} 40 {pw} 40 L{pw} {ph-40} C{pw-10} {ph-40} {pw-40} {ph-30} {pw-40} {ph} "
              f"L40 {ph} C40 {ph-30} 10 {ph-40} 0 {ph-40} L0 40 C10 40 40 30 40 0 Z")
     svg = (f'<svg width="{pw}" height="{ph}" viewBox="-14 -14 {pw+28} {ph+28}" style="position:absolute;inset:0;overflow:visible">{foil_defs("fp")}'
            f'<path d="{shape}" fill="{MAROON}" stroke="url(#fp)" stroke-width="14"/>'
            f'<path d="{shape}" transform="translate({pw*.03} {ph*.065}) scale(.94 .87)" fill="none" stroke="#d9b45e" stroke-width="3.5"/></svg>')
-    inner = (f'<div style="position:absolute;left:0;right:0;top:40px;text-align:center;font-family:Marcellus;'
-             f'font-size:180px;line-height:1.05;color:{IVORY};letter-spacing:4px">{E(T["hall"])}</div>'
-             f'<div style="position:absolute;left:0;right:0;top:238px;text-align:center;font-family:Marcellus;'
-             f'font-size:124px;line-height:1.1;color:#efd48c;letter-spacing:3px">{E(T["floor"])}</div>')
+    inner = (f'<div style="position:absolute;left:0;right:0;top:32px;text-align:center;font-family:Marcellus;'
+             f'font-size:170px;line-height:1.05;color:{IVORY};letter-spacing:4px">{E(T["hall"])}</div>'
+             f'<div style="position:absolute;left:0;right:0;top:216px;text-align:center;font-family:Marcellus;'
+             f'font-size:116px;line-height:1.1;color:#efd48c;letter-spacing:3px">{E(T["floor"])}</div>')
     return f'<div style="position:absolute;left:{x0}px;top:{top}px;width:{pw}px;height:{ph}px">{svg}{inner}</div>'
 
 def sign():
@@ -142,12 +142,12 @@ def sign():
     b.append(f'<div class="c foil" style="top:852px;font-family:\'Tiro Telugu\';font-size:104px">{E(T["te"])}</div>')
     b.append(f'<div class="c" style="top:1012px;font-family:Marcellus;font-size:165px;letter-spacing:24px;text-indent:24px;color:{MAROON}">{E(T["heading"].upper())}</div>')
     # the engagement portrait
-    b.append(photo(1225, w=990, h=1225))
-    b.append(f'<div class="c" style="top:2462px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1;color:{MAROON}">{E(T["bride"])}'
+    b.append(photo(1215, w=1070, h=1320))
+    b.append(f'<div class="c" style="top:2545px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1;color:{MAROON}">{E(T["bride"])}'
              f'<span style="font-family:Marcellus;font-size:100px;margin:0 50px;vertical-align:middle;color:{GOLD}">&amp;</span>{E(T["groom"])}</div>')
-    b.append(f'<div class="c" style="top:2742px;font-family:Marcellus;font-size:64px;letter-spacing:3px;color:{MAROON_LO}">{E(T["when"])}</div>')
-    b.append(f'<div class="c" style="top:2836px;font-family:Marcellus;font-size:72px;letter-spacing:6px;color:{GOLD}">{E(T["hotel"].upper())}</div>')
-    b.append(plaque(2968))
+    b.append(f'<div class="c" style="top:2795px;font-family:Marcellus;font-size:64px;letter-spacing:3px;color:{MAROON_LO}">{E(T["when"])}</div>')
+    b.append(f'<div class="c" style="top:2885px;font-family:Marcellus;font-size:72px;letter-spacing:6px;color:{GOLD}">{E(T["hotel"].upper())}</div>')
+    b.append(plaque(3002))
     css = (font("Alex Brush") + font("Tiro Telugu") + font("Marcellus") + font("Karla", 500) +
            f"*{{margin:0;padding:0;box-sizing:border-box}}html,body{{width:{W+2*BLEED}px;height:{H+2*BLEED}px;overflow:hidden}}"
            f"body{{position:relative;background:radial-gradient(120% 85% at 50% 40%,{IVORY} 0%,{IVORY} 45%,{IVORY_LO} 100%)}}"
