@@ -4,7 +4,7 @@
     python3 invite-src/signage/trace_art.py          # only if the toranam / Ganesha art changes
 
 Wording and details come from the invitation (body.html / poster/poster.py). The plaque carries the hall and floor
-in large type so it reads from across a lobby; the -left, -right and -up versions add an arrow for wherever it hangs.
+in large type so it reads from across a lobby; the -left, -right and -up versions add an arrow beside it, for wherever it hangs.
 Rendering needs node + Playwright's Chromium (render.mjs, next to this file). Fonts are Google Fonts subsets of the
 text used, cached in fonts/ (network once); the art is the invitation's own (invite-src/art).
 """
@@ -101,13 +101,13 @@ def masked(name, x, y, w, h):
     return (f'<div class="foil-img" style="position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;'
             f'-webkit-mask:url({outline(name)}) center/contain no-repeat;mask:url({outline(name)}) center/contain no-repeat"></div>')
 
-def arrow(direction, color=MAROON):
+def arrow(direction, color=MAROON, k=.75):
     """a plain, bold arrow, big enough to read across a lobby"""
     if direction == "up":
-        return (f'<svg width="150" height="190" viewBox="-75 -95 150 190">'
+        return (f'<svg width="{150*k}" height="{190*k}" viewBox="-75 -95 150 190">'
                 f'<path d="M-20 92 L-20 -10 L-62 -10 L0 -92 L62 -10 L20 -10 L20 92 Z" fill="{color}"/></svg>')
     flip = "scale(-1 1)" if direction == "left" else ""
-    return (f'<svg width="420" height="150" viewBox="-210 -75 420 150"><g transform="{flip}">'
+    return (f'<svg width="{420*k}" height="{150*k}" viewBox="-210 -75 420 150"><g transform="{flip}">'
             f'<path d="M-200 -20 L110 -20 L110 -62 L200 0 L110 62 L110 20 L-200 20 Z" fill="{color}"/></g></svg>')
 
 def photo(top, w=880, h=1100, rim=14, mat=10):
@@ -123,7 +123,7 @@ def photo(top, w=880, h=1100, rim=14, mat=10):
 
 def plaque(top, direction=None):
     """the hall and floor on ivory, in a gold-edged cartouche"""
-    pw, ph = 1360, (440 if direction is None else 600)
+    pw, ph = 1560, 440
     x0 = (W - pw) / 2
     shape = (f"M{40} 0 L{pw-40} 0 C{pw-40} 30 {pw-10} 40 {pw} 40 L{pw} {ph-40} C{pw-10} {ph-40} {pw-40} {ph-30} {pw-40} {ph} "
              f"L40 {ph} C40 {ph-30} 10 {ph-40} 0 {ph-40} L0 40 C10 40 40 30 40 0 Z")
@@ -134,8 +134,10 @@ def plaque(top, direction=None):
              f'font-size:180px;line-height:1.05;color:{MAROON_LO};letter-spacing:4px">{E(T["hall"])}</div>'
              f'<div style="position:absolute;left:0;right:0;top:238px;text-align:center;font-family:Marcellus;'
              f'font-size:124px;line-height:1.1;color:{MAROON};letter-spacing:3px">{E(T["floor"])}</div>')
-    if direction:                                         # the arrow, centred under the floor
-        inner += f'<div style="position:absolute;left:0;right:0;top:{405 if direction != "up" else 385}px;text-align:center">{arrow(direction)}</div>'
+    # the arrow beside the words, on the side it points to (up: both sides)
+    for side in (("left", "right") if direction == "up" else (direction,) if direction else ()):
+        inner += (f'<div style="position:absolute;{side}:125px;top:0;bottom:0;display:flex;align-items:center">'
+                  f'{arrow(direction, k=1.15 if direction == "up" else .7)}</div>')
     return f'<div style="position:absolute;left:{x0}px;top:{top}px;width:{pw}px;height:{ph}px">{svg}{inner}</div>'
 
 def sign(direction=None):
@@ -148,16 +150,13 @@ def sign(direction=None):
     b.append(masked("ganesha", 1050, 470, 300, 390))
     b.append(f'<div class="c foil" style="top:852px;font-family:\'Tiro Telugu\';font-size:104px">{E(T["te"])}</div>')
     b.append(f'<div class="c foil" style="top:1012px;font-family:Marcellus;font-size:165px;letter-spacing:24px;text-indent:24px">{E(T["heading"].upper())}</div>')
-    # the engagement portrait, with the peacock pair from Blessings facing each other across it
-    pk = art("peacock")
-    b.append(f'<img src="{pk}" style="position:absolute;left:330px;top:1432px;height:880px;transform:scaleX(-1);filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
-    b.append(f'<img src="{pk}" style="position:absolute;right:330px;top:1432px;height:880px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
-    b.append(photo(1238, h=1074))
-    b.append(f'<div class="c foil" style="top:2320px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1">{E(T["bride"])}'
+    # the engagement portrait
+    b.append(photo(1225, w=990, h=1225))
+    b.append(f'<div class="c foil" style="top:2462px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1">{E(T["bride"])}'
              f'<span style="font-family:Marcellus;font-size:100px;margin:0 50px;vertical-align:middle">&amp;</span>{E(T["groom"])}</div>')
-    b.append(f'<div class="c" style="top:2606px;font-family:Marcellus;font-size:64px;letter-spacing:3px;color:#f3e6c8">{E(T["when"])}</div>')
-    b.append(f'<div class="c" style="top:2712px;font-family:Marcellus;font-size:72px;letter-spacing:6px;color:#e9cf86">{E(T["hotel"].upper())}</div>')
-    b.append(plaque(2900 if direction is None else 2822, direction))
+    b.append(f'<div class="c" style="top:2742px;font-family:Marcellus;font-size:64px;letter-spacing:3px;color:#f3e6c8">{E(T["when"])}</div>')
+    b.append(f'<div class="c" style="top:2836px;font-family:Marcellus;font-size:72px;letter-spacing:6px;color:#e9cf86">{E(T["hotel"].upper())}</div>')
+    b.append(plaque(2968, direction))
     css = (font("Alex Brush") + font("Tiro Telugu") + font("Marcellus") + font("Karla", 500) +
            f"*{{margin:0;padding:0;box-sizing:border-box}}html,body{{width:{W+2*BLEED}px;height:{H+2*BLEED}px;overflow:hidden}}"
            f"body{{position:relative;background:radial-gradient(120% 85% at 50% 40%,{MAROON_HI} 0%,{MAROON} 55%,{MAROON_LO} 100%)}}"
