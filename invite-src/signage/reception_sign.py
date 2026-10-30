@@ -1,6 +1,7 @@
 """The reception's welcome sign, hung outside the hall to guide guests: 24 x 36 in, portrait.
 
     python3 invite-src/signage/reception_sign.py      # -> invite-src/signage/out/reception-sign[-left|-right|-up].{html,png,pdf}
+    python3 invite-src/signage/trace_art.py          # only if the toranam / Ganesha art changes
 
 Wording and details come from the invitation (body.html / poster/poster.py). The plaque carries the hall and floor
 in large type so it reads from across a lobby; the -left, -right and -up versions add an arrow for wherever it hangs.
@@ -13,7 +14,11 @@ HERE = pathlib.Path(__file__).resolve().parent
 ART = HERE.parent / "art"
 FONTS = HERE / "fonts"; FONTS.mkdir(exist_ok=True)
 OUT = HERE / "out"; OUT.mkdir(exist_ok=True)
-W, H = 2400, 3600                          # CSS px: 100 per inch; rendered at 1.5x (150 dpi) and as a vector PDF
+W, H = 2400, 3600                          # CSS px: 100 per inch; rendered at 1.5x (150 dpi) and as a print PDF
+BLEED = 20                                 # 0.2 in (5 mm) of background past the trim on every side, for the printer
+# maroons chosen inside the CMYK gamut (checked against a press profile): the deeper #5a0d1a / #3f0812 the site uses
+# print as muddy brown. MAROON is the background's middle, also used for cut-outs in the gold.
+MAROON_HI, MAROON, MAROON_LO = "#8a2d36", "#7a2b32", "#6a292e"
 
 T = dict(te="రిసెప్షన్", heading="Reception", bride="Sai Susmita", groom="Ashish",
          when="Sunday · 1 November 2026 · 12:00 PM onwards", hotel="Hotel Tulip Grand", hall="‘Vedha’", floor="5th Floor")
@@ -32,6 +37,8 @@ def font(family, weight=400):
             f"src:url(data:font/woff2;base64,{base64.b64encode(f.read_bytes()).decode()}) format('woff2')}}")
 
 def art(name): return "data:image/png;base64," + base64.b64encode((ART / f"{name}.png").read_bytes()).decode()
+def outline(name):                         # traced silhouette (trace_art.py) for the gold masks; prints crisp at any size
+    return "data:image/svg+xml;base64," + base64.b64encode((HERE / "vector" / f"{name}.svg").read_bytes()).decode()
 
 FOIL = ("linear-gradient(118deg,#7b561a 0%,#c99a3e 14%,#f4dc97 26%,#b3842f 39%,#f8e8b4 52%,#a7772a 64%,"
         "#e2c06c 79%,#8a6220 100%)")
@@ -44,7 +51,7 @@ def foil_defs(i):
 def paisley(x, y, s, rot, fill):
     return (f'<g transform="translate({x},{y}) rotate({rot}) scale({s})" fill="{fill}">'
             '<path d="M0 10 C0 2 8 -3 15 -1 C23 1 27 8 24 14 C21 20 13 22 7 19 C2 16 0 13 0 10 Z M18 2 C22 -4 29 -4 31 0 '
-            'C27 -2 23 -1 21 3 Z"/><circle cx="12" cy="10" r="3" fill="#5a0d1a"/></g>')
+            f'C27 -2 23 -1 21 3 Z"/><circle cx="12" cy="10" r="3" fill="{MAROON}"/></g>')
 
 def frame(w, h, o=70, band=52, step=70):
     """temple-style frame: rules, a band of mango leaves and dots, a row of small arches, rosette corners"""
@@ -78,7 +85,7 @@ def frame(w, h, o=70, band=52, step=70):
     for cx, cy in ((mid, mid), (w - mid, mid), (w - mid, h - mid), (mid, h - mid)):
         ring = lambda n, l, wd, off=0: "".join(
             f'<path transform="rotate({k*360/n+off})" d="M0 -9 C-{wd} -{l*.35} -{wd*.7} -{l} 0 -{l} C{wd*.7} -{l} {wd} -{l*.35} 0 -9 Z"/>' for k in range(n))
-        s.append(f'<g transform="translate({cx},{cy})" fill="{c}">{ring(12, 46, 10)}<g fill="#5a0d1a">{ring(12, 28, 6)}</g>{ring(8, 21, 6, 22.5)}<circle r="9"/></g>')
+        s.append(f'<g transform="translate({cx},{cy})" fill="{c}">{ring(12, 46, 10)}<g fill="{MAROON}">{ring(12, 28, 6)}</g>{ring(8, 21, 6, 22.5)}<circle r="9"/></g>')
     s.append("</svg>")
     return "".join(s)
 
@@ -91,9 +98,9 @@ def ornament(y, half=420):
 
 def masked(name, x, y, w, h):
     return (f'<div class="foil-img" style="position:absolute;left:{x}px;top:{y}px;width:{w}px;height:{h}px;'
-            f'-webkit-mask:url({art(name)}) center/contain no-repeat;mask:url({art(name)}) center/contain no-repeat"></div>')
+            f'-webkit-mask:url({outline(name)}) center/contain no-repeat;mask:url({outline(name)}) center/contain no-repeat"></div>')
 
-def arrow(direction, color="#7a1626"):
+def arrow(direction, color=MAROON):
     """a plain, bold arrow, big enough to read across a lobby"""
     if direction == "up":
         return (f'<svg width="150" height="190" viewBox="-75 -95 150 190">'
@@ -112,21 +119,21 @@ def plaque(top, direction=None):
            f'<path d="{shape}" fill="#fbf4e3" stroke="url(#fp)" stroke-width="14"/>'
            f'<path d="{shape}" transform="translate({pw*.03} {ph*.065}) scale(.94 .87)" fill="none" stroke="#a77b2c" stroke-width="3.5"/></svg>')
     inner = (f'<div style="position:absolute;left:0;right:0;top:70px;text-align:center;font-family:Marcellus;'
-             f'font-size:210px;line-height:1.05;color:#5a0d1a;letter-spacing:4px">{E(T["hall"])}</div>'
+             f'font-size:210px;line-height:1.05;color:{MAROON_LO};letter-spacing:4px">{E(T["hall"])}</div>'
              f'<div style="position:absolute;left:0;right:0;top:300px;text-align:center;font-family:Marcellus;'
-             f'font-size:150px;line-height:1.1;color:#7a1626;letter-spacing:3px">{E(T["floor"])}</div>')
+             f'font-size:150px;line-height:1.1;color:{MAROON};letter-spacing:3px">{E(T["floor"])}</div>')
     if direction:                                         # the arrow, centred under the floor
         inner += f'<div style="position:absolute;left:0;right:0;top:{530 if direction != "up" else 505}px;text-align:center">{arrow(direction)}</div>'
     return f'<div style="position:absolute;left:{x0}px;top:{top}px;width:{pw}px;height:{ph}px">{svg}{inner}</div>'
 
 def sign(direction=None):
     brocade = ('<svg style="position:absolute;inset:0" width="100%" height="100%"><defs><pattern id="br" width="130" height="170" '
-               'patternUnits="userSpaceOnUse">' + paisley(24, 40, 1.3, -20, "rgba(0,0,0,.17)") + paisley(89, 125, 1.3, -20, "rgba(0,0,0,.17)") +
+               'patternUnits="userSpaceOnUse">' + paisley(24, 40, 1.3, -20, "rgba(0,0,0,.12)") + paisley(89, 125, 1.3, -20, "rgba(0,0,0,.12)") +
                '</pattern></defs><rect width="100%" height="100%" fill="url(#br)"/></svg>')
-    grain = ('<svg style="position:absolute;inset:0;mix-blend-mode:multiply;opacity:.16" width="100%" height="100%"><filter id="g">'
+    grain = ('<svg style="position:absolute;inset:0;mix-blend-mode:multiply;opacity:.08" width="100%" height="100%"><filter id="g">'
              '<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" seed="7"/><feColorMatrix values="0 0 0 0 .5 0 0 0 0 .45 '
              '0 0 0 0 .4 0 0 0 .9 0"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>')
-    b = [brocade, grain, frame(W, H)]
+    b = [frame(W, H)]                      # everything from here sits inside the trim
     b.append(masked("toranam", 220, 205, 1960, 693))
     b.append(masked("ganesha", 1050, 470, 300, 390))
     b.append(f'<div class="c foil" style="top:880px;font-family:\'Tiro Telugu\';font-size:120px">{E(T["te"])}</div>')
@@ -144,14 +151,15 @@ def sign(direction=None):
     b.append(f'<img src="{pk}" style="position:absolute;right:150px;top:2560px;height:880px;filter:drop-shadow(0 10px 18px rgba(0,0,0,.45))">')
     b.append(plaque(2660 if direction is None else 2600, direction))
     css = (font("Alex Brush") + font("Tiro Telugu") + font("Marcellus") + font("Karla", 500) +
-           f"*{{margin:0;padding:0;box-sizing:border-box}}html,body{{width:{W}px;height:{H}px;overflow:hidden}}"
-           f"body{{position:relative;background:radial-gradient(120% 85% at 50% 40%,#7a1626 0%,#5a0d1a 55%,#3f0812 100%)}}"
+           f"*{{margin:0;padding:0;box-sizing:border-box}}html,body{{width:{W+2*BLEED}px;height:{H+2*BLEED}px;overflow:hidden}}"
+           f"body{{position:relative;background:radial-gradient(120% 85% at 50% 40%,{MAROON_HI} 0%,{MAROON} 55%,{MAROON_LO} 100%)}}"
            f".c{{position:absolute;left:0;right:0;text-align:center}}"
            f".foil{{background:{FOIL};-webkit-background-clip:text;background-clip:text;color:transparent;"
            f"filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(0 -1px 0 rgba(255,236,190,.25))}}"
            f".foil-img{{background:{FOIL};filter:drop-shadow(0 4px 0 rgba(0,0,0,.45))}}"
-           f"@page{{size:24in 36in;margin:0}}")
-    return f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{"".join(b)}</body></html>'
+           f"@page{{size:{(W+2*BLEED)/100}in {(H+2*BLEED)/100}in;margin:0}}")
+    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{brocade}{grain}'
+            f'<div id="trim" style="position:absolute;left:{BLEED}px;top:{BLEED}px;width:{W}px;height:{H}px">{"".join(b)}</div></body></html>')
 
 names = []
 for d in (None, "left", "right", "up"):
