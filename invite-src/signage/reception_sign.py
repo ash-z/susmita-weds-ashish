@@ -143,8 +143,9 @@ def sign():
     b.append(f'<div class="c" style="top:1012px;font-family:Marcellus;font-size:165px;letter-spacing:24px;text-indent:24px;color:{MAROON}">{E(T["heading"].upper())}</div>')
     # the engagement portrait
     b.append(photo(1215, w=1070, h=1320))
-    b.append(f'<div class="c" style="top:2545px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1;color:{MAROON}">{E(T["bride"])}'
-             f'<span style="font-family:Marcellus;font-size:100px;margin:0 50px;vertical-align:middle;color:{GOLD}">&amp;</span>{E(T["groom"])}</div>')
+    # the couple asked for the groom first on this board
+    b.append(f'<div class="c" style="top:2545px;font-family:\'Alex Brush\';font-size:230px;line-height:1.1;color:{MAROON}">{E(T["groom"])}'
+             f'<span style="font-family:Marcellus;font-size:100px;margin:0 50px;vertical-align:middle;color:{GOLD}">&amp;</span>{E(T["bride"])}</div>')
     b.append(f'<div class="c" style="top:2795px;font-family:Marcellus;font-size:64px;letter-spacing:3px;color:{MAROON_LO}">{E(T["when"])}</div>')
     b.append(f'<div class="c" style="top:2885px;font-family:Marcellus;font-size:72px;letter-spacing:6px;color:{GOLD}">{E(T["hotel"].upper())}</div>')
     b.append(plaque(3002))

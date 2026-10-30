@@ -130,7 +130,7 @@ Fonts subsets in `poster/fonts/` (fetches new ones only when the text changes) a
 **Reception welcome sign** (30 Oct, for printing; not on the site): a 24 × 36 in board for outside the hall, made by
 `invite-src/signage/reception_sign.py` → `signage/out/reception-sign.{png,pdf}` (out/ is gitignored; the PDF carries
 5 mm bleed). Toranam with Ganesha, రిసెప్షన్ / RECEPTION, the engagement portrait (the cover crop, larger) in the
-arch, the names on one line, date, hotel, and a maroon plaque with ‘Vedha’ / 5th Floor. The couple's calls: no arrows,
+arch, the names on one line (groom first, at the couple's request), date, hotel, and a maroon plaque with ‘Vedha’ / 5th Floor. The couple's calls: no arrows,
 no peacocks; it's a daytime reception and the board stands outdoors, so ivory with maroon type and deep-gold ornament
 (the earlier maroon-and-gold board was dropped). Colours are kept inside the CMYK gamut (soft-proofed against a press
 profile): the site's deep maroons print as muddy brown. The toranam and Ganesha are traced to vector outlines
