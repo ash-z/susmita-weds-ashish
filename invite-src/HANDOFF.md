@@ -127,6 +127,16 @@ when any detail changes; its wording and details are a copy of body.html's, so c
 Fonts subsets in `poster/fonts/` (fetches new ones only when the text changes) and renders the PNGs with
 `poster/render.mjs` (node + Playwright's Chromium).
 
+**Reception welcome sign** (30 Oct, for printing; not on the site): a 24 × 36 in board for outside the hall, made by
+`invite-src/signage/reception_sign.py` → `signage/out/reception-sign.{png,pdf}` (out/ is gitignored; the PDF carries
+5 mm bleed). Toranam with Ganesha, రిసెప్షన్ / RECEPTION, the engagement portrait (the cover crop, larger) in the
+arch, the names on one line, date, hotel, and a maroon plaque with ‘Vedha’ / 5th Floor. The couple's calls: no arrows,
+no peacocks; it's a daytime reception and the board stands outdoors, so ivory with maroon type and deep-gold ornament
+(the earlier maroon-and-gold board was dropped). Colours are kept inside the CMYK gamut (soft-proofed against a press
+profile): the site's deep maroons print as muddy brown. The toranam and Ganesha are traced to vector outlines
+(`signage/trace_art.py` → `signage/vector/`, committed) because the PNGs would print at ~65 dpi. The photo is a phone
+screenshot (~130 dpi at this size); if the couple upload the photographer's original, point `photo()` at it.
+
 ## Screens
 Invite (the sea) · Us (photo deck) · Wedding · Reception · RSVP · Blessings — six tabs, each its own full screen. Both tickets carry the same days/hours/mins/secs countdown.
 The friends' version adds a seventh, **Haldi** ("The day before"), between Us and Wedding: one ticket with the day's
