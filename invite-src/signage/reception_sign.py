@@ -130,9 +130,7 @@ def sign(direction=None):
     brocade = ('<svg style="position:absolute;inset:0" width="100%" height="100%"><defs><pattern id="br" width="130" height="170" '
                'patternUnits="userSpaceOnUse">' + paisley(24, 40, 1.3, -20, "rgba(0,0,0,.12)") + paisley(89, 125, 1.3, -20, "rgba(0,0,0,.12)") +
                '</pattern></defs><rect width="100%" height="100%" fill="url(#br)"/></svg>')
-    grain = ('<svg style="position:absolute;inset:0;mix-blend-mode:multiply;opacity:.08" width="100%" height="100%"><filter id="g">'
-             '<feTurbulence type="fractalNoise" baseFrequency=".8" numOctaves="3" seed="7"/><feColorMatrix values="0 0 0 0 .5 0 0 0 0 .45 '
-             '0 0 0 0 .4 0 0 0 .9 0"/></filter><rect width="100%" height="100%" filter="url(#g)"/></svg>')
+    # (no paper grain: it barely shows in print and turns the PDF into a 150 MB full-page bitmap)
     b = [frame(W, H)]                      # everything from here sits inside the trim
     b.append(masked("toranam", 220, 205, 1960, 693))
     b.append(masked("ganesha", 1050, 470, 300, 390))
@@ -158,7 +156,7 @@ def sign(direction=None):
            f"filter:drop-shadow(0 3px 0 rgba(0,0,0,.45)) drop-shadow(0 -1px 0 rgba(255,236,190,.25))}}"
            f".foil-img{{background:{FOIL};filter:drop-shadow(0 4px 0 rgba(0,0,0,.45))}}"
            f"@page{{size:{(W+2*BLEED)/100}in {(H+2*BLEED)/100}in;margin:0}}")
-    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{brocade}{grain}'
+    return (f'<!doctype html><html><head><meta charset="utf-8"><style>{css}</style></head><body>{brocade}'
             f'<div id="trim" style="position:absolute;left:{BLEED}px;top:{BLEED}px;width:{W}px;height:{H}px">{"".join(b)}</div></body></html>')
 
 names = []
