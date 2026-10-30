@@ -142,7 +142,12 @@ lotus / jasmine / lotus-leaf clusters off the corners and sides (the engagement'
 the couple drawn flat in a simple outlined style as at the engagement, full and round as they asked (Ashish: beard, grey-blue kurta, silver
 brocade jacket; Sai Susmita: green saree, pink blouse and pallu, jasmine in her bun; jasmine-and-lotus garlands).
 All vector, hand-drawn in the script (not traced from photos), so the PDF is ~1 MB. `common.py` holds the font
-subsetting and page geometry both boards share.
+subsetting and page geometry the boards share.
+A third, the couple's "typical Indian reception flexi, made minimal": `signage/reception_flexi.py` →
+`out/reception-flexi.{png,pdf}`. Ivory, three colours (maroon, gold, a touch of marigold), the toranam reduced to a gold
+string of outlined mango leaves and marigold dots, small Ganesha, రిసెప్షన్ / RECEPTION, the engagement portrait large
+in a tall temple arch drawn as one gold line (cropped clear of the backdrop's painted figure), the names, date, and
+‘Vedha’ · 5th Floor large, Hotel Tulip Grand, a thin gold keyline round the board.
 
 ## Screens
 Invite (the sea) · Us (photo deck) · Wedding · Reception · RSVP · Blessings — six tabs, each its own full screen. Both tickets carry the same days/hours/mins/secs countdown.
