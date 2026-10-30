@@ -1,0 +1,7 @@
+{
+  "name": "invite-src",
+  "private": true,
+  "description": "Build sources for docs/index.html (the wedding invitation).",
+  "scripts": { "build": "python3 build.py" },
+  "devDependencies": { "esbuild": "0.28.2", "three": "0.186.0" }
+}

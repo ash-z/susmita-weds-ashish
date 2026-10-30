@@ -19,6 +19,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
+// serve the three.js ES module build (and its addons) straight from node_modules
+app.use('/vendor/three/build', express.static(path.join(__dirname, 'node_modules/three/build')));
+app.use('/vendor/three/addons', express.static(path.join(__dirname, 'node_modules/three/examples/jsm')));
+
 app.use('/', indexRouter);
 app.use('/users', usersRouter);
 
